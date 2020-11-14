@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/client.dir/main.cpp.o CMakeFiles/client.dir/FileWatcher.cpp.o CMakeFiles/client.dir/FSElement.cpp.o CMakeFiles/client.dir/Message.cpp.o CMakeFiles/client.dir/Client.cpp.o  -o client  /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.71.0 /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so -lpthread 
