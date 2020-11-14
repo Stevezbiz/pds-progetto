@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/Client.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir/Client.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/FSElement.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir/FSElement.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/FileWatcher.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir/FileWatcher.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/Message.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir/Message.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/main.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir/main.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/client/Client.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/CMakeFiles/client.dir/Client.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/client/FSElement.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/CMakeFiles/client.dir/FSElement.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/client/FileWatcher.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/CMakeFiles/client.dir/FileWatcher.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/client/Message.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/CMakeFiles/client.dir/Message.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/client/main.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/CMakeFiles/client.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

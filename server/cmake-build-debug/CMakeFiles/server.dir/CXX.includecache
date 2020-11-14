@@ -6,27 +6,45 @@
 
 #IncludeRegexTransform: 
 
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp
+Message.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Message.h
+utility
+-
+cstring
+-
+
+/home/stevezbiz/CLionProjects/pds-progetto/server/Message.h
 string
 -
 
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.h
-Session.h
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp
+Server.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Server.h
 
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Server.h
+Session.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Session.h
+
+/home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp
+iostream
+-
+Session.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Session.h
+
+/home/stevezbiz/CLionProjects/pds-progetto/server/Session.h
 Message.h
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Message.h
 boost/asio.hpp
 -
 deque
 -
 
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/main.cpp
+/home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp
 iostream
 -
 list
 -
 Server.h
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.h
+/home/stevezbiz/CLionProjects/pds-progetto/server/Server.h
 

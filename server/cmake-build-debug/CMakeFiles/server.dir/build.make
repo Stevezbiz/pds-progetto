@@ -63,10 +63,10 @@ RM = /opt/clion-2020.2.3/bin/cmake/linux/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server
+CMAKE_SOURCE_DIR = /home/stevezbiz/CLionProjects/pds-progetto/server
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug
+CMAKE_BINARY_DIR = /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/server.dir/depend.make
@@ -79,55 +79,55 @@ include CMakeFiles/server.dir/flags.make
 
 CMakeFiles/server.dir/main.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/server.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/main.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/server.dir/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/main.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp
 
 CMakeFiles/server.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/main.cpp > CMakeFiles/server.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp > CMakeFiles/server.dir/main.cpp.i
 
 CMakeFiles/server.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/main.cpp -o CMakeFiles/server.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp -o CMakeFiles/server.dir/main.cpp.s
 
 CMakeFiles/server.dir/Message.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/Message.cpp.o: ../Message.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/server.dir/Message.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Message.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/server.dir/Message.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Message.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp
 
 CMakeFiles/server.dir/Message.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/Message.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.cpp > CMakeFiles/server.dir/Message.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp > CMakeFiles/server.dir/Message.cpp.i
 
 CMakeFiles/server.dir/Message.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/Message.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.cpp -o CMakeFiles/server.dir/Message.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp -o CMakeFiles/server.dir/Message.cpp.s
 
 CMakeFiles/server.dir/Server.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/Server.cpp.o: ../Server.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/server.dir/Server.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Server.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/server.dir/Server.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Server.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp
 
 CMakeFiles/server.dir/Server.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/Server.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.cpp > CMakeFiles/server.dir/Server.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp > CMakeFiles/server.dir/Server.cpp.i
 
 CMakeFiles/server.dir/Server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/Server.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.cpp -o CMakeFiles/server.dir/Server.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp -o CMakeFiles/server.dir/Server.cpp.s
 
 CMakeFiles/server.dir/Session.cpp.o: CMakeFiles/server.dir/flags.make
 CMakeFiles/server.dir/Session.cpp.o: ../Session.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/server.dir/Session.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Session.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/server.dir/Session.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/server.dir/Session.cpp.o -c /home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp
 
 CMakeFiles/server.dir/Session.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/server.dir/Session.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.cpp > CMakeFiles/server.dir/Session.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp > CMakeFiles/server.dir/Session.cpp.i
 
 CMakeFiles/server.dir/Session.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/server.dir/Session.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.cpp -o CMakeFiles/server.dir/Session.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp -o CMakeFiles/server.dir/Session.cpp.s
 
 # Object files for target server
 server_OBJECTS = \
@@ -149,7 +149,7 @@ server: /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0
 server: /usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.71.0
 server: /usr/lib/x86_64-linux-gnu/libboost_atomic.so.1.71.0
 server: CMakeFiles/server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -162,6 +162,6 @@ CMakeFiles/server.dir/clean:
 .PHONY : CMakeFiles/server.dir/clean
 
 CMakeFiles/server.dir/depend:
-	cd /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug /home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles/server.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/stevezbiz/CLionProjects/pds-progetto/server /home/stevezbiz/CLionProjects/pds-progetto/server /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/server.dir/depend
 

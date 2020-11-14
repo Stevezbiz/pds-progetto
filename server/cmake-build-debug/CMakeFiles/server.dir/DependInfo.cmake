@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Message.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles/server.dir/Message.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Server.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles/server.dir/Server.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/Session.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles/server.dir/Session.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/main.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/server/cmake-build-debug/CMakeFiles/server.dir/main.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Message.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Server.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Session.cpp.o"
+  "/home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
