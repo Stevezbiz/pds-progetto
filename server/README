@@ -1,8 +1,0 @@
-I messaggi devono essere divisi in:
-- header: contiene body_length
-- body
-In questo modo si può far si che alla ricezione di un messaggio seguano due letture ordinate di header e body in loop
-per ogni messaggio ricevuto:
-1 - event(message recv)
-2 - handle read header -> async read(handle read body)
-3 - handle read body -> async read(handle read header)

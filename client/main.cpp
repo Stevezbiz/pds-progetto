@@ -1,13 +1,17 @@
 #include <iostream>
 #include <thread>
+#include <utility>
 #include "Client.h"
 #include "FileWatcher.h"
 
-namespace fs = boost::filesystem;
-
-void startFileWatcher(Client &client) {
-    FileWatcher fw{".", std::chrono::milliseconds(1000)};
-    fw.start([&client](const std::string& path_to_watch, ElementStatus status) -> void {
+/**
+ * Il file watcher viene avviato e lancerà le azioni da compiere nell'handler
+ * @param client: l'oggetto Client che si occupa di inviare messaggi al server
+ * @param directory: la directory che il file watcher deve monitorare
+ */
+void startFileWatcher(Client &client, std::string directory) {
+    FileWatcher fw{std::move(directory), std::chrono::milliseconds(1000)};
+    fw.start([&client](const std::string &path_to_watch, ElementStatus status) -> void {
         std::ostringstream os;
         switch (status) {
             case ElementStatus::erasedFile:
@@ -37,8 +41,8 @@ void startFileWatcher(Client &client) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <host> <port>" << std::endl;
+    if (argc != 4) {
+        std::cerr << "Usage: " << argv[0] << " <directory> <host> <port>" << std::endl;
         exit(-1);
     }
     try {
@@ -46,10 +50,10 @@ int main(int argc, char **argv) {
         boost::asio::ip::tcp::resolver resolver(ctx);
         auto endpoint_iterator = resolver.resolve({argv[1], argv[2]});
         Client client(ctx, endpoint_iterator);
-        std::thread t([&ctx](){
+        std::thread t([&ctx]() {
             ctx.run();
         });
-        startFileWatcher(client);
+        startFileWatcher(client, argv[3]);
         client.close();
         t.join();
     } catch (std::exception &e) {

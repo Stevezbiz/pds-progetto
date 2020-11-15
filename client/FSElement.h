@@ -23,7 +23,9 @@ class FSElement {
 
 public:
     FSElement(boost::filesystem::path path, ElementType type, time_t last_write_time);
+
     bool isOld(time_t lwt);
+
     bool needUpdate();
 
     ElementType getType();
