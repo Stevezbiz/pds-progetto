@@ -108,7 +108,7 @@ void Session::authenticate_client() {
 bool Session::do_authenticate(std::string username, const std::string &password) {
     sqlite3 *db;
     // apro il database
-    if (sqlite3_open("tutorial.db", &db) != SQLITE_OK) {
+    if (sqlite3_open_v2("tutorial.db", &db, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK) {
         return false;
     }
     // definisco la query al database
@@ -139,6 +139,9 @@ bool Session::do_authenticate(std::string username, const std::string &password)
             return false;
     }
     if (sqlite3_finalize(query) != SQLITE_OK) {
+        return false;
+    }
+    if(sqlite3_close_v2(db) != SQLITE_OK){
         return false;
     }
     user_ = username;
