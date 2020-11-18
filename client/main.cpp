@@ -42,20 +42,27 @@ void startFileWatcher(Client &client, std::string directory) {
 
 int main(int argc, char **argv) {
     if (argc != 4) {
-        std::cerr << "Usage: " << argv[0] << " <directory> <host> <port>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << "<host> <port> <directory> " << std::endl;
         exit(-1);
     }
+    auto address = argv[1];
+    auto port = argv[2];
+    auto pathWatcher = argv[3];
+    auto filePath = argv[4];
+
     try {
         boost::asio::io_context ctx;
         boost::asio::ip::tcp::resolver resolver(ctx);
-        auto endpoint_iterator = resolver.resolve({argv[1], argv[2]});
+        auto endpoint_iterator = resolver.resolve({address, port});
         Client client(ctx, endpoint_iterator);
         std::thread t([&ctx]() {
             ctx.run();
         });
-        startFileWatcher(client, argv[3]);
-        client.close();
+        //startFileWatcher(client, pathWatcher);
+        //client.close();
         t.join();
+    } catch (std::fstream::failure &e) {
+        std::cerr << e.what() << "\n";
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }

@@ -1,4 +1,4 @@
-# Install script for directory: /home/stevezbiz/CLionProjects/pds-progetto/client
+# Install script for directory: /home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/client
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/stevezbiz/CLionProjects/pds-progetto/client/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/client/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
