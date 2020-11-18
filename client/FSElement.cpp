@@ -10,11 +10,21 @@
 
 namespace fs = boost::filesystem;
 
-FSElement::FSElement(fs::path path, ElementType type, time_t last_write_time) : path_(std::move(path)), type_(type),
-                                                                                last_write_time_(last_write_time) {
+/**
+ * Inizializza i campi dell'oggetto e ne calcola anche l'hash
+ * @param path: il path del file/directory
+ * @param type: il tipo dell'elemento (file/directory)
+ * @param last_write_time: l'ultima modifica del file
+ */
+FSElement::FSElement(fs::path path, ElementType type, time_t last_write_time) :
+        path_(std::move(path)), type_(type), last_write_time_(last_write_time) {
     SHA256();
 }
 
+/**
+ * Calcola l'hash di un file utilizzando SHA256 implementato in openssl
+ * Per uniformità viene calcolato anche l'hash per una directory, utilizzando il suo nome
+ */
 void FSElement::SHA256() {
     if (type_ == ElementType::dir) {
         std::size_t buf_size{path_.leaf().string().length()};
@@ -66,6 +76,12 @@ void FSElement::SHA256() {
     }
 }
 
+/**
+ * Verifica se un elemento è stato aggiornato dall'ultimo check e riscrive la data di ultima modifica
+ * La modifica effettiva però è verificata dalla funzione needUpdate()
+ * @param lwt: data di ultima modifica effettiva
+ * @return True se l'elemento non è aggiornato
+ */
 bool FSElement::isOld(time_t lwt) {
     if (last_write_time_ == lwt) {
         return false;
@@ -75,6 +91,10 @@ bool FSElement::isOld(time_t lwt) {
     }
 }
 
+/**
+ * Ricalcola l'hash dell'elemento e verifica così se l'elemento è stato effettivamente modificato
+ * @return True se l'elemento è stato modificato
+ */
 bool FSElement::needUpdate() {
     std::string old = hash_;
     SHA256();
@@ -85,6 +105,10 @@ bool FSElement::needUpdate() {
     }
 }
 
+/**
+ * Getter del campo type_
+ * @return type_
+ */
 ElementType FSElement::getType() {
     return type_;
 }

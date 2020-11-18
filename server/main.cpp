@@ -1,9 +1,7 @@
 #include <iostream>
-#include <list>
 #include "Server.h"
 
 int main(int argc, char **argv) {
-    // Paolo Gastaldi puzza
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <port>" << std::endl;
         exit(-1);

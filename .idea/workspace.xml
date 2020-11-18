@@ -27,7 +27,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="" />
+    <list default="true" id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/.idea/vcs.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,7 +64,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/client" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
@@ -90,6 +95,8 @@
       <workItem from="1604667882641" duration="688000" />
       <workItem from="1604739188216" duration="79000" />
       <workItem from="1604767174115" duration="954000" />
+      <workItem from="1605375608861" duration="643000" />
+      <workItem from="1605430951786" duration="729000" />
     </task>
     <task id="LOCAL-00001" summary="added rudimental file watcher">
       <created>1604422706637</created>
@@ -148,10 +155,11 @@
       <screen x="64" y="27" width="1856" height="933" />
     </state>
     <state x="240" y="109" width="1484" height="783" key="DiffContextDialog/64.27.1856.933@64.27.1856.933" timestamp="1604767350481" />
-    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl" timestamp="1604739247996">
+    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605431626370">
       <screen x="64" y="27" width="1856" height="933" />
     </state>
-    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl/64.27.1856.933@64.27.1856.933" timestamp="1604739247996" />
+    <state x="775" y="249" key="FileChooserDialogImpl/64.27.1856.923@64.27.1856.923" timestamp="1605375633294" />
+    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl/64.27.1856.933@64.27.1856.933" timestamp="1605431626370" />
     <state x="587" y="229" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1604767411245">
       <screen x="64" y="27" width="1856" height="933" />
     </state>

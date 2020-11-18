@@ -4,12 +4,19 @@
 
 #include "Server.h"
 
-Server::Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint)
-        : acceptor_(io_service, endpoint),
-          socket_(io_service) {
+/**
+ * Inizializza i campi dell'oggetto e pone il server in attesa di accettare connessioni
+ * @param ctx: i servizi di I/O forniti
+ * @param endpoint: l'indirizzo e la porta a cui lanciare il server
+ */
+Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint)
+        : acceptor_(ctx, endpoint), socket_(ctx) {
     do_accept();
 }
 
+/**
+ * Accetta le connessioni dei client
+ */
 void Server::do_accept() {
     acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
         if (!ec) {
