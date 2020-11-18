@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <sqlite3.h>
 #include "Session.h"
 
 using namespace boost::asio;
@@ -14,9 +15,10 @@ using namespace boost::asio;
 Session::Session(ip::tcp::socket socket) : socket_(std::move(socket)) {}
 
 /**
- * Pone il server in ascolto di messaggi in arrivo dal client
+ * Dopo l'autenticazione del client pone il server in ascolto di messaggi in arrivo dal client
  */
 void Session::start() {
+    authenticate_client();
     do_read_header();
 }
 
@@ -80,4 +82,65 @@ void Session::do_write() {
 
                     }
                 });
+}
+
+/**
+ * Autentica il client tramite la verifica di username e password
+ */
+void Session::authenticate_client() {
+    std::string username;
+    std::string password;
+    // TODO: ricevo le credenziali dal client
+    if(do_authenticate(username, password)){
+        // TODO: invio l'esito positivo al client
+    } else {
+        // TODO: invio l'esito negativo al client
+        socket_.close();
+    }
+}
+
+/**
+ * Esamina il database per verificare le credenziali fornite dall'utente
+ * @param username: lo username digitata dall'utente
+ * @param password: la password digitata dall'utente
+ * @return: true se l'autenticazione è andata a buon fine
+ */
+bool Session::do_authenticate(std::string username, const std::string &password) {
+    sqlite3 *db;
+    // apro il database
+    if (sqlite3_open("tutorial.db", &db) != SQLITE_OK) {
+        return false;
+    }
+    // definisco la query al database
+    sqlite3_stmt *query;
+    if (sqlite3_prepare_v2(db, "SELECT Password FROM USERS WHERE Username = ?", -1, &query, nullptr) != SQLITE_OK) {
+        return false;
+    }
+    if (sqlite3_bind_text(query, 1, username.data(), -1, nullptr) != SQLITE_OK) {
+        return false;
+    }
+    // eseguo la query
+    if (sqlite3_step(query) != SQLITE_OK) {
+        return false;
+    }
+    int n = sqlite3_column_count(query);
+    std::string res;
+    // verifico l'esito della query
+    switch (n) {
+        case 0:
+            return false;
+        case 1:
+            res = reinterpret_cast<const char *>(sqlite3_column_text(query, 0));
+            if (res != password) {
+                return false;
+            }
+            break;
+        default:
+            return false;
+    }
+    if (sqlite3_finalize(query) != SQLITE_OK) {
+        return false;
+    }
+    user_ = username;
+    return true;
 }
