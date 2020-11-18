@@ -1,0 +1,7 @@
+/server/cmake-build-debug/server.cbp
+/server/CMakeLists.txt
+/server/cmake-build-debug/CMakeFiles/*
+
+/client/cmake-build-debug/server.cbp
+/client/CMakeLists.txt
+/client/cmake-build-debug/CMakeFiles/*
