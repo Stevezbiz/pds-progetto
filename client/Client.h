@@ -49,17 +49,7 @@ public:
     void close();
 };
 
-template<class Buffer>
-void Client::write_buffer(Buffer& t_buffer)
-{
-    //std::cout << "Write buffer" << std::endl;
-    boost::asio::async_write(socket_,
-                             t_buffer,
-                             [this](boost::system::error_code ec, size_t /*length*/)
-                             {
-                                 do_write_file(ec);
-                             });
-}
+
 
 
 #endif //CLIENT_CLIENT_H
