@@ -14,11 +14,11 @@ using namespace boost::asio;
 Client::Client(io_context &ctx, ip::tcp::resolver::iterator endpoint_iterator)
         : ctx_(ctx), socket_(ctx) {
 
-    m_path = "/home/carlo/CLion/CLionProjects/Progetto/filetransfer/test.txt";
-
     do_connect(std::move(endpoint_iterator));
 
-    openFile(m_path);
+    //set an example file path
+    m_path = "/home/carlo/test.txt";
+    open_file(m_path);
 }
 
 /**
@@ -50,8 +50,10 @@ void Client::do_connect(ip::tcp::resolver::iterator endpoint_iterator) {
     async_connect(socket_, std::move(endpoint_iterator),
                   [this](boost::system::error_code ec, const ip::tcp::resolver::iterator &it) {
                       if (!ec) {
+                          //use a connection to sent the file
                           if (m_path != "");
-                            writeBuffer(m_request);
+                            write_buffer(m_request);
+
                           do_read_header();
                       } else {
                           std::cout << "Coudn't connect to host. Please run server "
@@ -109,7 +111,7 @@ void Client::do_write() {
 /**
  * Open a file from a path and initialize asio::streambuf and ifstream
  */
-void Client::openFile(std::string const& t_path)
+void Client::open_file(std::string const& t_path)
 {
     m_sourceFile.open(t_path, std::ios_base::binary | std::ios_base::ate);
     if (m_sourceFile.fail()) {
@@ -130,7 +132,7 @@ void Client::openFile(std::string const& t_path)
  * Actural write in the socket using
  */
 
-void Client::doWriteFile(const boost::system::error_code& t_ec)
+void Client::do_write_file(const boost::system::error_code& t_ec)
 {
     if (!t_ec) {
         if (m_sourceFile) {
@@ -145,7 +147,7 @@ void Client::doWriteFile(const boost::system::error_code& t_ec)
             std::cout << ss.str() << std::endl;
 
             auto buf = boost::asio::buffer(m_buf.data(), static_cast<size_t>(m_sourceFile.gcount()));
-            writeBuffer(buf);
+            write_buffer(buf);
         }
     } else {
         std::cerr << "error writing in the socket" << std::endl;

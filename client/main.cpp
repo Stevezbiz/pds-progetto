@@ -58,7 +58,9 @@ int main(int argc, char **argv) {
         std::thread t([&ctx]() {
             ctx.run();
         });
-        //startFileWatcher(client, pathWatcher);
+
+        startFileWatcher(client, pathWatcher);
+        //temporarily disabled for full file submission before the client closes
         //client.close();
         t.join();
     } catch (std::fstream::failure &e) {

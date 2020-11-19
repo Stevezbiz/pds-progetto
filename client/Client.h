@@ -34,12 +34,12 @@ class Client {
 
     void do_write();
 
-    void openFile(std::string const& t_path);
+    void open_file(std::string const& t_path);
 
-    void doWriteFile(const boost::system::error_code& t_ec);
+    void do_write_file(const boost::system::error_code& t_ec);
 
     template<class Buffer>
-    void writeBuffer(Buffer& t_buffer);
+    void write_buffer(Buffer& t_buffer);
 
 public:
     Client(boost::asio::io_context &ctx, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
@@ -50,14 +50,14 @@ public:
 };
 
 template<class Buffer>
-void Client::writeBuffer(Buffer& t_buffer)
+void Client::write_buffer(Buffer& t_buffer)
 {
     //std::cout << "Write buffer" << std::endl;
     boost::asio::async_write(socket_,
                              t_buffer,
                              [this](boost::system::error_code ec, size_t /*length*/)
                              {
-                                 doWriteFile(ec);
+                                 do_write_file(ec);
                              });
 }
 
