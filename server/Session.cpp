@@ -17,7 +17,10 @@ Session::Session(ip::tcp::socket socket) : socket_(std::move(socket)) {}
  * Pone il server in ascolto di messaggi in arrivo dal client
  */
 void Session::start() {
-    do_read_header();
+    //
+    //do_read_header();
+
+    do_read_file();// -> read a file
 }
 
 /**
@@ -80,4 +83,83 @@ void Session::do_write() {
 
                     }
                 });
+}
+/**
+ * Legge il file in arrivo
+ */
+void Session::do_read_file()
+{
+    auto self = shared_from_this();
+    async_read_until(socket_, m_requestBuf_, "\n\n",
+                     [this, self](boost::system::error_code ec, size_t bytes)
+                     {
+                         if (!ec)
+                             process_read(bytes);
+                     });
+}
+/**
+ * Processa la lettura
+ */
+void Session::process_read(size_t t_bytesTransferred)
+{
+    std::istream requestStream(&m_requestBuf_);
+    //read first the file name and file size
+    do_read_file_header(requestStream);
+
+    auto pos = m_fileName.find_last_of('\\');
+    if (pos != std::string::npos)
+        m_fileName = m_fileName.substr(pos + 1);
+
+    create_file();
+
+    auto self = shared_from_this();
+    socket_.async_read_some(boost::asio::buffer(m_buf.data(), m_buf.size()),
+                             [this, self](boost::system::error_code ec, size_t bytes)
+                             {
+                                 if (!ec)
+                                     do_read_file_body(bytes);
+                             });
+    std::cout << "Transfer completed" <<std::endl;
+
+}
+
+void Session::do_read_file_header(std::istream &stream)
+{
+
+    stream >> m_fileName;
+    stream >> m_fileSize;
+    stream.read(m_buf.data(), 2);
+    std::cout << "Name File insert into stream: "<<m_fileName <<  "\nFile size: " << m_fileSize <<std::endl;
+}
+
+void Session::create_file()
+{
+    m_outputFile.open(m_fileName, std::ios_base::binary);
+    if (!m_outputFile) {
+        std::cerr << "ERROR CREATING NEW FILE"<< "\n";
+        return;
+    }
+
+}
+
+void Session::do_read_file_body(size_t t_bytesTransferred)
+{
+    if (t_bytesTransferred > 0) {
+        m_outputFile.write(m_buf.data(), static_cast<std::streamsize>(t_bytesTransferred));
+        //std::cout << "What i received: " << m_buf.data() << std::endl;
+
+        if (m_outputFile.tellp() >= static_cast<std::streamsize>(m_fileSize)) {
+            //I received the entire file, now is in server m_outputFile (ofstream)
+            //termination of the async recursive function
+            std::cout << "Received file: " << m_fileName << std::endl;
+            return;
+        }
+    }
+    //recursively call the doReadFileContent until the tranfer is completed
+    auto self = shared_from_this();
+    socket_.async_read_some(boost::asio::buffer(m_buf.data(), m_buf.size()),
+                             [this, self](boost::system::error_code ec, size_t bytes)
+                             {
+                                 do_read_file_body(bytes);
+                             });
 }

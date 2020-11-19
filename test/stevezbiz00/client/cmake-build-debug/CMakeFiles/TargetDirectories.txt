@@ -1,3 +1,0 @@
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/stevezbiz/CLionProjects/pds-progetto/test/stevezbiz00/client/cmake-build-debug/CMakeFiles/client.dir

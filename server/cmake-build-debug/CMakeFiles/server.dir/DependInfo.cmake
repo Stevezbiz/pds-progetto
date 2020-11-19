@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Message.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/server/Server.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Server.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Session.cpp.o"
-  "/home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp" "/home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/main.cpp.o"
+  "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/Message.cpp" "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Message.cpp.o"
+  "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/Server.cpp" "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Server.cpp.o"
+  "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/Session.cpp" "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/Session.cpp.o"
+  "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/main.cpp" "/home/carlo/CLion/CLionProjects/Progetto/git/branch_carlo/pds-progetto/server/cmake-build-debug/CMakeFiles/server.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -16,6 +16,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
   "BOOST_ALL_NO_LIB"
   "BOOST_ATOMIC_DYN_LINK"
   "BOOST_CHRONO_DYN_LINK"
+  "BOOST_FILESYSTEM_DYN_LINK"
   "BOOST_THREAD_DYN_LINK"
   "BOOST_TIMER_DYN_LINK"
   )
