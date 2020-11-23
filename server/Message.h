@@ -40,12 +40,19 @@ enum MESSAGE_TYPE : int {
  * @version 1.0.0
  */
 class Message {
-    enum {
-        type_length = sizeof(int),
+    enum lengths {
+        type_length = sizeof(typeof(MESSAGE_TYPE)),
         length_length = sizeof(size_t)
     };
 
-    Message(MESSAGE_TYPE code = ERROR) : code(code), status(true) {}
+    struct struct_header_buffer {
+        MESSAGE_TYPE type;
+        size_t length;
+    };
+
+    ~Message() {
+        delete this->content_buffer;
+    }
 
     friend class boost::serialization::access;
 
@@ -54,9 +61,12 @@ public:
     std::string username, password;
     std::string path, hash;
     std::vector<std::string> paths;
-    std::vector<std::string> hashes;
+    std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
     bool status; // = okay
+
+    struct_header_buffer *header_buffer;
+    char *content_buffer;
 
     /**
      * send this message
@@ -81,9 +91,9 @@ public:
 
         // concat buffers into a vector
         std::vector<boost::asio::const_buffer> out_buffers;
-        out_buffers.push_back(boost::asio::buffer(type_data));
-        out_buffers.push_back(boost::asio::buffer(length_data));
-        out_buffers.push_back(boost::asio::buffer(value_data));
+        out_buffers.emplace_back(boost::asio::buffer(type_data));
+        out_buffers.emplace_back(boost::asio::buffer(length_data));
+        out_buffers.emplace_back(boost::asio::buffer(value_data));
 
         return out_buffers;
     }
@@ -92,54 +102,20 @@ public:
      * check if the inner status is okay
      * @return boolean
      */
-    bool isOkay() { return this->status; }
+    [[nodiscard]] bool isOkay() const { return this->status; }
 
-    /**
-     * build a message from the TCP stream received
-     * @param in_stream
-     */
-    Message(std::istream in_stream) : Message() {
-        std::istringstream archive_stream{};
-        boost::archive::text_iarchive ia{ in_stream };
-
-        MESSAGE_TYPE code;
-        ia >> this->code;
-        switch(code) {
-            case OKAY:
-                ia >> this->okay;
-                break;
-            case LOGIN:
-                ia >> this->username;
-                ia >> this->password;
-                break;
-            case PROBE:
-                ia >> this->paths;
-                break;
-            case PROBE_CONTENT:
-                ia >> this->hashes;
-                break;
-            case GET:
-                ia >> this->path;
-                break;
-            case GET_CONTENT:
-                ia >> this->file;
-            case PUSH:
-                ia >> this->path;
-                ia >> this->file;
-                ia >> this->hash;
-                break;
-            default:
-                this->status = false;
-        }
+    explicit Message(MESSAGE_TYPE code = ERROR) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr) {
+        if(code == ERROR)
+            status = false;
     }
 
     /**
      * create a message to say everything is okay
      * @return new message
      */
-    static std::vector<boost::asio::const_buffer> okay() {
-        Message message{ OKAY };
-        return message.send();
+    static Message *okay() {
+        auto message = new Message{ OKAY };
+        return message;
     }
 
     /**
@@ -148,23 +124,24 @@ public:
      * @param password
      * @return new message
      */
-    static std::vector<boost::asio::const_buffer> login(std::string username = "", std::string password = "") {
-        Message message{ LOGIN };
-        message.username = username;
-        message.password = password;
-        return message.send();
+    static Message *login(const std::string &username = "", const std::string &password = "") {
+        auto message = new Message{ LOGIN };
+        message->username = username;
+        message->password = password;
+        return message;
     }
 
     /**
      * create a message to send a probe command
      * a probe command gets a list of versions for all the given paths
+     * it retrives a map <path, version>
      * @param paths
      * @return new message
      */
-    static std::vector<boost::asio::const_buffer> probe(std::vector<std::string> paths) {
-        Message message{ PROBE };
-        message.paths = paths;
-        return message.send();
+    static Message *probe(const std::vector<std::string> &paths) {
+        auto message = new Message{ PROBE };
+        message->paths = paths;
+        return message;
     }
 
     /**
@@ -172,10 +149,10 @@ public:
      * @param path
      * @return new message
      */
-    static std::vector<boost::asio::const_buffer> get(std::string path = "") {
-        Message message{ GET };
-        message.path = path;
-        return message.send();
+    static Message *get(const std::string &path = "") {
+        auto message = new Message{ GET };
+        message->path = path;
+        return message;
     }
 
     /**
@@ -187,12 +164,12 @@ public:
      *
      * DO NOT change the params order, no default value for the std::iostream
      */
-    static std::vector<boost::asio::const_buffer> push(std::iostream file, std::string path = "", std::string hash = "") {
-        Message message{ PUSH };
-        message.file = std::vector<unsigned char>{ std::istreambuf_iterator<char>(file), {} };
-        message.path = path;
-        message.hash = hash;
-        return message.send();
+    static Message *push(std::istream &file, const std::string &path = "", const std::string &hash = "") {
+        auto message = new Message{ PUSH };
+        message->file = std::vector<unsigned char>{ std::istreambuf_iterator<char>(file), {} };
+        message->path = path;
+        message->hash = hash;
+        return message;
     }
 
     /**
@@ -200,9 +177,45 @@ public:
      * il returns the list of paths you have to ask to (with the get(...) method)
      * @return new message
      */
-    static std::vector<boost::asio::const_buffer> restore() {
-        Message message{ RESTORE };
-        return message.send();
+    static Message *restore() {
+        auto message = new Message{ RESTORE };
+        return message;
+    }
+
+    /**
+     * fill message fields
+     * @return modified message or new message
+     */
+    Message *build() {
+        if(this->content_buffer == nullptr) { // if only the header has been received
+            this->code = this->header_buffer->type;
+            this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
+            return this;
+        }
+
+        // else if the content as been received
+        std::stringstream ss{ this->content_buffer };
+        boost::archive::text_iarchive ia{ ss };
+        auto *new_message = new Message{};
+        ia >> *new_message; // de-serialization
+        return new_message;
+    }
+
+    /**
+     * get the header buffer
+     * the header is made up by "type" and "length" of the message
+     * @return header buffer
+     */
+    [[nodiscard]] boost::asio::const_buffer get_header_buffer() const { // generic pointer, sorry
+        return boost::asio::const_buffer(this->header_buffer, sizeof(struct_header_buffer));
+    }
+
+    /**
+     * get the content buffer
+     * @return content buffer
+     */
+    [[nodiscard]] boost::asio::const_buffer get_content_buffer() const { // generic pointer, sorry
+        return boost::asio::const_buffer(this->content_buffer, sizeof(this->header_buffer->length));
     }
 };
 
