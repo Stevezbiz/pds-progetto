@@ -56,7 +56,13 @@ class Client_API {
     }
 
 public:
-    explicit Client_API(Socket_API *api, std::function<std::string(std::ifstream &)> hash_function, std::string &&root_path = ".") : api(api), hash_function(std::move(hash_function)), root_path(fs::path{ root_path }) {}
+    /**
+     * class constructor
+     * @param socket_api
+     * @param hash_function
+     * @param root_path
+     */
+    explicit Client_API(Socket_API *socket_api, std::function<std::string(std::ifstream &)> hash_function, std::string &&root_path = ".") : api(socket_api), hash_function(std::move(hash_function)), root_path(fs::path{ root_path }) {}
 
     /**
      * do the login complete procedure:
@@ -80,8 +86,10 @@ public:
 
     /**
      * do the complete probe procedure:
-     * 1-
-     * 2-
+     * 1- send a list of paths to the server
+     * 2- receive a map <path, hash>
+     * 3- compare the hash for each file and push all changes
+     *
      * @tparam Handler
      * @param map - <path, hash> mapping
      * @param handler
