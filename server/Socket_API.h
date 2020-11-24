@@ -86,6 +86,11 @@ public:
 
         return message->build(); // build the whole message
     }
+
+    ~Socket_API() {
+        if(this->socket_.is_open())
+            this->socket_.close();
+    }
 };
 
 
