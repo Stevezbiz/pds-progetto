@@ -121,7 +121,7 @@ public:
      * @return status
      */
     template <typename Handler>
-    bool do_push(std::istream &file, const std::string &path, const std::string &hash, Handler handler) {
+    bool do_push(const std::vector<unsigned char> file, const std::string &path, const std::string &hash, Handler handler) {
         auto req = Message::push(file, path, hash);
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ OKAY }, handler);
