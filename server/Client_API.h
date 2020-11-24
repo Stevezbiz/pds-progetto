@@ -10,31 +10,16 @@
 #include <vector>
 #include <functional>
 #include <boost/filesystem.hpp>
+#include "API.h"
 #include "Socket_API.h"
 
 namespace fs = boost::filesystem;
 
-class Client_API {
-    Socket_API *api;
+/**
+ * easy class to manage client-side protocol usage
+ */
+class Client_API : public API {
     std::function<std::string(std::ifstream &)> hash_function;
-    fs::path root_path;
-
-    /**
-     * save a file on disk
-     * the path is a relative path from the root_path
-     * @param message
-     * @return status
-     */
-    bool _save_file(Message *message) {
-        fs::path full_path = this->root_path / fs::path(message->path);
-        fs::ofstream os{ full_path };
-
-        char *file_buffer = reinterpret_cast<char *>(&(message->file[0]));
-        os << file_buffer;
-        os.close();
-
-        return true;
-    }
 
     /**
      * get a file from the server and save it
@@ -48,10 +33,10 @@ class Client_API {
         auto req = Message::get(path);
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ GET_CONTENT }, handler);
-        if(!res->isOkay())
+        if(!res->is_okay())
             return false;
 
-        if(!_save_file(res))
+        if(!this->_save_file(res))
             return false;
     }
 
@@ -62,7 +47,7 @@ public:
      * @param hash_function
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api, std::function<std::string(std::ifstream &)> hash_function, std::string &&root_path = ".") : api(socket_api), hash_function(std::move(hash_function)), root_path(fs::path{ root_path }) {}
+    explicit Client_API(Socket_API *socket_api, std::function<std::string(std::ifstream &)> hash_function, const std::string &root_path = ".") : API(api, root_path), hash_function(std::move(hash_function)) {}
 
     /**
      * do the login complete procedure:
@@ -81,7 +66,7 @@ public:
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ OKAY }, handler);
 
-        return res->isOkay();
+        return res->is_okay();
     }
 
     /**
@@ -105,7 +90,7 @@ public:
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ PROBE_CONTENT }, handler);
 
-        if(!res->isOkay())
+        if(!res->is_okay())
             return false;
 
         for(auto const &item : res->hashes) {
@@ -141,7 +126,7 @@ public:
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ OKAY }, handler);
 
-        return res->isOkay();
+        return res->is_okay();
     }
 
     /**
@@ -160,7 +145,7 @@ public:
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ RESTORE_CONTENT }, handler);
 
-        if(!res->isOkay())
+        if(!res->is_okay())
             return false;
 
         for(auto path : res->paths)
