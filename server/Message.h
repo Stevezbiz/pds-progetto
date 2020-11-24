@@ -102,7 +102,7 @@ public:
      * check if the inner status is okay
      * @return boolean
      */
-    [[nodiscard]] bool isOkay() const { return this->status; }
+    [[nodiscard]] bool is_okay() const { return this->status; }
 
     explicit Message(MESSAGE_TYPE code = ERROR) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr) {
         if(code == ERROR)
@@ -114,8 +114,15 @@ public:
      * @return new message
      */
     static Message *okay() {
-        auto message = new Message{ OKAY };
-        return message;
+        return new Message{ OKAY };
+    }
+
+    /**
+     * create a message to say something has gone wrong
+     * @return new message
+     */
+    static Message *error() {
+        return new Message{ ERROR };
     }
 
     /**
@@ -145,12 +152,36 @@ public:
     }
 
     /**
+     * create a message for a probe response
+     * @param hashes - <path, version>
+     * @return new message
+     */
+    static Message *probe_content(const std::map<std::string, std::string> &hashes) {
+        auto message = new Message{ PROBE_CONTENT };
+        message->hashes = hashes;
+        return message;
+    }
+
+    /**
      * create a message to retrieve a file with a specific path
      * @param path
      * @return new message
      */
     static Message *get(const std::string &path = "") {
         auto message = new Message{ GET };
+        message->path = path;
+        return message;
+    }
+
+    /**
+     * create a message for a get response
+     * @param file
+     * @param path
+     * @return new message
+     */
+    static Message *get_content(const std::vector<unsigned char> &file, const std::string &path) {
+        auto message = new Message{ GET_CONTENT };
+        message->file = file;
         message->path = path;
         return message;
     }
@@ -164,9 +195,9 @@ public:
      *
      * DO NOT change the params order, no default value for the std::iostream
      */
-    static Message *push(std::istream &file, const std::string &path = "", const std::string &hash = "") {
+    static Message *push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "") {
         auto message = new Message{ PUSH };
-        message->file = std::vector<unsigned char>{ std::istreambuf_iterator<char>(file), {} };
+        message->file = file;
         message->path = path;
         message->hash = hash;
         return message;
@@ -179,6 +210,17 @@ public:
      */
     static Message *restore() {
         auto message = new Message{ RESTORE };
+        return message;
+    }
+
+    /**
+     * create a message for a restore response
+     * @param paths
+     * @return new message
+     */
+    static Message *restore_content(const std::vector<std::string> &paths) {
+        auto message = new Message{ RESTORE_CONTENT };
+        message->paths = paths;
         return message;
     }
 
