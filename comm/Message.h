@@ -30,7 +30,8 @@ enum MESSAGE_TYPE : int {
     GET_CONTENT = 5,
     PUSH = 6,
     RESTORE = 7,
-    RESTORE_CONTENT = 8
+    RESTORE_CONTENT = 8,
+    END = 100
 };
 
 /**
@@ -222,6 +223,14 @@ public:
         auto message = new Message{ RESTORE_CONTENT };
         message->paths = paths;
         return message;
+    }
+
+    /**
+     * create a message for a end request
+     * @return new message
+     */
+    static Message *end() {
+        return new Message{ END };
     }
 
     /**

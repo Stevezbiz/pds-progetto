@@ -152,6 +152,24 @@ public:
 
         return true;
     }
+
+    /**
+     * do the end procedure:
+     * 1- send request to the server
+     * 2- receive server approval
+     *
+     * @tparam Handler
+     * @param handler
+     * @return status
+     */
+    template <typename Handler>
+    bool do_end(Handler handler) {
+        auto req = Message::end();
+        this->api->async_send(req, handler);
+        auto res = this->api->receive(new Message{ OKAY }, handler);
+
+        return res->is_okay();
+    }
 };
 
 

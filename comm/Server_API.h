@@ -26,6 +26,7 @@ class Server_API : public API {
     std::function<const std::vector<unsigned char> &(const std::string &)> get;
     std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
     std::function<const std::vector<std::string> &()> restore;
+    std::function<bool()> end;
 
     /**
      * manage login protocol procedure
@@ -75,6 +76,16 @@ class Server_API : public API {
     Message *do_restore(Message *req) {
         auto paths = this->restore();
         return Message::restore_content(paths);
+    }
+
+    /**
+     * manage end protocol procedure
+     * @param request message
+     * @return response message
+     */
+    Message *do_end(Message *req) {
+        auto status = this->end();
+        return status ? Message::okay() : Message::error();
     }
 
 public:
@@ -148,13 +159,26 @@ public:
     }
 
     /**
+     * set how to manage a end request
+     * @param end_function
+     * - input:
+     *      - (empty)
+     * - output:
+     *      - bool status
+     */
+    void set_end(const std::function<bool()> &end_function) {
+        this->end = end_function;
+    }
+
+    /**
      * start handling requests
      * @tparam Handler
      * @param handler
      */
     template <typename Handler>
     void run(Handler handler) {
-        while(true) {
+        bool stop = false;
+        while(!stop) {
             auto req = this->api->receive(new Message{ ERROR }, handler);
             Message *res;
 
@@ -174,6 +198,10 @@ public:
                     break;
                 case RESTORE:
                     res = this->do_restore(req);
+                    break;
+                case END:
+                    res = this->do_end(req);
+                    stop = true;
                     break;
                 default:
                     res = new Message{ ERROR };
