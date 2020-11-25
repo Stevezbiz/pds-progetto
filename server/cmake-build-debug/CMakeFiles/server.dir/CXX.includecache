@@ -6,14 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/stevezbiz/CLionProjects/pds-progetto/server/Message.cpp
-Message.h
-/home/stevezbiz/CLionProjects/pds-progetto/server/Message.h
-utility
--
-cstring
--
-
 /home/stevezbiz/CLionProjects/pds-progetto/server/Message.h
 string
 -
@@ -29,6 +21,8 @@ Session.h
 /home/stevezbiz/CLionProjects/pds-progetto/server/Session.cpp
 iostream
 -
+sqlite3.h
+-
 Session.h
 /home/stevezbiz/CLionProjects/pds-progetto/server/Session.h
 
@@ -42,8 +36,6 @@ deque
 
 /home/stevezbiz/CLionProjects/pds-progetto/server/main.cpp
 iostream
--
-list
 -
 Server.h
 /home/stevezbiz/CLionProjects/pds-progetto/server/Server.h

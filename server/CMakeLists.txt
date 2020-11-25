@@ -10,3 +10,5 @@ if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     target_link_libraries(server ${Boost_LIBRARIES})
 endif()
+
+target_link_libraries (server sqlite3)
