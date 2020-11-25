@@ -19,8 +19,6 @@ namespace fs = boost::filesystem;
  * easy class to manage client-side protocol usage
  */
 class Client_API : public API {
-    std::function<std::string(std::ifstream &)> hash_function;
-
     /**
      * get a file from the server and save it
      * @tparam Handler
@@ -44,10 +42,9 @@ public:
     /**
      * class constructor
      * @param socket_api
-     * @param hash_function
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api, std::function<std::string(std::ifstream &)> hash_function, const std::string &root_path = ".") : API(api, root_path), hash_function(std::move(hash_function)) {}
+    explicit Client_API(Socket_API *socket_api, const std::string &root_path = ".") : API(api, root_path) {}
 
     /**
      * do the login complete procedure:
@@ -94,11 +91,12 @@ public:
             return false;
 
         for(auto const &item : res->hashes) {
-            if(map[item.first] != item.second) { // check if the version is different
+            auto it = map.find(item.first);
+            if(it == map.end() || map[item.first] != item.second) { // check if the file not exists or if versions (hashes) are different
                 // if the client has a different file than the server, the client starts a push procedure
                 auto path = item.first;
                 fs::ifstream is{ path };
-                if(!this->do_push(path, is, hash_function(is), handler)) {
+                if(!this->do_push(path, is, map[path], handler)) {
                     is.close();
                     return false;
                 }
@@ -121,7 +119,7 @@ public:
      * @return status
      */
     template <typename Handler>
-    bool do_push(const std::vector<unsigned char> file, const std::string &path, const std::string &hash, Handler handler) {
+    bool do_push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, Handler handler) {
         auto req = Message::push(file, path, hash);
         this->api->async_send(req, handler);
         auto res = this->api->receive(new Message{ OKAY }, handler);
