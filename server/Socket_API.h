@@ -31,6 +31,8 @@ public:
      * @param socket
      */
     void set_socket(boost::asio::ip::tcp::socket &&socket) {
+        if(this->socket_.is_open())
+            this->socket_.close();
         this->socket_ = std::move(socket);
     }
 
@@ -38,8 +40,8 @@ public:
      * socket getter
      * @return socket
      */
-    boost::asio::ip::tcp::socket& get_socket() {
-        return socket_;
+    boost::asio::ip::tcp::socket &&get_socket() {
+        return std::move(this->socket_);
     }
 
     /**
