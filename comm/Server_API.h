@@ -94,7 +94,7 @@ public:
      * @param socket_api
      * @param user_root_path
      */
-    explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".") : API(api, user_root_path) {}
+    explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".") : API(socket_api, user_root_path) {}
 
     /**
      * set how to manage a login request
@@ -179,7 +179,7 @@ public:
     void run(Handler handler) {
         bool stop = false;
         while(!stop) {
-            auto req = this->api->receive(new Message{ ERROR }, handler);
+            auto req = this->api->receive(UNDEFINED, handler);
             Message *res;
 
             // manage the request and produce a response message

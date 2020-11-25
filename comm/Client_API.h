@@ -30,7 +30,7 @@ class Client_API : public API {
     bool _get_and_save(const std::string &path, Handler handler) {
         auto req = Message::get(path);
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ GET_CONTENT }, handler);
+        auto res = this->api->receive(GET_CONTENT, handler);
         if(!res->is_okay())
             return false;
 
@@ -44,7 +44,7 @@ public:
      * @param socket_api
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api, const std::string &root_path = ".") : API(api, root_path) {}
+    explicit Client_API(Socket_API *socket_api, const std::string &root_path = ".") : API(socket_api, root_path) {}
 
     /**
      * do the login complete procedure:
@@ -61,7 +61,7 @@ public:
     bool do_login(const std::string &username, const std::string &password, Handler handler) {
         auto req = Message::login(username, password);
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ OKAY }, handler);
+        auto res = this->api->receive(OKAY, handler);
 
         return res->is_okay();
     }
@@ -85,7 +85,7 @@ public:
             paths.push_back(item.first);
         auto req = Message::probe(paths);
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ PROBE_CONTENT }, handler);
+        auto res = this->api->receive(PROBE_CONTENT, handler);
 
         if(!res->is_okay())
             return false;
@@ -122,7 +122,7 @@ public:
     bool do_push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, Handler handler) {
         auto req = Message::push(file, path, hash);
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ OKAY }, handler);
+        auto res = this->api->receive(OKAY, handler);
 
         return res->is_okay();
     }
@@ -141,7 +141,7 @@ public:
     bool do_restore(Handler handler) {
         auto req = Message::restore();
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ RESTORE_CONTENT }, handler);
+        auto res = this->api->receive(RESTORE_CONTENT, handler);
 
         if(!res->is_okay())
             return false;
@@ -166,7 +166,7 @@ public:
     bool do_end(Handler handler) {
         auto req = Message::end();
         this->api->async_send(req, handler);
-        auto res = this->api->receive(new Message{ OKAY }, handler);
+        auto res = this->api->receive(OKAY, handler);
 
         return res->is_okay();
     }

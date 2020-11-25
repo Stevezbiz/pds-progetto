@@ -76,12 +76,12 @@ public:
      * @return message
      */
     template <typename Handler>
-    Message *receive(Message *expectedMessage = new Message{ ERROR }, Handler handler = generic_handler) {
+    Message *receive(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler = generic_handler) {
         auto message = new Message{};
         boost::asio::read(this->socket_, message->get_header_buffer(), handler);
 
         message->build(); // build the header
-        if(message->code != expectedMessage->code)
+        if(expectedMessage != UNDEFINED && message->code != expectedMessage)
             return new Message{ ERROR };
 
         boost::asio::read(socket_, message->get_content_buffer(), handler);
