@@ -59,8 +59,10 @@ Message *Message::okay() {
  * create a message to say something has gone wrong
  * @return new message
  */
-Message *Message::error() {
-    return new Message{ERROR};
+Message *Message::error(Comm_error &error) {
+    autom message = new Message{ERROR};
+    message->error = error;
+    return error;
 }
 
 /**

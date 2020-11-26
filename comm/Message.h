@@ -64,6 +64,7 @@ public:
     std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
     bool status; // = okay
+    Comm_error *error;
 
     struct_header_buffer *header_buffer;
     char *content_buffer;
@@ -76,7 +77,7 @@ public:
 
     static Message *okay();
 
-    static Message *error();
+    static Message *error(Comm_error &error = new Comm_error{});
 
     static Message *login(const std::string &username = "", const std::string &password = "");
 
