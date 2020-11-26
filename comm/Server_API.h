@@ -13,6 +13,7 @@
 #include "API.h"
 #include "Socket_API.h"
 #include "Message.h"
+#include "Comm_error.h"
 
 namespace fs = boost::filesystem;
 
