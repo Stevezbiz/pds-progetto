@@ -8,24 +8,13 @@
 
 using namespace boost::asio;
 
-/**
- * Inizializza i campi dell'oggetto
- * @param socket: socket su cui aprire la connessione
- */
 Session::Session(ip::tcp::socket socket) : socket_(std::move(socket)) {}
 
-/**
- * Dopo l'autenticazione del client pone il server in ascolto di messaggi in arrivo dal client
- */
 void Session::start() {
     authenticate_client();
     do_read_header();
 }
 
-/**
- * Invia un messaggio al client
- * @param msg: messaggio da inviare
- */
 void Session::write(const Message &msg) {
     bool write_in_progress = !write_msgs_.empty();
     write_msgs_.push_back(msg);
@@ -34,9 +23,6 @@ void Session::write(const Message &msg) {
     }
 }
 
-/**
- * Legge l'header del messaggio in arrivo, lo decodifica e lancia la lettura del body
- */
 void Session::do_read_header() {
     auto self(shared_from_this());
     async_read(socket_, buffer(read_msg_.getData(), Message::header_length),
@@ -49,9 +35,6 @@ void Session::do_read_header() {
                });
 }
 
-/**
- * Legge il body sulla base delle informazioni presenti nell'header e si pone in ascolto del prossimo header
- */
 void Session::do_read_body() {
     auto self(shared_from_this());
     async_read(socket_, buffer(read_msg_.getBody(), read_msg_.getBodyLength()),
@@ -66,9 +49,6 @@ void Session::do_read_body() {
                });
 }
 
-/**
- * Esegue l'invio di un messaggio al client
- */
 void Session::do_write() {
     auto self(shared_from_this());
     async_write(socket_, buffer(write_msgs_.front().getData(), write_msgs_.front().getLength()),
@@ -84,9 +64,6 @@ void Session::do_write() {
                 });
 }
 
-/**
- * Autentica il client tramite la verifica di username e password
- */
 void Session::authenticate_client() {
     std::string username;
     std::string password;
@@ -99,12 +76,6 @@ void Session::authenticate_client() {
     }
 }
 
-/**
- * Esamina il database per verificare le credenziali fornite dall'utente
- * @param username: lo username digitata dall'utente
- * @param password: la password digitata dall'utente
- * @return: true se l'autenticazione è andata a buon fine
- */
 bool Session::do_authenticate(std::string username, const std::string &password) {
     sqlite3 *db;
     // apro il database

@@ -21,20 +21,42 @@ class FileWatcher {
     std::unordered_map<std::string, FSElement> paths_;
     bool running_;
 
+    /**
+     * Verifica se la mappa contiene la chiave
+     * @param key: chiave da cercare
+     * @return True se la chiave è presente
+     */
     bool contains(const std::string &key);
 
+    /**
+     * Verifica se gli elementi presenti al precedente check sono stati cancellati
+     * @param action: una funzione di handler per gestire le eventuali cancellazioni
+     */
     void findErased(const std::function<void(std::string, ElementStatus)> &action);
 
+    /**
+     * Verifica se gli elementi ora presenti non esistevano ancora al precedente check
+     * e verifica se gli elementi sono stati modificati
+     * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
+     */
     void findCreatedOrModified(const std::function<void(std::string, ElementStatus)> &action);
 
 public:
-
+    /**
+     * Inizializza i campi dell'oggetto e acquisisce la struttura iniziale della directory
+     * @param path_to_watch: la directory che il file watcher deve monitorare
+     * @param delay: il tempo di polling tra un check e il successivo
+     */
     FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay);
 
     FileWatcher(const FileWatcher &) = delete;
 
     FileWatcher &operator=(const FileWatcher &) = delete;
 
+    /**
+     * Opera il polling sul thread del file watcher e chiama le funzioni per il check delle modifiche alla directory
+     * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
+     */
     void start(const std::function<void(std::string, ElementStatus)> &action);
 };
 
