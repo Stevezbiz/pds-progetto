@@ -8,12 +8,14 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/bind.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include "Comm_error.h"
 
 /**
  * list of possible messages supported by the protocol

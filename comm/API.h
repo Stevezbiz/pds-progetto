@@ -5,8 +5,15 @@
 #ifndef SERVER_API_H
 #define SERVER_API_H
 
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <functional>
 #include <boost/filesystem.hpp>
 #include "Socket_API.h"
+#include "Comm_error.h"
+
+namespace fs = boost::filesystem;
 
 class API {
 

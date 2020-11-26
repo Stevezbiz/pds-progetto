@@ -5,11 +5,11 @@
 #include "Message.h"
 
 /**
-        * send this message
-        * using a TLV format (type, length, value)
-        * @return asio buffer
-        */
-std::vector<boost::asio::const_buffer> Message::send() {
+* send this message
+* using a TLV format (type, length, value)
+* @return asio buffer
+*/
+std::vector <boost::asio::const_buffer> Message::send() {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
     std::ostringstream value_stream{};
@@ -26,7 +26,7 @@ std::vector<boost::asio::const_buffer> Message::send() {
     auto length_data = value_stream.str();
 
     // concat buffers into a vector
-    std::vector<boost::asio::const_buffer> out_buffers;
+    std::vector <boost::asio::const_buffer> out_buffers;
     out_buffers.emplace_back(boost::asio::buffer(type_data));
     out_buffers.emplace_back(boost::asio::buffer(length_data));
     out_buffers.emplace_back(boost::asio::buffer(value_data));
