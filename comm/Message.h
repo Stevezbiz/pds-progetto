@@ -64,43 +64,128 @@ public:
     std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
     bool status; // = okay
-    Comm_error *error;
+    Comm_error *comm_error;
 
     struct_header_buffer *header_buffer;
     char *content_buffer;
 
+    /**
+    * send this message
+    * using a TLV format (type, length, value)
+    * @return a list of asio buffers
+    */
     std::vector <boost::asio::const_buffer> send();
 
+    /**
+     * check if the inner status is okay
+     * @return boolean
+     */
     [[nodiscard]] bool is_okay() const;
 
+    /**
+     * class constructor
+     * @param code
+     */
     explicit Message(MESSAGE_TYPE code = ERROR);
 
+    /**
+     * create a message to say everything is okay
+     * @return new message
+     */
     static Message *okay();
 
-    static Message *error(Comm_error &error = new Comm_error{});
+    /**
+     * create a message to say something has gone wrong
+     * @param comm_error
+     * @return new message
+     */
+    static Message *error(Comm_error *comm_error = new Comm_error{});
 
+    /**
+     * create a message to perform login
+     * @param username
+     * @param password
+     * @return new message
+     */
     static Message *login(const std::string &username = "", const std::string &password = "");
 
+    /**
+     * create a message to send a probe command
+     * a probe command gets a list of versions for all the given paths
+     * it retrives a map <path, version>
+     * @param paths
+     * @return new message
+     */
     static Message *probe(const std::vector <std::string> &paths);
 
+    /**
+     * create a message for a probe response
+     * @param hashes - <path, version>
+     * @return new message
+     */
     static Message *probe_content(const std::map <std::string, std::string> &hashes);
 
+    /**
+     * create a message to retrieve a file with a specific path
+     * @param path
+     * @return new message
+     */
     static Message *get(const std::string &path = "");
 
+    /**
+     * create a message for a get response
+     * @param file
+     * @param path
+     * @return new message
+     */
     static Message *get_content(const std::vector<unsigned char> &file, const std::string &path);
 
+    /**
+     * create a message to upload a file on the server
+     * @param file
+     * @param path
+     * @param hash
+     * @return new message
+     */
     static Message *push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "");
 
+    /**
+     * create a message for a restore request
+     * il returns the list of paths you have to ask to (with the get(...) method)
+     * @return new message
+     */
     static Message *restore();
 
+    /**
+     * create a message for a restore response
+     * @param paths
+     * @return new message
+     */
     static Message *restore_content(const std::vector <std::string> &paths);
 
+    /**
+     * create a message for a end request
+     * @return new message
+     */
     static Message *end();
 
+    /**
+     * fill message fields
+     * @return modified message or new message
+     */
     Message *build();
 
+    /**
+     * get the header buffer
+     * the header is made up by "type" and "length" of the message
+     * @return header buffer
+     */
     [[nodiscard]] boost::asio::const_buffer get_header_buffer() const;
 
+    /**
+     * get the content buffer
+     * @return content buffer
+     */
     [[nodiscard]] boost::asio::const_buffer get_content_buffer() const;
 };
 
