@@ -5,10 +5,10 @@
 #include "Message.h"
 
 /**
-        * send this message
-        * using a TLV format (type, length, value)
-        * @return asio buffer
-        */
+* send this message
+* using a TLV format (type, length, value)
+* @return asio buffer
+*/
 std::vector <boost::asio::const_buffer> Message::send() {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
