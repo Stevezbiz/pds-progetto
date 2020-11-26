@@ -5,6 +5,11 @@
 #ifndef SERVER_SERVER_API_H
 #define SERVER_SERVER_API_H
 
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <boost/filesystem.hpp>
 #include "API.h"
 #include "Socket_API.h"
 #include "Message.h"
@@ -17,10 +22,11 @@ namespace fs = boost::filesystem;
 class Server_API : public API {
     // functions this class needs to manage client responses
     std::function<bool(const std::string &, const std::string &)> login;
-    std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
+    std::function<const std::map<std::string, std::string> &(const std::vector<std::string> &)> probe;
     std::function<const std::vector<unsigned char> &(const std::string &)> get;
     std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
-    std::function<const std::vector <std::string> &()> restore;
+    std::function<const std::vector<std::string> &()> restore;
+    std::function<bool()> end;
 
     Message *do_login(Message *req);
 
@@ -31,6 +37,16 @@ class Server_API : public API {
     Message *do_push(Message *req);
 
     Message *do_restore(Message *req);
+
+    /**
+     * manage end protocol procedure
+     * @param request message
+     * @return response message
+     */
+    Message *do_end(Message *req) {
+        auto status = this->end();
+        return status ? Message::okay() : Message::error();
+    }
 
 public:
     explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".");

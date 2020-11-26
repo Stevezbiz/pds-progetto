@@ -5,6 +5,11 @@
 #ifndef SERVER_CLIENT_API_H
 #define SERVER_CLIENT_API_H
 
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <functional>
+#include <boost/filesystem.hpp>
 #include "API.h"
 #include "Socket_API.h"
 

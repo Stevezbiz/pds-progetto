@@ -22,15 +22,17 @@
  */
 enum MESSAGE_TYPE : int {
     ERROR = -1,
-    OKAY = 0,
-    LOGIN = 1,
-    PROBE = 2,
-    PROBE_CONTENT = 3,
-    GET = 4,
-    GET_CONTENT = 5,
-    PUSH = 6,
-    RESTORE = 7,
-    RESTORE_CONTENT = 8
+    UNDEFINED = 0,
+    OKAY = 1,
+    LOGIN = 2,
+    PROBE = 3,
+    PROBE_CONTENT = 4,
+    GET = 5,
+    GET_CONTENT = 6,
+    PUSH = 7,
+    RESTORE = 8,
+    RESTORE_CONTENT = 9,
+    END = 100
 };
 
 /**
@@ -56,8 +58,8 @@ public:
     MESSAGE_TYPE code;
     std::string username, password;
     std::string path, hash;
-    std::vector <std::string> paths;
-    std::map <std::string, std::string> hashes;
+    std::vector<std::string> paths;
+    std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
     bool status; // = okay
 
@@ -90,6 +92,14 @@ public:
     static Message *restore();
 
     static Message *restore_content(const std::vector <std::string> &paths);
+
+    /**
+     * create a message for a end request
+     * @return new message
+     */
+    static Message *end() {
+        return new Message{ END };
+    }
 
     Message *build();
 
