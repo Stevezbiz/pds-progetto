@@ -16,11 +16,8 @@ namespace fs = boost::filesystem;
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
         path_to_watch_(std::move(path_to_watch)), delay_(delay), running_(true) {
     for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
-        if (fs::is_directory(el.path())) {
-            FSElement dir{el.path(), ElementType::dir, fs::last_write_time(el.path())};
-            paths_.insert(std::make_pair(el.path().string(), dir));
-        } else {
-            FSElement file{el.path(), ElementType::file, fs::last_write_time(el.path())};
+        if (fs::is_regular_file(el.path())) {
+            FSElement file{el.path(), fs::last_write_time(el.path())};
             paths_.insert(std::make_pair(el.path().string(), file));
         }
     }
@@ -56,11 +53,7 @@ void FileWatcher::findErased(const std::function<void(std::string, ElementStatus
     auto it = paths_.begin();
     while (it != paths_.end()) {
         if (!fs::exists(it->first)) {
-            if (it->second.getType() == ElementType::dir) {
-                action(it->first, ElementStatus::erasedDir);
-            } else {
-                action(it->first, ElementStatus::erasedFile);
-            }
+            action(it->first, ElementStatus::erasedFile);
             it = paths_.erase(it);
         } else {
             it++;
@@ -75,19 +68,16 @@ void FileWatcher::findErased(const std::function<void(std::string, ElementStatus
  */
 void FileWatcher::findCreatedOrModified(const std::function<void(std::string, ElementStatus)> &action) {
     for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
-        time_t lwt = fs::last_write_time(el);
-        if (!contains(el.path().string())) {
-            if (fs::is_directory(el)) {
-                paths_.insert(std::make_pair(el.path().string(), FSElement{el.path(), ElementType::dir, lwt}));
-                action(el.path().string(), ElementStatus::createdDir);
-            } else {
-                paths_.insert(std::make_pair(el.path().string(), FSElement{el.path(), ElementType::file, lwt}));
+        if (fs::is_regular_file(el.path())) {
+            time_t lwt = fs::last_write_time(el);
+            if (!contains(el.path().string())) {
+                paths_.insert(std::make_pair(el.path().string(), FSElement{el.path(), lwt}));
                 action(el.path().string(), ElementStatus::createdFile);
-            }
-        } else if (fs::is_regular_file(el)) {
-            if (paths_.find(el.path().string())->second.isOld(lwt)) {
-                if (paths_.find(el.path().string())->second.needUpdate()) {
-                    action(el.path().string(), ElementStatus::modifiedFile);
+            } else {
+                if (paths_.find(el.path().string())->second.isOld(lwt)) {
+                    if (paths_.find(el.path().string())->second.needUpdate()) {
+                        action(el.path().string(), ElementStatus::modifiedFile);
+                    }
                 }
             }
         }

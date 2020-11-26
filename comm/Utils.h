@@ -7,12 +7,15 @@
 
 #include <iostream>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 class Utils {
 public:
     static std::vector<unsigned char> read_from_file(std::istream &is);
 
     static void write_on_file(std::ostream &os, const std::vector<unsigned char> &file);
+
+    static std::string SHA256(const boost::filesystem::path &path);
 };
 
 

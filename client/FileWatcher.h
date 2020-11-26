@@ -12,7 +12,7 @@
 #include "FSElement.h"
 
 enum class ElementStatus {
-    createdFile, modifiedFile, erasedFile, createdDir, erasedDir
+    createdFile, modifiedFile, erasedFile
 };
 
 class FileWatcher {
