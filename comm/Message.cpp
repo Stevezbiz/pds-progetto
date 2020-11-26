@@ -31,9 +31,7 @@ std::vector <boost::asio::const_buffer> Message::send() {
 
 [[nodiscard]] bool Message::is_okay() const { return this->status; }
 
-Message::Message(MESSAGE_TYPE code) : code(code), status(true),
-                                      header_buffer(new struct_header_buffer{ ERROR, 0 }),
-                                      content_buffer(nullptr) {
+Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr) {
     if (code == ERROR)
         status = false;
 }

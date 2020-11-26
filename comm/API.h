@@ -12,6 +12,7 @@
 #include <boost/filesystem.hpp>
 #include "Socket_API.h"
 #include "Comm_error.h"
+#include "Utils.h"
 
 namespace fs = boost::filesystem;
 
@@ -21,9 +22,20 @@ protected:
     Socket_API &api;
     boost::filesystem::path root_path;
 
+    /**
+     * class constructor
+     * @param socket_api
+     * @param root_path
+     */
     explicit API(Socket_API &socket_api, const std::string &root_path = ".");
 
-    bool _save_file(Message &message);
+    /**
+     * save a file on disk
+     * the path is a relative path from the root_path
+     * @param message
+     * @return status
+     */
+    bool save_file_(Message *message);
 };
 
 

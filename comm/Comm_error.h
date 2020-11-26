@@ -10,9 +10,11 @@
 /**
  * list of error numbers (error codes)
  */
-enum ERRNO : int {
-    GENERIC = 0,
-    FAILURE = 1,
+enum COMM_ERRNO : int {
+    NOT_AN_ERROR = -1,
+    UNDEFINED = 0,
+    GENERIC = 1,
+    FAILURE = 2,
     UNEXPECTED_TYPE = 10,
     UNEXPECTED_VALUE = 11,
     WRONG_TYPE = 20,
@@ -24,7 +26,7 @@ enum ERRNO : int {
  */
 class Comm_error {
 public:
-    ERRNO errno;
+    COMM_ERRNO comm_errno;
     std::string location;
     std::string message;
 
@@ -34,7 +36,7 @@ public:
      * @param location
      * @param message
      */
-    Comm_error(ERRNO errno = GENERIC, const std::string &location = "System", const std::string message = "Generic error") : errno(errno), location(location), message(message) {}
+    explicit Comm_error(COMM_ERRNO comm_errno = GENERIC, std::string &&location = "System", std::string &&message = "Generic error");
 };
 
 

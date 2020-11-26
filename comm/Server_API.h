@@ -29,33 +29,111 @@ class Server_API : public API {
     std::function<const std::vector <std::string> &()> restore;
     std::function<bool()> end;
 
+    /**
+     * manage login protocol procedure
+     * @param request message
+     * @return response message
+     */
     Message *do_login(Message *req);
 
+    /**
+     * manage probe protocol procedure
+     * @param request message
+     * @return response message
+     */
     Message *do_probe(Message *req);
 
+    /**
+     * manage get protocol procedure
+     * @param request message
+     * @return response message
+     */
     Message *do_get(Message *req);
 
+    /**
+     * manage push protocol procedure
+     * @param request message
+     * @return response message
+     */
     Message *do_push(Message *req);
 
+    /**
+     * manage restore protocol procedure
+     * @param request message
+     * @return response message
+     */
     Message *do_restore(Message *req);
 
+    /**
+    * manage end protocol procedure
+    * @param request message
+    * @return response message
+    */
     Message *do_end(Message *req);
 
 public:
+    /**
+     * class constructor
+     * @param socket_api
+     * @param user_root_path
+     */
     explicit Server_API(Socket_API &socket_api, const std::string &user_root_path = ".");
 
+    /**
+     * set how to manage a login request
+     * @param login_function
+     * - input:
+     *      - const std::string &username
+     *      - const std::string &password
+     * - output: bool is_okay
+     */
     void set_login(const std::function<bool(const std::string &, const std::string &)> &login_function);
 
-    void set_probe(const std::function<const std::map <std::string, std::string> &(
-            const std::vector <std::string> &)> &probe_function);
+    /**
+     * set how to manage a probe request
+     * @param probe_function
+     * - input:
+     *      - const std::vector<std::string> &, a list of paths
+     * - output:
+     *      - const std::map<std::string, std::string> &, a map of <path, hash>
+     */
+    void set_probe(const std::function<const std::map <std::string, std::string> &( const std::vector <std::string> &)> &probe_function);
 
+    /**
+     * set how to manage a get request
+     * @param get_function
+     * - input:
+     *      - const std::string &path
+     * - output:
+     *      - const std::vector<unsigned char> &file, a vector of bytes
+     */
     void set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function);
 
-    void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &,
-                                           const std::string &)> &push_function);
+    /**
+     * set how to manage a push request
+     * @param push_function
+     * - input:
+     *      - const std::string &path
+     *      - const std::vector<char> &file
+     *      - const std::string &hash
+     * - output:
+     *      - bool is_okay
+     */
+    void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function);
 
+    /**
+     * set how to manage a restore request
+     * @param restore_function
+     * - input:
+     *      - (empty)
+     * - output:
+     *      - const std::vector<std::string> &paths, a list of paths
+     */
     void set_restore(const std::function<const std::vector <std::string> &()> &restore_function);
 
+    /**
+     * start handling requests
+     */
     void run();
 };
 
