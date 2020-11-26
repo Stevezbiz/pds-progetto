@@ -5,8 +5,7 @@
 #ifndef SERVER_SESSION_H
 #define SERVER_SESSION_H
 
-
-#include "Message.h"
+#include "../comm/Message.h"
 #include <boost/asio.hpp>
 #include <deque>
 

@@ -28,10 +28,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/comm/API.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comm/Client_API.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comm/Message.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comm/Server_API.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comm/Socket_API.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/comm/Utils.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/client/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/API.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Client_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Client_API.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Message.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Message.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Server_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Server_API.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Socket_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Socket_API.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/Session.h" beforeDir="false" afterPath="$PROJECT_DIR$/server/Session.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +74,8 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/client" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="ObjectiveC" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
@@ -97,6 +108,8 @@
       <workItem from="1604767174115" duration="954000" />
       <workItem from="1605375608861" duration="643000" />
       <workItem from="1605430951786" duration="729000" />
+      <workItem from="1606342118465" duration="4000" />
+      <workItem from="1606378604515" duration="5200000" />
     </task>
     <task id="LOCAL-00001" summary="added rudimental file watcher">
       <created>1604422706637</created>
@@ -148,7 +161,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="added rudimental file watcher" />
     <MESSAGE value="added stub client-server protocol" />
-    <option name="LAST_COMMIT_MESSAGE" value="added stub client-server protocol" />
+    <MESSAGE value="modified structure of files in comm folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="modified structure of files in comm folder" />
   </component>
   <component name="WindowStateProjectService">
     <state x="240" y="109" width="1484" height="783" key="DiffContextDialog" timestamp="1604767350481">
