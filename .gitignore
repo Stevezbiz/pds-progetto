@@ -17,3 +17,5 @@
 workspace.xml
 
 .DS_store
+server/cmake-build-debug/CMakeFiles/clion-log.txt
+server/cmake-build-debug/CMakeFiles/CMakeOutput.log
