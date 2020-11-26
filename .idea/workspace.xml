@@ -16,13 +16,16 @@
         <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </expand>
-    <select />
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated>
-      <config projectName="server" targetName="server" />
-      <config projectName="server" targetName="client" />
-    </generated>
+    <generated />
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -31,22 +34,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="modified structure of files in comm folder">
-      <change afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Client.h" beforeDir="false" afterPath="$PROJECT_DIR$/client/Client.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/API.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/API.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/API.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Client_API.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Client_API.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Client_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Client_API.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Message.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Message.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Message.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Message.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Server_API.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Server_API.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Server_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Server_API.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Socket_API.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Socket_API.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Socket_API.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Socket_API.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/comm/Utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Utils.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Message.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeCache.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeCCompiler.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeCCompiler.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeCXXCompiler.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeCXXCompiler.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeDetermineCompilerABI_C.bin" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeDetermineCompilerABI_C.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeDetermineCompilerABI_CXX.bin" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeDetermineCompilerABI_CXX.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeSystem.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CMakeSystem.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdC/a.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdCXX/a.out" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/3.17.3/CompilerIdCXX/a.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/CMakeDirectoryInformation.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/CMakeError.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/CMakeOutput.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/Makefile.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/TargetDirectories.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/progress.marks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/CXX.includecache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/DependInfo.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/Message.cpp.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/Server.cpp.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/Session.cpp.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/build.make" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/cmake_clean.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/depend.internal" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/depend.make" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/flags.make" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/link.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/main.cpp.o" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/cmake-build-debug/CMakeFiles/server.dir/progress.make" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +75,6 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -69,6 +87,7 @@
   </component>
   <component name="ProjectId" id="1fbQoePpiaXMpUkETVwsW3mzJKV" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
@@ -88,18 +107,8 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.client">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="server" TARGET_NAME="client" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="server" RUN_TARGET_NAME="client">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="server" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="server" TARGET_NAME="server" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="server" RUN_TARGET_NAME="server">
+  <component name="RunManager">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -109,10 +118,6 @@
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="CMake Application.client" />
-      <item itemvalue="CMake Application.server" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -204,6 +209,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="modified structure of files in comm folder" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1606389756052">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="458" y="204" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1606389756052" />
     <state x="240" y="109" width="1484" height="783" key="DiffContextDialog" timestamp="1604767350481">
       <screen x="64" y="27" width="1856" height="933" />
     </state>
@@ -221,9 +230,10 @@
       <screen x="64" y="27" width="1856" height="933" />
     </state>
     <state x="623" y="256" width="728" height="482" key="MultipleFileMergeDialog/64.27.1856.933@64.27.1856.933" timestamp="1606384936281" />
-    <state x="587" y="229" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1606385565485">
-      <screen x="64" y="27" width="1856" height="933" />
+    <state x="406" y="195" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1606389688188">
+      <screen x="0" y="0" width="1440" height="900" />
     </state>
+    <state x="406" y="195" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1606389688188" />
     <state x="587" y="229" width="800" height="535" key="Vcs.Push.Dialog.v2/64.27.1856.933@64.27.1856.933" timestamp="1606385565485" />
   </component>
 </project>

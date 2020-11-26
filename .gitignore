@@ -8,3 +8,12 @@
 /client/CMakeLists.txt
 /client/cmake-build-debug/CMakeFiles/*
 
+/comm/cmake-build-debug/
+/comm/cmake-build-debug/server.cbp
+/comm/CMakeLists.txt
+/comm/cmake-build-debug/CMakeFiles/*
+
+/.idea
+workspace.xml
+
+.DS_store

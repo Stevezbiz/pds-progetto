@@ -1,4 +1,11 @@
-/opt/clion-2020.2.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/stevezbiz/CLionProjects/pds-progetto/server
--- Configuring done
--- Generating done
--- Build files have been written to: /home/stevezbiz/CLionProjects/pds-progetto/server/cmake-build-debug
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/paologastaldi/Documents/polito/PDS/pds-progetto/server
+CMake Error at /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake:164 (message):
+  Could NOT find Boost (missing: Boost_INCLUDE_DIR timer thread)
+Call Stack (most recent call first):
+  /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake:445 (_FPHSA_FAILURE_MESSAGE)
+  /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.17/Modules/FindBoost.cmake:2166 (find_package_handle_standard_args)
+  CMakeLists.txt:7 (find_package)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/Users/paologastaldi/Documents/polito/PDS/pds-progetto/server/cmake-build-debug/CMakeFiles/CMakeOutput.log".
