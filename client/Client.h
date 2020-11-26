@@ -8,7 +8,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <deque>
-#include "Message.h"
+#include "../comm/Message.h"
 
 class Client {
     boost::asio::io_context &ctx_;

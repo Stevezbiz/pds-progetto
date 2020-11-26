@@ -86,8 +86,7 @@ public:
 
     static Message *get_content(const std::vector<unsigned char> &file, const std::string &path);
 
-    static Message *
-    push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "");
+    static Message *push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "");
 
     static Message *restore();
 

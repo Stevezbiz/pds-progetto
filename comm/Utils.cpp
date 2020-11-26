@@ -9,7 +9,7 @@
  * @param input stream
  * @return vector of bytes
  */
-staticstd::vector<unsigned char> Utils::read_from_file(std::istream &is) {
+ std::vector<unsigned char> Utils::read_from_file(std::istream &is) {
     return std::vector < unsigned char > {std::istreambuf_iterator<char>(is), {}};
 }
 
@@ -18,7 +18,7 @@ staticstd::vector<unsigned char> Utils::read_from_file(std::istream &is) {
  * @param output stream
  * @param vector of bytes
  */
-static void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &file) {
+ void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &file) {
     auto file_buffer = reinterpret_cast<char *>(file[0]); // TODO: check this
     os << file_buffer;
 }

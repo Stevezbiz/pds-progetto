@@ -69,8 +69,7 @@ Message *Server_API::do_end(Message *req) {
  * @param socket_api
  * @param user_root_path
  */
-explicit Server_API::Server_API(Socket_API *socket_api, const std::string &user_root_path = ".") : API(socket_api,
-                                                                                                       user_root_path) {}
+Server_API::Server_API(Socket_API &socket_api, const std::string &user_root_path) : API(socket_api, user_root_path) {}
 
 /**
  * set how to manage a login request
@@ -92,8 +91,8 @@ void Server_API::set_login(const std::function<bool(const std::string &, const s
  * - output:
  *      - const std::map<std::string, std::string> &, a map of <path, hash>
  */
-void Server_API::set_probe(const std::function<const std::map <std::string, std::string> &(
-        const std::vector <std::string> &)> &probe_function) {
+void Server_API::set_probe(const std::function<const std::map<std::string, std::string> &(
+        const std::vector<std::string> &)> &probe_function) {
     this->probe = probe_function;
 }
 
@@ -132,7 +131,7 @@ void Server_API::set_push(const std::function<bool(const std::string &, const st
  * - output:
  *      - const std::vector<std::string> &paths, a list of paths
  */
-void Server_API::set_restore(const std::function<const std::vector <std::string> &()> &restore_function) {
+void Server_API::set_restore(const std::function<const std::vector<std::string> &()> &restore_function) {
     this->restore = restore_function;
 }
 
@@ -144,7 +143,7 @@ void Server_API::set_restore(const std::function<const std::vector <std::string>
 template<typename Handler>
 void Server_API::run(Handler handler) {
     while (true) {
-        auto req = this->api->receive(new Message{ERROR}, handler);
+        auto req = this->api.receive(new Message{ERROR}, handler);
         Message *res;
 
         // manage the request and produce a response message
@@ -167,6 +166,6 @@ void Server_API::run(Handler handler) {
             default:
                 res = new Message{ERROR};
         }
-        this->api->async_send(res, handler);
+        this->api.async_send(res, handler);
     }
 }

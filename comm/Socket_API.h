@@ -19,7 +19,13 @@ public:
 
     boost::asio::ip::tcp::socket &&get_socket();
 
-    void send(Message *message = new Message{ ERROR }, Handler handler = generic_handler);
+    template<typename Handler>
+    void send(Message *message = new Message{ERROR}, Handler handler = generic_handler);
+
+    template<typename Handler>
+    void async_send(Message *message = new Message{ERROR}, Handler handler = generic_handler);
+
+    template<typename Handler>
     Message *receive(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler = generic_handler);
 
 

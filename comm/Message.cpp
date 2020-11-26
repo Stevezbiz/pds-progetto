@@ -9,7 +9,7 @@
         * using a TLV format (type, length, value)
         * @return asio buffer
         */
-std::vector <boost::asio::const_buffer> Message::send() {
+std::vector<boost::asio::const_buffer> Message::send() {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
     std::ostringstream value_stream{};
@@ -26,7 +26,7 @@ std::vector <boost::asio::const_buffer> Message::send() {
     auto length_data = value_stream.str();
 
     // concat buffers into a vector
-    std::vector <boost::asio::const_buffer> out_buffers;
+    std::vector<boost::asio::const_buffer> out_buffers;
     out_buffers.emplace_back(boost::asio::buffer(type_data));
     out_buffers.emplace_back(boost::asio::buffer(length_data));
     out_buffers.emplace_back(boost::asio::buffer(value_data));
@@ -40,9 +40,9 @@ std::vector <boost::asio::const_buffer> Message::send() {
  */
 [[nodiscard]] bool Message::is_okay() const { return this->status; }
 
-explicit Message::Message(MESSAGE_TYPE code = ERROR) : code(code), status(true),
-                                                       header_buffer(new struct_header_buffer{ERROR, 0}),
-                                                       content_buffer(nullptr) {
+Message::Message(MESSAGE_TYPE code) : code(code), status(true),
+                                      header_buffer(new struct_header_buffer{ERROR, 0}),
+                                      content_buffer(nullptr) {
     if (code == ERROR)
         status = false;
 }
@@ -51,7 +51,7 @@ explicit Message::Message(MESSAGE_TYPE code = ERROR) : code(code), status(true),
  * create a message to say everything is okay
  * @return new message
  */
-static Message *Message::okay() {
+Message *Message::okay() {
     return new Message{OKAY};
 }
 
@@ -59,7 +59,7 @@ static Message *Message::okay() {
  * create a message to say something has gone wrong
  * @return new message
  */
-static Message *Message::error() {
+Message *Message::error() {
     return new Message{ERROR};
 }
 
@@ -69,7 +69,7 @@ static Message *Message::error() {
  * @param password
  * @return new message
  */
-static Message *Message::login(const std::string &username = "", const std::string &password = "") {
+Message *Message::login(const std::string &username, const std::string &password) {
     auto message = new Message{LOGIN};
     message->username = username;
     message->password = password;
@@ -83,7 +83,7 @@ static Message *Message::login(const std::string &username = "", const std::stri
  * @param paths
  * @return new message
  */
-static Message *Message::probe(const std::vector <std::string> &paths) {
+Message *Message::probe(const std::vector<std::string> &paths) {
     auto message = new Message{PROBE};
     message->paths = paths;
     return message;
@@ -94,7 +94,7 @@ static Message *Message::probe(const std::vector <std::string> &paths) {
  * @param hashes - <path, version>
  * @return new message
  */
-static Message *Message::probe_content(const std::map <std::string, std::string> &hashes) {
+Message *Message::probe_content(const std::map<std::string, std::string> &hashes) {
     auto message = new Message{PROBE_CONTENT};
     message->hashes = hashes;
     return message;
@@ -105,7 +105,7 @@ static Message *Message::probe_content(const std::map <std::string, std::string>
  * @param path
  * @return new message
  */
-static Message *Message::get(const std::string &path = "") {
+Message *Message::get(const std::string &path) {
     auto message = new Message{GET};
     message->path = path;
     return message;
@@ -117,7 +117,7 @@ static Message *Message::get(const std::string &path = "") {
  * @param path
  * @return new message
  */
-static Message *Message::get_content(const std::vector<unsigned char> &file, const std::string &path) {
+Message *Message::get_content(const std::vector<unsigned char> &file, const std::string &path) {
     auto message = new Message{GET_CONTENT};
     message->file = file;
     message->path = path;
@@ -133,8 +133,7 @@ static Message *Message::get_content(const std::vector<unsigned char> &file, con
  *
  * DO NOT change the params order, no default value for the std::iostream
  */
-static Message *
-Message::push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "") {
+Message *Message::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash) {
     auto message = new Message{PUSH};
     message->file = file;
     message->path = path;
@@ -147,7 +146,7 @@ Message::push(const std::vector<unsigned char> &file, const std::string &path = 
  * il returns the list of paths you have to ask to (with the get(...) method)
  * @return new message
  */
-static Message *Message::restore() {
+Message *Message::restore() {
     auto message = new Message{RESTORE};
     return message;
 }
@@ -157,7 +156,7 @@ static Message *Message::restore() {
  * @param paths
  * @return new message
  */
-static Message *Message::restore_content(const std::vector <std::string> &paths) {
+Message *Message::restore_content(const std::vector<std::string> &paths) {
     auto message = new Message{RESTORE_CONTENT};
     message->paths = paths;
     return message;
@@ -167,7 +166,7 @@ static Message *Message::restore_content(const std::vector <std::string> &paths)
  * create a message for a end request
  * @return new message
  */
-static Message *Message::end() {
+Message *Message::end() {
     return new Message{END};
 }
 
