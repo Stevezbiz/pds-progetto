@@ -41,11 +41,17 @@ class Socket_API {
         bool status = true;
         int retry_cont = 0;
 
-        auto err_cb = [ this->n_retry, this->retry_delay, &status, &retry_cont, &this->last_error ](const boost::system::error_code &ec) {
-            if (ec) {
-                if () {
+        auto err_cb = [ this->socket_, buffer, this->n_retry, this->retry_delay, &status, &retry_cont, &this->last_error ](const boost::system::error_code &ec) {
+            if(ec) {
+                if(retry_cont < n_retry) {
+                    retry_cont++;
+
                     std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay));
-                    perform_this(this->socket_, buffer, err_cb);
+                    perform_this(socket_, buffer, err_cb);
+                }
+                else {
+                    status = false;
+                    last_error = new Comm_error{ FAILURE, "Socket_API", "Connection failure" };
                 }
             };
         };
@@ -73,18 +79,23 @@ class Socket_API {
      */
     template <typename Handler>
     bool receive_header_(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler) {
+        bool status = true;
         this->message = new Message{};
 
-        if!(this->call_(boost::asio::read, this->socket_, this->message->get_header_buffer(), handler);
+        if(!this->call_(boost::asio::read, this->socket_, this->message->get_header_buffer(), handler);
             return false;
 
         this->message->build(); // build the header
-        if(expectedMessage != UNDEFINED && this->message->code != expectedMessage) {
+        if(this->message->code == ERROR) {
+            this->last_error = message->error;
+            status = false;
+        }
+        else if(expectedMessage != UNDEFINED && this->message->code != expectedMessage) {
             this->last_error = new Error{ UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code : " + expectedMessage};
             this->last_message = new Message{ this->last_error };
-            return false;
+            status = false;
         }
-        return true;
+        return status;
     }
 
     /**
@@ -95,10 +106,10 @@ class Socket_API {
      */
     template <typename Handler>
     bool receive_content_(Handler handler) {
-        if!(this->call_(boost::asio::read, socket_, this->message->get_content_buffer(), handler))
+        if(!this->call_(boost::asio::read, socket_, this->message->get_content_buffer(), handler))
             return false;
 
-        this-> message = message->build(); // build the whole message
+        this->message = message->build(); // build the whole message
 
         return true;
     }
