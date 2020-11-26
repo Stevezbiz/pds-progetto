@@ -54,6 +54,8 @@ public:
      * @param vector of bytes
      */
     static void write_on_file(std::ostream &os, const std::vector<unsigned char> &file);
+
+    static std::string SHA256(const boost::filesystem::path &path);
 };
 
 

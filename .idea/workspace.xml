@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="server" targetName="server" />
+      <config projectName="server" targetName="client" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="modified structure of files in comm folder">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/FSElement.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/FSElement.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/FSElement.h" beforeDir="false" afterPath="$PROJECT_DIR$/client/FSElement.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/FileWatcher.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/FileWatcher.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/FileWatcher.h" beforeDir="false" afterPath="$PROJECT_DIR$/client/FileWatcher.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/comm/Utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/comm/Utils.h" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="hiddenUrls">
+      <set>
+        <option value="https://github.com/Stevezbiz/pds-progetto" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectId" id="1fbQoePpiaXMpUkETVwsW3mzJKV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="ObjectiveC" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunManager" selected="CMake Application.client">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="server" TARGET_NAME="client" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="server" RUN_TARGET_NAME="client">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="server" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="server" TARGET_NAME="server" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="server" RUN_TARGET_NAME="server">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.client" />
+      <item itemvalue="CMake Application.server" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c869a95d-6a2a-415e-9786-e730e2c1bac8" name="Default Changelist" comment="" />
+      <created>1596484488033</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1596484488033</updated>
+      <workItem from="1596484490967" duration="105000" />
+      <workItem from="1604422328465" duration="1273000" />
+      <workItem from="1604493168338" duration="48000" />
+      <workItem from="1604667882641" duration="688000" />
+      <workItem from="1604739188216" duration="79000" />
+      <workItem from="1604767174115" duration="954000" />
+      <workItem from="1605375608861" duration="643000" />
+      <workItem from="1605430951786" duration="729000" />
+      <workItem from="1606342118465" duration="4000" />
+      <workItem from="1606378604515" duration="13427000" />
+    </task>
+    <task id="LOCAL-00001" summary="added rudimental file watcher">
+      <created>1604422706637</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1604422706637</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added rudimental file watcher">
+      <created>1604422939433</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1604422939433</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added rudimental file watcher">
+      <created>1604422988540</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1604422988540</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added stub client-server protocol">
+      <created>1604767283911</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1604767283912</updated>
+    </task>
+    <task id="LOCAL-00005" summary="modified structure of files in comm folder">
+      <created>1606384440833</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1606384440833</updated>
+    </task>
+    <task id="LOCAL-00006" summary="modified structure of files in comm folder">
+      <created>1606385559528</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1606385559528</updated>
+    </task>
+    <task id="LOCAL-00007" summary="modified structure of files in comm folder">
+      <created>1606388471264</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1606388471264</updated>
+    </task>
+    <task id="LOCAL-00008" summary="modified structure of files in comm folder">
+      <created>1606388542532</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1606388542532</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="added rudimental file watcher" />
+    <MESSAGE value="added stub client-server protocol" />
+    <MESSAGE value="modified structure of files in comm folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="modified structure of files in comm folder" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="240" y="109" width="1484" height="783" key="DiffContextDialog" timestamp="1604767350481">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="240" y="109" width="1484" height="783" key="DiffContextDialog/64.27.1856.933@64.27.1856.933" timestamp="1604767350481" />
+    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605431626370">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="775" y="249" key="FileChooserDialogImpl/64.27.1856.923@64.27.1856.923" timestamp="1605375633294" />
+    <state x="775" y="251" width="424" height="491" key="FileChooserDialogImpl/64.27.1856.933@64.27.1856.933" timestamp="1605431626370" />
+    <state x="240" y="109" width="1376" height="783" key="MergeDialog" timestamp="1606389181493">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="240" y="109" width="1376" height="783" key="MergeDialog/64.27.1856.933@64.27.1856.933" timestamp="1606389181493" />
+    <state x="623" y="256" width="728" height="482" key="MultipleFileMergeDialog" timestamp="1606389181499">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="623" y="256" width="728" height="482" key="MultipleFileMergeDialog/64.27.1856.933@64.27.1856.933" timestamp="1606389181499" />
+    <state x="587" y="229" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1606389213351">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="587" y="229" width="800" height="535" key="Vcs.Push.Dialog.v2/64.27.1856.933@64.27.1856.933" timestamp="1606389213351" />
+    <state x="773" y="408" width="438" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1606389294150">
+      <screen x="64" y="27" width="1856" height="933" />
+    </state>
+    <state x="773" y="408" width="438" height="177" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/64.27.1856.933@64.27.1856.933" timestamp="1606389294150" />
+  </component>
+</project>
