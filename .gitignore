@@ -13,10 +13,12 @@
 /comm/CMakeLists.txt
 /comm/cmake-build-debug/CMakeFiles/*
 
-/.idea
-workspace.xml
-
 .DS_store
 server/cmake-build-debug/CMakeFiles/clion-log.txt
 server/cmake-build-debug/CMakeFiles/CMakeOutput.log
 .idea/workspace.xml
+server/cmake-build-debug/CMakeFiles/CMakeOutput.log
+
+/.idea/
+workspace.xml
+/cmake-build-debug/
