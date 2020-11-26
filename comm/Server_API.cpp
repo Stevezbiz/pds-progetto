@@ -5,10 +5,10 @@
 #include "Server_API.h"
 
 /**
-     * manage login protocol procedure
-     * @param request message
-     * @return response message
-     */
+ * manage login protocol procedure
+ * @param request message
+ * @return response message
+ */
 Message *Server_API::do_login(Message *req) {
     auto status = this->login(req->username, req->password);
     return status ? Message::okay() : Message::error();
@@ -55,10 +55,20 @@ Message *Server_API::do_restore(Message *req) {
 }
 
 /**
-     * class constructor
-     * @param socket_api
-     * @param user_root_path
-     */
+* manage end protocol procedure
+* @param request message
+* @return response message
+*/
+Message *Server_API::do_end(Message *req) {
+    auto status = this->end();
+    return status ? Message::okay() : Message::error();
+}
+
+/**
+ * class constructor
+ * @param socket_api
+ * @param user_root_path
+ */
 explicit Server_API::Server_API(Socket_API *socket_api, const std::string &user_root_path = ".") : API(socket_api,
                                                                                                        user_root_path) {}
 

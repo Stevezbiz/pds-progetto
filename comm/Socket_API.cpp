@@ -70,19 +70,14 @@ void Socket_API::async_send(Message *message = new Message{ERROR}, Handler handl
      * @param handler
      * @return message
      */
-template<typename Handler>
-Message *Socket_API::receive(Message *expectedMessage = new Message{ERROR}, Handler handler = generic_handler) {
+template <typename Handler>
+Message *Message::receive(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler = generic_handler) {
     auto message = new Message{};
-    read(this->socket_, message->get_header_buffer(), handler);
+    boost::asio::read(this->socket_, message->get_header_buffer(), handler);
 
     message->build(); // build the header
-    if (message->code != expectedMessage->code)
-        return new Message{ERROR};
-
-    read(socket_, message->get_content_buffer(), handler);
-
-    return message->build(); // build the whole message
-}
+    if(expectedMessage != UNDEFINED && message->code != expectedMessage)
+        return new Message{ ERROR };
 
 Socket_API::~Socket_API() {
     if (this->socket_.is_open())

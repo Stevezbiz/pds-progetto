@@ -93,13 +93,7 @@ public:
 
     static Message *restore_content(const std::vector <std::string> &paths);
 
-    /**
-     * create a message for a end request
-     * @return new message
-     */
-    static Message *end() {
-        return new Message{ END };
-    }
+    static Message *end();
 
     Message *build();
 
