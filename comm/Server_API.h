@@ -42,17 +42,19 @@ class Server_API : public API {
     Message *do_end(Message *req);
 
 public:
-    explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".");
+    explicit Server_API(Socket_API &socket_api, const std::string &user_root_path = ".");
 
     void set_login(const std::function<bool(const std::string &, const std::string &)> &login_function);
 
-    void set_probe(const std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> &probe_function);
+    void set_probe(const std::function<const std::map <std::string, std::string> &(
+            const std::vector <std::string> &)> &probe_function);
 
     void set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function);
 
-    void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function);
+    void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &,
+                                           const std::string &)> &push_function);
 
-    void set_restore(const std::function<const std::vector <std::string> &()> &restore_function)
+    void set_restore(const std::function<const std::vector <std::string> &()> &restore_function);
 
     void run();
 };

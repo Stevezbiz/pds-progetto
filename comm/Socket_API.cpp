@@ -11,7 +11,7 @@ using namespace boost::asio;
      * @param ec
      * @param bytes_transferred
      */
-static void Socket_API::generic_handler(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+ void Socket_API::generic_handler(const boost::system::error_code &ec, std::size_t bytes_transferred) {
     std::cout << ec << " errors, " << bytes_transferred << " bytes as been transferred correctly" << std::endl;
 }
 
@@ -19,7 +19,7 @@ static void Socket_API::generic_handler(const boost::system::error_code &ec, std
      * constructor
      * @param socket
      */
-explicit Socket_API::Socket_API(io_context &socket) : socket_(socket) {}
+ Socket_API::Socket_API(io_context &socket) : socket_(socket) {}
 
 /**
      * socket setter
@@ -48,7 +48,7 @@ ip::tcp::socket &&Socket_API::get_socket() {
      * @param handler
      */
 template<typename Handler>
-void Socket_API::send(Message *message = new Message{ERROR}, Handler handler = generic_handler) {
+void Socket_API::send(Message *message, Handler handler) {
     write(this->socket_, message->send(), handler);
 }
 
@@ -59,7 +59,7 @@ void Socket_API::send(Message *message = new Message{ERROR}, Handler handler = g
  * @param handler
  */
 template<typename Handler>
-void Socket_API::async_send(Message *message = new Message{ERROR}, Handler handler = generic_handler) {
+void Socket_API::async_send(Message *message, Handler handler) {
     async_write(this->socket_, message->send(), handler); // deferred or async ? The system chooses
 }
 
@@ -71,13 +71,14 @@ void Socket_API::async_send(Message *message = new Message{ERROR}, Handler handl
      * @return message
      */
 template <typename Handler>
-Message *Message::receive(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler = generic_handler) {
+Message *Socket_API::receive(MESSAGE_TYPE expectedMessage, Handler handler) {
     auto message = new Message{};
     boost::asio::read(this->socket_, message->get_header_buffer(), handler);
 
     message->build(); // build the header
-    if(expectedMessage != UNDEFINED && message->code != expectedMessage)
-        return new Message{ ERROR };
+    if (expectedMessage != UNDEFINED && message->code != expectedMessage)
+        return new Message{ERROR};
+}
 
 Socket_API::~Socket_API() {
     if (this->socket_.is_open())

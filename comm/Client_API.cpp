@@ -16,8 +16,8 @@ namespace fs = boost::filesystem;
 template<typename Handler>
 bool Client_API::_get_and_save(const std::string &path, Handler handler) {
     auto req = Message::get(path);
-    this->api->async_send(req, handler);
-    auto res = this->api->receive(new Message{GET_CONTENT}, handler);
+    this->api.async_send(req, handler);
+    auto res = this->api.receive(new Message{GET_CONTENT}, handler);
     if (!res->is_okay())
         return false;
 
@@ -30,8 +30,7 @@ bool Client_API::_get_and_save(const std::string &path, Handler handler) {
      * @param socket_api
      * @param root_path
      */
-explicit Client_API::Client_API(Socket_API &socket_api, const std::string &root_path = ".") : API(socket_api,
-                                                                                                  root_path) {}
+Client_API::Client_API(Socket_API &socket_api, const std::string &root_path) : API(socket_api, root_path) {}
 
 /**
      * do the login complete procedure:
@@ -47,8 +46,8 @@ explicit Client_API::Client_API(Socket_API &socket_api, const std::string &root_
 template<typename Handler>
 bool Client_API::do_login(const std::string &username, const std::string &password, Handler handler) {
     auto req = Message::login(username, password);
-    this->api->async_send(req, handler);
-    auto res = this->api->receive(new Message{OKAY}, handler);
+    this->api.async_send(req, handler);
+    auto res = this->api.receive(new Message{OKAY}, handler);
 
     return res->is_okay();
 }
@@ -65,14 +64,14 @@ bool Client_API::do_login(const std::string &username, const std::string &passwo
      * @return status
      */
 template<typename Handler>
-bool Client_API::do_probe(const std::map <std::string, std::string> &map, Handler handler) {
-    std::vector <std::string> paths;
+bool Client_API::do_probe(const std::map<std::string, std::string> &map, Handler handler) {
+    std::vector<std::string> paths;
     paths.reserve(map.size());
     for (auto const &item : map)
         paths.push_back(item.first);
     auto req = Message::probe(paths);
-    this->api->async_send(req, handler);
-    auto res = this->api->receive(new Message{PROBE_CONTENT}, handler);
+    this->api.async_send(req, handler);
+    auto res = this->api.receive(new Message{PROBE_CONTENT}, handler);
 
     if (!res->is_okay())
         return false;
@@ -110,8 +109,8 @@ template<typename Handler>
 bool Client_API::do_push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash,
                          Handler handler) {
     auto req = Message::push(file, path, hash);
-    this->api->async_send(req, handler);
-    auto res = this->api->receive(new Message{OKAY}, handler);
+    this->api.async_send(req, handler);
+    auto res = this->api.receive(new Message{OKAY}, handler);
 
     return res->is_okay();
 }
@@ -129,8 +128,8 @@ bool Client_API::do_push(const std::vector<unsigned char> &file, const std::stri
 template<typename Handler>
 bool Client_API::do_restore(Handler handler) {
     auto req = Message::restore();
-    this->api->async_send(req, handler);
-    auto res = this->api->receive(new Message{RESTORE_CONTENT}, handler);
+    this->api.async_send(req, handler);
+    auto res = this->api.receive(new Message{RESTORE_CONTENT}, handler);
 
     if (!res->is_okay())
         return false;
