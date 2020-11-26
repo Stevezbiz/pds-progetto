@@ -77,8 +77,7 @@ class Socket_API {
      * @param handler
      * @return status
      */
-    template <typename Handler>
-    bool receive_header_(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler) {
+    bool receive_header_(MESSAGE_TYPE expectedMessage = UNDEFINED) {
         bool status = true;
         this->message = new Message{};
 
@@ -104,8 +103,7 @@ class Socket_API {
      * @param handler
      * @return status
      */
-    template <typename Handler>
-    bool receive_content_(Handler handler) {
+    bool receive_content_() {
         if(!this->call_(boost::asio::read, socket_, this->message->get_content_buffer(), handler))
             return false;
 
@@ -143,45 +141,66 @@ public:
      * send a Message
      * (sync mode by default)
      * wait until the message as been sent
-     * @tparam Handler
      * @param message
-     * @param handler
+     * @return status
      */
-    template <typename Handler>
-    void send(Message *message = new Message{ ERROR }, Handler handler = generic_handler) {
-        boost::asio::write(this->socket_, message->send(), handler);
+    bool send(Message *message = new Message{ ERROR }) {
+        return this->call_(boost::asio::write, message->send());
     }
 
     /**
      * async send a Message
-     * @tparam Handler
      * @param message
-     * @param handler
+     * @return status
      */
-    template <typename Handler>
-    void async_send(Message *message = new Message{ ERROR }, Handler handler = generic_handler) {
-        boost::asio::async_write(this->socket_, message->send(), handler); // deferred or async ? The system chooses
+    void async_send(Message *message = new Message{ ERROR }) {
+        return this->call_(boost::asio::async_write, message->send()); // deferred or async ? The system chooses
     }
 
     /**
      * receive a message
-     * @tparam Handler
      * @param expectedMessage
-     * @param handler
-     * @return message
+     * @return status
      */
-    template <typename Handler>
-    Message *receive(MESSAGE_TYPE expectedMessage = UNDEFINED, Handler handler = generic_handler) {
-        auto message = new Message{};
-        boost::asio::read(this->socket_, message->get_header_buffer(), handler);
+    Message *receive(MESSAGE_TYPE expectedMessage = UNDEFINED) {
+        bool status = true;
+        this->message = new Message{};
 
-        message->build(); // build the header
-        if(expectedMessage != UNDEFINED && message->code != expectedMessage)
-            return new Message{ ERROR };
+        if(!this->call_(boost::asio::read, message->get_header_buffer()));
+            return false;
 
-        boost::asio::read(socket_, message->get_content_buffer(), handler);
+        this->message->build(); // build the header
 
-        return message->build(); // build the whole message
+        if(this->message->code == ERROR) {
+            status = false;
+        }
+        else if(expectedMessage != UNDEFINED && message->code != expectedMessage) {
+            this->message = Message::error(UNEXPECTED_TYPE, 'SocketApi::receive', 'Another message type was expected');
+            status = false;
+        }
+
+        if(!this->call_(boost::asio::read, message->get_content_buffer())) // read the message content in any case
+            status = false;
+
+        this->message = message->build(); // build the whole message
+
+        return status;
+    }
+
+    /**
+     * getter
+     * @return last message
+     */
+    Message *get_last_message() {
+        return this->last_message;
+    }
+
+    /**
+     * getter
+     * @return last error
+     */
+    Comm_error *get_last_error() {
+        return this->last_error;
     }
 
     ~Socket_API() {

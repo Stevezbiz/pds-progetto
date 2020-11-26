@@ -138,13 +138,10 @@ void Server_API::set_restore(const std::function<const std::vector <std::string>
 
 /**
  * start handling requests
- * @tparam Handler
- * @param handler
  */
-template<typename Handler>
-void Server_API::run(Handler handler) {
+void Server_API::run() {
     while (true) {
-        auto req = this->api->receive(new Message{ERROR}, handler);
+        auto req = this->api->receive(new Message{ERROR});
         Message *res;
 
         // manage the request and produce a response message
@@ -167,6 +164,6 @@ void Server_API::run(Handler handler) {
             default:
                 res = new Message{ERROR};
         }
-        this->api->async_send(res, handler);
+        this->api->async_send(res);
     }
 }
