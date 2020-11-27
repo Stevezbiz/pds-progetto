@@ -4,83 +4,113 @@
 
 #include "Socket_API.h"
 
-using namespace boost::asio;
+bool Socket_API::call_(const std::function<void(const boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
+    bool status = false;
+    bool stop = false;
+    int retry_cont = 0;
+    boost::system::error_code ec;
 
-/**
-     * testing handler
-     * @param ec
-     * @param bytes_transferred
-     */
- void Socket_API::generic_handler(const boost::system::error_code &ec, std::size_t bytes_transferred) {
-    std::cout << ec << " errors, " << bytes_transferred << " bytes as been transferred correctly" << std::endl;
+    while(!stop && retry_cont < this->n_retry) {
+        perform_this(this->socket_, ec);
+
+        if(!ec) {
+            stop = true;
+            status = true;
+        }
+        else
+            std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay));
+
+        retry_cont++;
+    }
+
+    if(!status)
+        this->comm_error = new Comm_error{FAILURE, "Socket_API", "Connection failure" };
+
+    return status;
 }
 
-/**
-     * constructor
-     * @param socket
-     */
- Socket_API::Socket_API(io_context &socket) : socket_(socket) {}
+bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+    std::cout << ec << " errors, " <<bytes_transferred << " bytes as been transferred correctly" << std::endl;
+    return ec ? true : false;
+}
 
-/**
-     * socket setter
-     * @param socket
-     */
-void Socket_API::set_socket(ip::tcp::socket &&socket) {
-    if (this->socket_.is_open())
+bool Socket_API::receive_header_() {
+    this->message = new Message{};
+
+    if(!this->call_([this](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+            boost::asio::read(this->socket_, this->message->get_header_buffer());
+        }))
+        return false;
+
+    return true;
+}
+bool Socket_API::receive_content_() {
+    char s[10];
+    boost::system::error_code ec;
+    boost::asio::read(this->socket_, boost::asio::mutable_buffer(s, 10), ec);
+    if(!this->call_([this](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+            boost::asio::read(socket, this->message->get_content_buffer(), ec);
+        }))
+        return false;
+
+    return true;
+}
+
+Socket_API::Socket_API(boost::asio::ip::tcp::socket &&socket, ERROR_MANAGEMENT error_management, long retry_delay) : socket_(std::move(socket)), n_retry(error_management), retry_delay(retry_delay) {}
+
+void Socket_API::set_socket(boost::asio::ip::tcp::socket &&socket) {
+    if(this->socket_.is_open())
         this->socket_.close();
     this->socket_ = std::move(socket);
 }
 
-/**
-     * socket getter
-     * @return socket
-     */
-ip::tcp::socket &&Socket_API::get_socket() {
+boost::asio::ip::tcp::socket &&Socket_API::get_socket() {
     return std::move(this->socket_);
 }
 
-/**
-     * send a Message
-     * (sync mode by default)
-     * wait until the message as been sent
-     * @tparam Handler
-     * @param message
-     * @param handler
-     */
-template<typename Handler>
-void Socket_API::send(Message *message, Handler handler) {
-    write(this->socket_, message->send(), handler);
+bool Socket_API::send(Message *message) {
+    this->call_([&message](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+        boost::asio::write(socket, message->send(), ec);
+    });
+
+    return true;
 }
 
-/**
- * async send a Message
- * @tparam Handler
- * @param message
- * @param handler
- */
-template<typename Handler>
-void Socket_API::async_send(Message *message, Handler handler) {
-    async_write(this->socket_, message->send(), handler); // deferred or async ? The system chooses
+bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
+    bool status = true;
+    this->message = new Message{};
+
+    if(!this->receive_header_())
+        return false;
+
+    this->message->build(); // build the header
+
+    if(this->message->code == ERROR) {
+        status = false;
+    }
+    else if(expectedMessage != UNDEFINED && message->code != expectedMessage) {
+        this->comm_error = new Comm_error{ UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code : " + std::to_string(expectedMessage) };
+        this->message = Message::error(this->comm_error);
+        status = false;
+    }
+
+    if(!this->receive_content_()) // read the message content in any case
+        status = false;
+
+    this->message = message->build(); // build the whole message
+
+    return status;
 }
 
-/**
-     * receive a message
-     * @tparam Handler
-     * @param expectedMessage
-     * @param handler
-     * @return message
-     */
-template <typename Handler>
-Message *Socket_API::receive(MESSAGE_TYPE expectedMessage, Handler handler) {
-    auto message = new Message{};
-    boost::asio::read(this->socket_, message->get_header_buffer(), handler);
-
-    message->build(); // build the header
-    if (expectedMessage != UNDEFINED && message->code != expectedMessage)
-        return new Message{ERROR};
+Message *Socket_API::get_message() {
+    return this->message;
+}
+Comm_error *Socket_API::get_last_error() {
+    return this->comm_error;
 }
 
 Socket_API::~Socket_API() {
-    if (this->socket_.is_open())
+    if(this->socket_.is_open())
         this->socket_.close();
 }
+

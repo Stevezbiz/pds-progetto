@@ -22,54 +22,54 @@ namespace fs = boost::filesystem;
  */
 class Server_API : public API {
     // functions this class needs to manage client responses
-    std::function<bool(const std::string &, const std::string &)> login;
-    std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
-    std::function<const std::vector<unsigned char> &(const std::string &)> get;
-    std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
-    std::function<const std::vector <std::string> &()> restore;
-    std::function<bool()> end;
+    static std::function<bool(const std::string &, const std::string &)> login;
+    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
+    static std::function<const std::vector<unsigned char> &(const std::string &)> get;
+    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
+    static std::function<const std::vector <std::string> &()> restore;
+    static std::function<bool()> end;
 
     /**
      * manage login protocol procedure
      * @param request message
      * @return response message
      */
-    Message *do_login(Message *req);
+    static Message *do_login(Message *req);
 
     /**
      * manage probe protocol procedure
      * @param request message
      * @return response message
      */
-    Message *do_probe(Message *req);
+    static Message *do_probe(Message *req);
 
     /**
      * manage get protocol procedure
      * @param request message
      * @return response message
      */
-    Message *do_get(Message *req);
+    static Message *do_get(Message *req);
 
     /**
      * manage push protocol procedure
      * @param request message
      * @return response message
      */
-    Message *do_push(Message *req);
+    static Message *do_push(Message *req);
 
     /**
      * manage restore protocol procedure
      * @param request message
      * @return response message
      */
-    Message *do_restore(Message *req);
+    static Message *do_restore(Message *req);
 
     /**
     * manage end protocol procedure
     * @param request message
     * @return response message
     */
-    Message *do_end(Message *req);
+    static Message *do_end(Message *req);
 
 public:
     /**
@@ -87,7 +87,7 @@ public:
      *      - const std::string &password
      * - output: bool is_okay
      */
-    void set_login(const std::function<bool(const std::string &, const std::string &)> &login_function);
+    static void set_login(const std::function<bool(const std::string &, const std::string &)> &login_function);
 
     /**
      * set how to manage a probe request
@@ -97,7 +97,7 @@ public:
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    void set_probe(const std::function<const std::map <std::string, std::string> &( const std::vector <std::string> &)> &probe_function);
+    static void set_probe(const std::function<const std::map <std::string, std::string> &( const std::vector <std::string> &)> &probe_function);
 
     /**
      * set how to manage a get request
@@ -107,7 +107,7 @@ public:
      * - output:
      *      - const std::vector<unsigned char> &file, a vector of bytes
      */
-    void set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function);
+    static void set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function);
 
     /**
      * set how to manage a push request
@@ -119,7 +119,7 @@ public:
      * - output:
      *      - bool is_okay
      */
-    void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function);
+    static void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function);
 
     /**
      * set how to manage a restore request
@@ -129,7 +129,17 @@ public:
      * - output:
      *      - const std::vector<std::string> &paths, a list of paths
      */
-    void set_restore(const std::function<const std::vector <std::string> &()> &restore_function);
+    static void set_restore(const std::function<const std::vector <std::string> &()> &restore_function);
+
+    /**
+     * set how to manage a end request
+     * @param restore_function
+     * - input:
+     *      - (empty)
+     * - output:
+     *      - bool status
+     */
+    static void set_end(const std::function<bool()> &end_function);
 
     /**
      * start handling requests

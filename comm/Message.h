@@ -180,13 +180,13 @@ public:
      * the header is made up by "type" and "length" of the message
      * @return header buffer
      */
-    [[nodiscard]] boost::asio::const_buffer get_header_buffer() const;
+    [[nodiscard]] boost::asio::mutable_buffer get_header_buffer() const;
 
     /**
      * get the content buffer
      * @return content buffer
      */
-    [[nodiscard]] boost::asio::const_buffer get_content_buffer() const;
+    [[nodiscard]] boost::asio::mutable_buffer get_content_buffer() const;
 };
 
 #endif //SERVER_MESSAGE_H

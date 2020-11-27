@@ -12,9 +12,8 @@
  */
 enum COMM_ERRNO : int {
     NOT_AN_ERROR = -1,
-    UNDEFINED = 0,
-    GENERIC = 1,
-    FAILURE = 2,
+    GENERIC = 0,
+    FAILURE = 1,
     UNEXPECTED_TYPE = 10,
     UNEXPECTED_VALUE = 11,
     WRONG_TYPE = 20,

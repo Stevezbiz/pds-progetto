@@ -5,62 +5,66 @@
 #include "Server_API.h"
 
 Message *Server_API::do_login(Message *req) {
-    auto status = this->login(req->username, req->password);
+    auto status = Server_API::login(req->username, req->password);
     return status ? Message::okay() : Message::error(new Comm_error{ WRONG_VALUE, "Server_API::do_login", "Invalid username or password" });
 }
 
 Message *Server_API::do_probe(Message *req) {
-    auto hashes = this->probe(req->paths);
+    auto hashes = Server_API::probe(req->paths);
     return Message::probe_content(hashes);
 }
 
 Message *Server_API::do_get(Message *req) {
-    auto file = this->get(req->path);
+    auto file = Server_API::get(req->path);
     return Message::get_content(file, req->path);
 }
 
 Message *Server_API::do_push(Message *req) {
-    auto status = this->push(req->path, req->file, req->hash);
+    auto status = Server_API::push(req->path, req->file, req->hash);
     return status ? Message::okay() : Message::error(new Comm_error{ FAILURE, "Server_API::do_push", "Unable to push the file" });
 }
 
 Message *Server_API::do_restore(Message *req) {
-    auto paths = this->restore();
+    auto paths = Server_API::restore();
     return Message::restore_content(paths);
 }
 
 Message *Server_API::do_end(Message *req) {
-    auto status = this->end();
+    auto status = Server_API::end();
     return status ? Message::okay() : Message::error(new Comm_error{ FAILURE, "Server_API::do_end", "The server doesn't approved your request" });
 }
 
 Server_API::Server_API(Socket_API &socket_api, const std::string &user_root_path) : API(socket_api, user_root_path) {}
 
 void Server_API::set_login(const std::function<bool(const std::string &, const std::string &)> &login_function) {
-    this->login = login_function;
+    Server_API::login = login_function;
 }
 
 void Server_API::set_probe(const std::function<const std::map<std::string, std::string> &(
         const std::vector<std::string> &)> &probe_function) {
-    this->probe = probe_function;
+    Server_API::probe = probe_function;
 }
 
 void Server_API::set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function) {
-    this->get = get_function;
+    Server_API::get = get_function;
 }
 
 void Server_API::set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function) {
-    this->push = push_function;
+    Server_API::push = push_function;
 }
 
 void Server_API::set_restore(const std::function<const std::vector<std::string> &()> &restore_function) {
-    this->restore = restore_function;
+    Server_API::restore = restore_function;
+}
+
+void Server_API::set_end(const std::function<bool()> &end_function) {
+    Server_API::end = end_function;
 }
 
 void Server_API::run() {
     bool stop = false;
 
-    while (!stop) {
+    while(!stop) {
         this->api.receive(UNDEFINED);
         auto req = this->api.get_message();
         Message *res;
@@ -68,27 +72,28 @@ void Server_API::run() {
         // manage the request and produce a response message
         switch (req->code) {
             case LOGIN:
-                res = this->do_login(req);
+                res = Server_API::do_login(req);
                 break;
             case PROBE:
-                res = this->do_probe(req);
+                res = Server_API::do_probe(req);
                 break;
             case GET:
-                res = this->do_get(req);
+                res = Server_API::do_get(req);
                 break;
             case PUSH:
-                res = this->do_push(req);
+                res = Server_API::do_push(req);
                 break;
             case RESTORE:
-                res = this->do_restore(req);
+                res = Server_API::do_restore(req);
                 break;
             case END:
-                res = this->do_end(req);
+                res = Server_API::do_end(req);
                 stop = true;
                 break;
             default:
                 res = Message::error(new Comm_error{UNEXPECTED_TYPE, "Server_API::run", "Message code not valid"});
         }
+
         this->api.send(res);
     }
 }

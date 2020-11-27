@@ -116,10 +116,10 @@ Message *Message::build() {
     return new_message;
 }
 
-[[nodiscard]] boost::asio::const_buffer Message::get_header_buffer() const { // generic pointer, sorry
-    return boost::asio::const_buffer(this->header_buffer, sizeof(struct_header_buffer));
+[[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
+    return boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer));
 }
 
-[[nodiscard]] boost::asio::const_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::const_buffer(this->content_buffer, sizeof(this->header_buffer->length));
+[[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
+    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length)));
 }
