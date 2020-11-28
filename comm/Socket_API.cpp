@@ -38,7 +38,7 @@ bool Socket_API::receive_header_() {
     this->message = new Message{};
 
     if(!this->call_([this](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::read(this->socket_, this->message->get_header_buffer());
+            boost::asio::read(this->socket_, this->message->get_header_buffer(), ec);
         }))
         return false;
 

@@ -130,14 +130,10 @@ Message *Message::build() {
     return new_message;
 }
 
-[[nodiscard]] std::vector<boost::asio::mutable_buffer> Message::get_header_buffer() const { // generic pointer, sorry
-    std::vector <boost::asio::mutable_buffer> out_buffers{};
-    out_buffers.emplace_back(boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer)));
-    return out_buffers;
+[[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
+    return boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer));
 }
 
-[[nodiscard]] std::vector<boost::asio::mutable_buffer> Message::get_content_buffer() const { // generic pointer, sorry
-    std::vector <boost::asio::mutable_buffer> out_buffers{};
-    out_buffers.emplace_back(boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length)));
-    return out_buffers;
+[[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
+    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
 }
