@@ -11,7 +11,7 @@
 #include "../comm/Client_API.h"
 #include "../comm/Client_socket_API.h"
 
-constexpr int FS_DELAY = 1000*5; // 5 seconds
+constexpr const long FW_DELAY = 1000 * 5; // 5 seconds
 
 class Stub_client {
     FileWatcher *fw;
@@ -29,24 +29,14 @@ class Stub_client {
     }
 
     /**
-     * manager filewatcher change events
-     * @param path
-     * @param hash
-     * @param es
-     */
-    void fw_handler_(const std::string &path, const std::string &hash, ElementStatus es) {
-        auto file = Utils::read_from_file(path);
-        if(!api->do_push(file, path, hash)) {
-            this->error_handler_(this->api->get_last_error());
-        }
-    }
-
-    /**
      * fill stub values
      */
     void prepare_stub() {
-        this->map.insert(std::pair<std::string, std::string>{ "a.txt", "0x00" });
-        this->map.insert(std::pair<std::string, std::string>{ "b.txt", "0x01" });
+        std::vector<std::string> paths{ "a.txt", "b.txt" };
+
+        for(const auto &path : paths) {
+            this->map.insert(std::pair<std::string, std::string>{ path, Utils::SHA256(path) });
+        }
     }
 
 public:
@@ -59,6 +49,7 @@ public:
 
         auto socket_api = new Client_socket_API{ std::move(socket) };
         this->api = new Client_API{socket_api};
+        this->fw = new FileWatcher{ root_path, std::chrono::duration<int, std::milli>{ FW_DELAY }};
 
         this->prepare_stub();
     }
@@ -70,7 +61,7 @@ public:
         if(!this->is_logged_in) {
             this->is_logged_in = this->api->do_login(username, password);
             if(!this->is_logged_in)
-                this->error_handler_(this->api->get_last_error());
+                Stub_client::error_handler_(this->api->get_last_error());
         }
 
         return this->is_logged_in;
@@ -83,7 +74,11 @@ public:
         if(!this->is_logged_in) return false;
 
         this->api->do_probe(this->map);
-        this->fw->start(this->fw_handler_);
+        this->fw->start([this](const std::string &path, const std::string &hash, ElementStatus es){
+            auto file = Utils::read_from_file(path);
+            if(!this->api->do_push(file, path, hash))
+                Stub_client::error_handler_(this->api->get_last_error());
+        });
 
         return true;
     }
