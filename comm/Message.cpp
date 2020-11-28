@@ -18,7 +18,7 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->status; // = okay
 }
 
-std::vector <boost::asio::const_buffer> Message::send() {
+std::vector <boost::asio::const_buffer> Message::send() const {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
     std::ostringstream value_stream{};

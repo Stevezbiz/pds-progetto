@@ -79,7 +79,7 @@ public:
     * using a TLV format (type, length, value)
     * @return a list of asio buffers
     */
-    std::vector<boost::asio::const_buffer> send();
+    std::vector<boost::asio::const_buffer> send() const;
 
     /**
      * check if the inner status is okay

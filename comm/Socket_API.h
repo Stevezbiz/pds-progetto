@@ -35,7 +35,7 @@ protected:
      * @param perform_this
      * @return status
      */
-    bool call_(const std::function<void(const boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this);
+    bool call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this);
 
     /**
      * testing handler

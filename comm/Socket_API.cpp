@@ -4,7 +4,7 @@
 
 #include "Socket_API.h"
 
-bool Socket_API::call_(const std::function<void(const boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
+bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
     bool status = false;
     bool stop = false;
     int retry_cont = 0;
@@ -37,7 +37,7 @@ bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size
 bool Socket_API::receive_header_() {
     this->message = new Message{};
 
-    if(!this->call_([this](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::read(this->socket_, this->message->get_header_buffer(), ec);
         }))
         return false;
@@ -48,7 +48,7 @@ bool Socket_API::receive_content_() {
     char s[10];
     boost::system::error_code ec;
     boost::asio::read(this->socket_, boost::asio::mutable_buffer(s, 10), ec);
-    if(!this->call_([this](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::read(socket, this->message->get_content_buffer(), ec);
         }))
         return false;
@@ -69,7 +69,7 @@ boost::asio::ip::tcp::socket &&Socket_API::get_socket() {
 }
 
 bool Socket_API::send(Message *message) {
-    this->call_([&message](const boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+    this->call_([&message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
         boost::asio::write(socket, message->send(), ec);
     });
 
