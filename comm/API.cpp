@@ -4,7 +4,7 @@
 
 #include "API.h"
 
-API::API(Socket_API &socket_api, const std::string &root_path) : api(socket_api), root_path(root_path) {}
+API::API(Socket_API *socket_api, const std::string &root_path) : api(socket_api), root_path(root_path) {}
 
 bool API::save_file_(Message *message) {
     fs::path full_path = this->root_path / fs::path(message->path);
@@ -13,9 +13,9 @@ bool API::save_file_(Message *message) {
 }
 
 Message *API::get_message() {
-    return this->api.get_message();
+    return this->api->get_message();
 }
 
 Comm_error *API::get_last_error() {
-    return this->api.get_last_error();
+    return this->api->get_last_error();
 }
