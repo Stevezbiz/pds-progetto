@@ -16,6 +16,40 @@ class Server {
      */
     void do_accept();
 
+    /**
+     *
+     * @return
+     */
+    static bool login(const std::string &, const std::string &);
+
+    /**
+     *
+     * @return
+     */
+    static const std::map<std::string, std::string> &probe(const std::vector<std::string> &);
+
+    /**
+     *
+     * @return
+     */
+    static const std::vector<unsigned char> &get(const std::string &);
+
+    /**
+     *
+     */
+    static bool push(const std::string &, const std::vector<unsigned char> &, const std::string &);
+
+    /**
+     *
+     */
+    static const std::vector<std::string> &restore();
+
+    /**
+     *
+     * @return
+     */
+    static bool end();
+
 public:
     /**
      * Inizializza i campi dell'oggetto e pone il server in attesa di accettare connessioni
