@@ -148,70 +148,7 @@ public:
     };
 
 };
-int main()
-{
-    ConfigSettings c;
-    c.init_configuration();
 
-
-
-
-
-    /*
-    // 4.1 Ask user to insert credentials
-    std::cout << "Please insert username: ";
-    std::cin >> username;
-    std::cout << "Please insert password: ";
-    std::cin >> password;
-    */
-
-    /*if (port_is_open(address, port))
-        std::cout << "OPEN" << std::endl;
-    else
-        std::cout << "CLOSED" << std::endl;
-    return 0;*/
-    /*
-    int choice;
-    bool gameOn = true;
-    while (gameOn != false){
-        cout << "*******************************\n";
-        cout << " 1 - Start the game.\n";
-        cout << " 2 - Story.\n";
-        cout << " 3 - Help.\n";
-        cout << " 4 - Exit.\n";
-        cout << " Enter your choice and press return: ";
-
-        cin >> choice;
-
-        switch (choice)
-        {
-            case 1:
-                cout << "game start!\n";
-// rest of code here
-                break;
-            case 2:
-                cout << "Story so far....\n";
-// rest of code here
-                break;
-            case 3:
-                cout << "Ahahah, you really think I will help you?\n";
-// rest of code here
-                break;
-            case 4:
-                cout << "End of Program.\n";
-                gameOn = false;
-                break;
-            default:
-                cout << "Not a Valid Choice. \n";
-                cout << "Choose again.\n";
-                cin >> choice;
-                break;
-        }
-
-    }
-     */
-    return 0;
-}
 
 
 
