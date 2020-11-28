@@ -8,6 +8,9 @@
 #include <iostream>
 #include <vector>
 #include <boost/filesystem.hpp>
+#include <openssl/sha.h>
+#include <iomanip>
+#include <sstream>
 
 namespace fs = boost::filesystem;
 
