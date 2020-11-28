@@ -69,6 +69,8 @@ set(CLIENT_SOURCE_FILES
         client/FSElement.h
         client/Client.cpp
         client/Client.h
+        client/ConfigSetting.cpp
+        client/ConfigSetting.h
         comm/Message.cpp
         comm/Message.h
         comm/Utils.cpp
