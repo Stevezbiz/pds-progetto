@@ -121,5 +121,5 @@ Message *Message::build() {
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length)));
+    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
 }
