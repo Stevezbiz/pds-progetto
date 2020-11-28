@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.17)
 
-set(Boost_INCLUDE_DIR "/Users/paologastaldi/Downloads/boost_1_74_0")
-set(Boost_LIBRARY_DIR "/Users/paologastaldi/Downloads/boost_1_74_0/lib")
-set(Boost_ROOT_DIR "/Users/paologastaldi/Downloads/boost_1_74_0")
-set(OPENSSL_INCLUDE_DIR /usr/local/opt/openssl)
+#set(Boost_INCLUDE_DIR "/Users/paologastaldi/Downloads/boost_1_74_0")
+#set(Boost_LIBRARY_DIR "/Users/paologastaldi/Downloads/boost_1_74_0/lib")
+#set(Boost_ROOT_DIR "/Users/paologastaldi/Downloads/boost_1_74_0")
+#set(OPENSSL_INCLUDE_DIR /usr/local/opt/openssl)
 
 # --- comm ---
 set(CMAKE_CXX_STANDARD 17)
@@ -37,6 +37,16 @@ set(STUB_CLIENT_SOURCE_FILES
         client/Stub_client.h
 )
 add_executable(stub_client ${STUB_CLIENT_SOURCE_FILES} ${COMM_SOURCE_FILES})
+
+find_package(Threads REQUIRED)
+target_link_libraries(stub_client Threads::Threads)
+
+find_package(OpenSSL REQUIRED)
+if (OPENSSL_FOUND)
+    target_link_libraries(stub_client ${OPENSSL_LIBRARIES})
+else ()
+    message(WARNING "Cannot find OpenSSL")
+endif ()
 
 # --- client ---
 project(client)
