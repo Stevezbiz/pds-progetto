@@ -26,6 +26,18 @@ SET(COMM_SOURCE_FILES
         comm/Utils.h
 )
 
+# --- stub client ---
+project(stub_client)
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(STUB_CLIENT_SOURCE_FILES
+        client/stub_main.cpp
+        client/Stub_client.cpp
+        client/Stub_client.h
+)
+add_executable(stub_client ${STUB_CLIENT_SOURCE_FILES} ${COMM_SOURCE_FILES})
+
 # --- client ---
 project(client)
 
