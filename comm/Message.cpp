@@ -4,11 +4,25 @@
 
 #include "Message.h"
 
+template<class Archive>
+void Message::serialize(Archive &ar, const unsigned int version) {
+    ar & this->code;
+    ar & this->username;
+    ar & this->password;
+    ar & this->path;
+    ar & this->hash;
+    ar & this->paths;
+    ar & this->hashes;
+    ar & this->file;
+    ar & this->comm_error;
+    ar & this->status; // = okay
+}
+
 std::vector <boost::asio::const_buffer> Message::send() {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
     std::ostringstream value_stream{};
-    boost::archive::text_oarchive oa{value_stream};
+    boost::archive::text_oarchive oa{ value_stream };
 
     // serialize message content
     oa << this;

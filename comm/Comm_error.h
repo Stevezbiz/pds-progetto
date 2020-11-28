@@ -6,6 +6,8 @@
 #define COMM_ERROR_H
 
 #include <iostream>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 /**
  * list of error numbers (error codes)
@@ -24,6 +26,11 @@ enum COMM_ERRNO : int {
  * standard format for errors
  */
 class Comm_error {
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
+    friend class boost::serialization::access;
+
 public:
     COMM_ERRNO comm_errno;
     std::string location;

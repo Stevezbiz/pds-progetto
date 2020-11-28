@@ -56,6 +56,9 @@ class Message {
         size_t length;
     };
 
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version);
+
     friend class boost::serialization::access;
 
 public:
@@ -65,8 +68,8 @@ public:
     std::vector<std::string> paths;
     std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
-    bool status; // = okay
     Comm_error *comm_error;
+    bool status; // = okay
 
     struct_header_buffer *header_buffer;
     char *content_buffer;
