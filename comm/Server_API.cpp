@@ -65,8 +65,8 @@ void Server_API::run() {
     bool stop = false;
 
     while(!stop) {
-        this->api.receive(UNDEFINED);
-        auto req = this->api.get_message();
+        this->api->receive(UNDEFINED);
+        auto req = this->api->get_message();
         Message *res;
 
         // manage the request and produce a response message
@@ -94,6 +94,6 @@ void Server_API::run() {
                 res = Message::error(new Comm_error{UNEXPECTED_TYPE, "Server_API::run", "Message code not valid"});
         }
 
-        this->api.send(res);
+        this->api->send(res);
     }
 }
