@@ -33,6 +33,12 @@ void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &fi
     auto file_buffer = reinterpret_cast<char *>(file[0]); // TODO: check this
     os << file_buffer;
 }
+
+
+std::string Utils::SHA256(const std::string &path) {
+    return Utils::SHA256(fs::path(path));
+}
+
 /**
  * Calcola l'hash di un file utilizzando SHA256 implementato in openssl
  * Per uniformità viene calcolato anche l'hash per una directory, utilizzando il suo nome
