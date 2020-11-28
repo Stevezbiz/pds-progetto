@@ -32,14 +32,14 @@ class FileWatcher {
      * Verifica se gli elementi presenti al precedente check sono stati cancellati
      * @param action: una funzione di handler per gestire le eventuali cancellazioni
      */
-    void findErased(const std::function<void(std::string, ElementStatus)> &action);
+    void findErased(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
 
     /**
      * Verifica se gli elementi ora presenti non esistevano ancora al precedente check
      * e verifica se gli elementi sono stati modificati
      * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
      */
-    void findCreatedOrModified(const std::function<void(std::string, ElementStatus)> &action);
+    void findCreatedOrModified(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
 
 public:
     /**
@@ -57,7 +57,7 @@ public:
      * Opera il polling sul thread del file watcher e chiama le funzioni per il check delle modifiche alla directory
      * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
      */
-    void start(const std::function<void(std::string, ElementStatus)> &action);
+    void start(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
 };
 
 

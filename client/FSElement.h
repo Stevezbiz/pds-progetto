@@ -36,6 +36,11 @@ public:
      * @return True se l'elemento è stato modificato
      */
     bool needUpdate();
+    /**
+     * Getter method
+     * @return the hash value
+     */
+    std::string getHash();
 };
 
 

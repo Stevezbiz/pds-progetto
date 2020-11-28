@@ -4,7 +4,6 @@
 
 #include "FSElement.h"
 #include <iostream>
-#include <utility>
 #include "../comm/Utils.h"
 
 namespace fs = boost::filesystem;
@@ -29,4 +28,8 @@ bool FSElement::needUpdate() {
     } else {
         return false;
     }
+}
+
+std::string FSElement::getHash() {
+    return hash_;
 }
