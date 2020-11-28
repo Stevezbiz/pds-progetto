@@ -34,7 +34,7 @@ Message *Server_API::do_end(Message *req) {
     return status ? Message::okay() : Message::error(new Comm_error{ FAILURE, "Server_API::do_end", "The server doesn't approved your request" });
 }
 
-Server_API::Server_API(Socket_API &socket_api, const std::string &user_root_path) : API(socket_api, user_root_path) {}
+Server_API::Server_API(Socket_API *socket_api, const std::string &user_root_path) : API(socket_api, user_root_path) {}
 
 void Server_API::set_login(const std::function<bool(const std::string &, const std::string &)> &login_function) {
     Server_API::login = login_function;

@@ -11,3 +11,11 @@ bool API::save_file_(Message *message) {
     Utils::write_on_file(full_path, message->file);
     return true;
 }
+
+Message *API::get_message() {
+    return this->api.get_message();
+}
+
+Comm_error *API::get_last_error() {
+    return this->api.get_last_error();
+}

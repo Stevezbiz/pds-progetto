@@ -22,12 +22,12 @@ namespace fs = boost::filesystem;
  */
 class Server_API : public API {
     // functions this class needs to manage client responses
-    static std::function<bool(const std::string &, const std::string &)> login;
-    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
-    static std::function<const std::vector<unsigned char> &(const std::string &)> get;
-    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
-    static std::function<const std::vector <std::string> &()> restore;
-    static std::function<bool()> end;
+    static std::function<bool(const std::string &, const std::string &)> &login;
+    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> &probe;
+    static std::function<const std::vector<unsigned char> &(const std::string &)> &get;
+    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push;
+    static std::function<const std::vector <std::string> &()> &restore;
+    static std::function<bool()> &end;
 
     /**
      * manage login protocol procedure
@@ -77,7 +77,7 @@ public:
      * @param socket_api
      * @param user_root_path
      */
-    explicit Server_API(Socket_API &socket_api, const std::string &user_root_path = ".");
+    explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".");
 
     /**
      * set how to manage a login request
