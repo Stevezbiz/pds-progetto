@@ -32,14 +32,19 @@ class Stub_client {
      * fill stub values
      */
     void prepare_stub() {
-        std::vector<std::string> paths{ "a.txt", "b.txt" };
+        std::vector<std::string> paths{ "a.txt", "b.txt" }; // see these files in cmake-build-debug
 
-        for(const auto &path : paths) {
+        for(const auto &path : paths)
             this->map.insert(std::pair<std::string, std::string>{ path, Utils::SHA256(path) });
-        }
     }
 
 public:
+    /**
+     * class constructor
+     * @param root_path
+     * @param ip
+     * @param port
+     */
     Stub_client(const std::string &root_path, const std::string &ip, const std::string &port) {
         boost::asio::io_context ctx;
         boost::asio::ip::tcp::resolver resolver(ctx);

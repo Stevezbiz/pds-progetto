@@ -35,7 +35,7 @@ std::vector <boost::asio::const_buffer> Message::send() {
     auto length_data = value_stream.str();
 
     // concat buffers into a vector
-    std::vector <boost::asio::const_buffer> out_buffers;
+    std::vector <boost::asio::const_buffer> out_buffers{};
     out_buffers.emplace_back(boost::asio::buffer(type_data));
     out_buffers.emplace_back(boost::asio::buffer(length_data));
     out_buffers.emplace_back(boost::asio::buffer(value_data));
@@ -130,10 +130,14 @@ Message *Message::build() {
     return new_message;
 }
 
-[[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer));
+[[nodiscard]] std::vector<boost::asio::mutable_buffer> Message::get_header_buffer() const { // generic pointer, sorry
+    std::vector <boost::asio::mutable_buffer> out_buffers{};
+    out_buffers.emplace_back(boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer)));
+    return out_buffers;
 }
 
-[[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
+[[nodiscard]] std::vector<boost::asio::mutable_buffer> Message::get_content_buffer() const { // generic pointer, sorry
+    std::vector <boost::asio::mutable_buffer> out_buffers{};
+    out_buffers.emplace_back(boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length)));
+    return out_buffers;
 }
