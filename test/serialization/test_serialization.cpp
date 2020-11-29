@@ -2,6 +2,7 @@
 // Created by Paolo Gastaldi on 29/11/2020.
 //
 
+#include <iostream>
 #include <sstream>
 #include <boost/tuple/tuple.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -18,8 +19,7 @@ class Inner {
 public:
     int val;
 
-    Inner() : Inner(0) {}
-    explicit Inner(int val) : val(val) {}
+    explicit Inner(int val = 0) : val(val) {}
 };
 
 class Outer {
@@ -35,8 +35,7 @@ public:
     int val;
     Inner *inner;
 
-    Outer() : Outer(0, new Inner{ 0 }) {}
-    Outer(int val, Inner *inner) : val(val), inner(inner) {}
+    Outer(int val = 0, Inner *inner = new Inner{ 0 }) : val(val), inner(inner) {}
 
     ~Outer() {
         delete this->inner;
@@ -59,5 +58,10 @@ int main(int argc, char **argv) {
     Outer *new_outer;
     ia >> new_outer;
 
+    std::cout << new_outer->val << std::endl;
+    std::cout << new_outer->inner->val << std::endl;
+
     delete outer;
+
+    return 0;
 }
