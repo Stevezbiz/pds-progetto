@@ -59,6 +59,8 @@ class Message {
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
 
+    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::map<std::string, std::string> hashes, std::vector<unsigned char> file, Comm_error *comm_error, bool status);
+
     friend class boost::serialization::access;
 
 public:
@@ -79,7 +81,7 @@ public:
     * using a TLV format (type, length, value)
     * @return a list of asio buffers
     */
-    std::vector<boost::asio::const_buffer> send() const;
+    [[nodiscard]] std::vector<boost::asio::const_buffer> send() const;
 
     /**
      * check if the inner status is okay

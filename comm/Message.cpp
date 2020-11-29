@@ -4,6 +4,8 @@
 
 #include "Message.h"
 
+#include <utility>
+
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->code;
@@ -18,7 +20,7 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->status; // = okay
 }
 
-std::vector <boost::asio::const_buffer> Message::send() const {
+std::vector<boost::asio::const_buffer> Message::send() const {
     std::ostringstream type_stream{};
     std::ostringstream length_stream{};
     std::ostringstream value_stream{};
@@ -138,3 +140,17 @@ Message *Message::build_content() {
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
     return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
 }
+
+Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
+                 std::vector<std::string> paths, std::map<std::string, std::string> hashes,
+                 std::vector<unsigned char> file, Comm_error *comm_error, bool status) :
+                    code(code),
+                    username(std::move(username)),
+                    password(std::move(password)),
+                    path(std::move(path)),
+                    hash(std::move(hash)),
+                    paths(std::move(paths)),
+                    hashes(std::move(hashes)),
+                    file(std::move(file)),
+                    comm_error(comm_error),
+                    status(status) {}
