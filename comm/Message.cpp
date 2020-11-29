@@ -116,14 +116,13 @@ Message *Message::end() {
     return new Message{ END };
 }
 
-Message *Message::build() {
-    if (this->content_buffer == nullptr) { // if only the header has been received
-        this->code = this->header_buffer->type;
-        this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
-        return this;
-    }
+Message *Message::build_header() {
+    this->code = this->header_buffer->type;
+    this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
+    return this;
+}
 
-    // else if the content as been received
+Message *Message::build_content() {
     std::istringstream ss{ this->content_buffer };
     boost::archive::text_iarchive ia{ ss };
     Message *new_message;

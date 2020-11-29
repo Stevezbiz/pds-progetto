@@ -83,7 +83,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     if(!this->receive_header_())
         return false;
 
-    this->message->build(); // build the header
+    this->message = this->message->build_header(); // build the header
 
     if(this->message->code == ERROR) {
         status = false;
@@ -97,7 +97,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     if(!this->receive_content_()) // read the message content in any case
         status = false;
 
-    this->message = message->build(); // build the whole message
+    this->message = message->build_content(); // build the whole message
 
     return status;
 }

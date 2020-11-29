@@ -175,10 +175,16 @@ public:
     static Message *end();
 
     /**
-     * fill message fields
+     * fill message header fields
      * @return modified message or new message
      */
-    Message *build();
+    Message *build_header();
+
+    /**
+     * fill message content fields
+     * @return modified message or new message
+     */
+    Message *build_content();
 
     /**
      * get the header buffer
