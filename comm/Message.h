@@ -57,7 +57,7 @@ class Message {
     };
 
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+    void serialize(Archive &ar, const unsigned int version);
 
     friend class boost::serialization::access;
 

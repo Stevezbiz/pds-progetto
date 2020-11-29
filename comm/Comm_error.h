@@ -5,7 +5,8 @@
 #ifndef COMM_ERROR_H
 #define COMM_ERROR_H
 
-#include <iostream>
+#include <sstream>
+#include <boost/tuple/tuple.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
@@ -27,7 +28,7 @@ enum COMM_ERRNO : int {
  */
 class Comm_error {
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+    void serialize(Archive &ar, const unsigned int version);
 
     friend class boost::serialization::access;
 
@@ -42,7 +43,13 @@ public:
      * @param location
      * @param message
      */
-    explicit Comm_error(COMM_ERRNO comm_errno = GENERIC, std::string &&location = "System", std::string &&message = "Generic error");
+    explicit Comm_error(COMM_ERRNO comm_errno = GENERIC, std::string location = "System", std::string message = "Generic error");
+
+    /**
+     * send an error
+     * @return serialized error
+     */
+    [[nodiscard]] std::string send() const;
 };
 
 
