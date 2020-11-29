@@ -12,12 +12,14 @@ class Inner {
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
         ar & this->val;
+        ar & this->no_init_val;
     }
 
     friend class boost::serialization::access;
 
 public:
     int val;
+    int no_init_val = -1;
 
     explicit Inner(int val = 0) : val(val) {}
 };
@@ -87,6 +89,7 @@ int main(int argc, char **argv) {
 
     // ------------ TEST 2 ------------
 
+    outer->inner->no_init_val = 2;
     auto serialized2 = outer->send();
 
     // other stuffs...
@@ -96,6 +99,7 @@ int main(int argc, char **argv) {
     std::cout << " --- TEST 2 --- " << std::endl;
     std::cout << new_outer2->val << std::endl;
     std::cout << new_outer2->inner->val << std::endl;
+    std::cout << new_outer2->inner->no_init_val << std::endl;
 
     // ------------ END ------------
 
