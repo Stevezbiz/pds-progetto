@@ -115,7 +115,7 @@ set(SERVER_SOURCE_FILES
         server/Session.h
 )
 add_executable(server ${SERVER_SOURCE_FILES} ${COMM_SOURCE_FILES})
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED serialization filesystem)
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
@@ -127,7 +127,7 @@ endif ()
 find_package(OpenSSL REQUIRED)
 if (OPENSSL_FOUND)
     include_directories(${openssl_INCLUDE_DIR})
-    target_link_libraries(client ${OPENSSL_LIBRARIES})
+    target_link_libraries(server ${OPENSSL_LIBRARIES})
 else ()
     message(WARNING "Cannot find OpenSSL")
 endif ()
