@@ -35,7 +35,7 @@ public:
     int val;
     Inner *inner;
 
-    Outer(int val = 0, Inner *inner = new Inner{ 0 }) : val(val), inner(inner) {}
+    explicit Outer(int val = 0, Inner *inner = new Inner{ 0 }) : val(val), inner(inner) {}
 
     ~Outer() {
         delete this->inner;
