@@ -80,10 +80,6 @@ set(CLIENT_SOURCE_FILES
         client/Client.h
         client/ConfigSetting.cpp
         client/ConfigSetting.h
-        comm/Message.cpp
-        comm/Message.h
-        comm/Utils.cpp
-        comm/Utils.h
 )
 add_executable(client ${CLIENT_SOURCE_FILES} ${COMM_SOURCE_FILES})
 
@@ -117,8 +113,6 @@ set(SERVER_SOURCE_FILES
         server/Server.h
         server/Session.cpp
         server/Session.h
-        comm/Message.cpp
-        comm/Message.h
 )
 add_executable(server ${SERVER_SOURCE_FILES} ${COMM_SOURCE_FILES})
 find_package(Boost REQUIRED)
@@ -164,7 +158,7 @@ project(test_static)
 
 set(test_static_SOURCE_FILES
         test/static/test_static.cpp
-        )
+)
 
 add_executable(test_static ${test_static_SOURCE_FILES})
 find_package(Boost REQUIRED)
