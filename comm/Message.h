@@ -9,6 +9,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <utility>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -186,7 +187,7 @@ public:
      * fill message content fields
      * @return modified message or new message
      */
-    Message *build_content();
+    [[nodiscard]] Message *build_content() const;
 
     /**
      * get the header buffer
@@ -200,6 +201,8 @@ public:
      * @return content buffer
      */
     [[nodiscard]] boost::asio::mutable_buffer get_content_buffer() const;
+
+    ~Message();
 };
 
 #endif //SERVER_MESSAGE_H

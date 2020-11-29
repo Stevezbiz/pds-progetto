@@ -4,7 +4,21 @@
 
 #include "Message.h"
 
-#include <utility>
+Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
+                 std::vector<std::string> paths, std::map<std::string, std::string> hashes,
+                 std::vector<unsigned char> file, Comm_error *comm_error, bool status) :
+        code(code),
+        username(std::move(username)),
+        password(std::move(password)),
+        path(std::move(path)),
+        hash(std::move(hash)),
+        paths(std::move(paths)),
+        hashes(std::move(hashes)),
+        file(std::move(file)),
+        comm_error(comm_error),
+        status(status),
+        header_buffer(nullptr),
+        content_buffer(nullptr) {}
 
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
@@ -48,7 +62,7 @@ std::vector<boost::asio::const_buffer> Message::send() const {
 
 [[nodiscard]] bool Message::is_okay() const { return this->status; }
 
-Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr), comm_error(new Comm_error{}) {
+Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr), comm_error(nullptr) {
     if(this->code == ERROR)
         this->status = false;
 }
@@ -121,15 +135,18 @@ Message *Message::end() {
 Message *Message::build_header() {
     this->code = this->header_buffer->type;
     this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
+    delete this->header_buffer; // not necessary anymore
+
     return this;
 }
 
-Message *Message::build_content() {
+Message *Message::build_content() const {
     std::istringstream ss{ this->content_buffer };
     boost::archive::text_iarchive ia{ ss };
     Message *new_message;
     ia >> new_message; // de-serialization
-    // ia >> new_message->comm_error;
+    delete this->content_buffer; // not necessary anymore
+
     return new_message;
 }
 
@@ -141,16 +158,8 @@ Message *Message::build_content() {
     return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
 }
 
-Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
-                 std::vector<std::string> paths, std::map<std::string, std::string> hashes,
-                 std::vector<unsigned char> file, Comm_error *comm_error, bool status) :
-                    code(code),
-                    username(std::move(username)),
-                    password(std::move(password)),
-                    path(std::move(path)),
-                    hash(std::move(hash)),
-                    paths(std::move(paths)),
-                    hashes(std::move(hashes)),
-                    file(std::move(file)),
-                    comm_error(comm_error),
-                    status(status) {}
+Message::~Message() {
+    delete this->comm_error;
+    delete this->header_buffer;
+    delete this->content_buffer;
+}
