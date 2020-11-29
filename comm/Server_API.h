@@ -147,29 +147,4 @@ public:
     void run();
 };
 
-// default functions
-std::function<bool(const std::string &, const std::string &)> Server_API::login = [](const std::string &, const std::string &) {
-    return true;
-};
-
-std::function<const std::map<std::string, std::string> *(const std::vector <std::string> &)> Server_API::probe = [](const std::vector <std::string> &) {
-    return new std::map<std::string, std::string>{};
-};
-
-std::function<const std::vector<unsigned char> *(const std::string &)> Server_API::get = [](const std::string &) {
-    return new std::vector<unsigned char>{};
-};
-
-std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> Server_API::push = [](const std::string &, const std::vector<unsigned char> &, const std::string &) {
-    return true;
-};
-
-std::function<const std::vector<std::string> *()> Server_API::restore = []() {
-    return new std::vector<std::string>{};
-};
-
-std::function<bool()> Server_API::end = []() {
-    return true;
-};
-
 #endif //SERVER_SERVER_API_H
