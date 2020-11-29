@@ -38,6 +38,22 @@ class Stub_client {
             this->map.insert(std::pair<std::string, std::string>{ path, Utils::SHA256(path) });
     }
 
+    void open_conn(const std::string &ip, const std::string &port) {
+        try {
+            boost::asio::io_context ctx;
+            boost::asio::ip::tcp::resolver resolver(ctx);
+            auto endpoint_iterator = resolver.resolve({ ip, port });
+            boost::asio::ip::tcp::socket socket{ ctx };
+            boost::asio::connect(socket, endpoint_iterator);
+
+            auto socket_api = new Client_socket_API{ std::move(socket) };
+            this->api = new Client_API{ socket_api };
+        } catch(const std::exception &e) {
+            std::cerr << "(Stub_client::open_conn_) " << e.what() << std::endl;
+            exit(-1);
+        }
+    }
+
 public:
     /**
      * class constructor
@@ -46,16 +62,8 @@ public:
      * @param port
      */
     Stub_client(const std::string &root_path, const std::string &ip, const std::string &port) {
-        boost::asio::io_context ctx;
-        boost::asio::ip::tcp::resolver resolver(ctx);
-        auto endpoint_iterator = resolver.resolve({ ip, port });
-        boost::asio::ip::tcp::socket socket{ ctx };
-        boost::asio::connect(socket, endpoint_iterator);
-
-        auto socket_api = new Client_socket_API{ std::move(socket) };
-        this->api = new Client_API{ socket_api };
+        this->open_conn(ip, port);
         this->fw = new FileWatcher{ root_path, std::chrono::milliseconds(FW_DELAY) };
-
         this->prepare_stub();
     }
 
