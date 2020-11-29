@@ -11,12 +11,12 @@ Message *Server_API::do_login(Message *req) {
 
 Message *Server_API::do_probe(Message *req) {
     auto hashes = Server_API::probe(req->paths);
-    return Message::probe_content(hashes);
+    return Message::probe_content(*hashes);
 }
 
 Message *Server_API::do_get(Message *req) {
     auto file = Server_API::get(req->path);
-    return Message::get_content(file, req->path);
+    return Message::get_content(*file, req->path);
 }
 
 Message *Server_API::do_push(Message *req) {
@@ -26,7 +26,7 @@ Message *Server_API::do_push(Message *req) {
 
 Message *Server_API::do_restore(Message *req) {
     auto paths = Server_API::restore();
-    return Message::restore_content(paths);
+    return Message::restore_content(*paths);
 }
 
 Message *Server_API::do_end(Message *req) {
@@ -40,12 +40,11 @@ void Server_API::set_login(const std::function<bool(const std::string &, const s
     login = login_function;
 }
 
-void Server_API::set_probe(const std::function<const std::map<std::string, std::string> &(
-        const std::vector<std::string> &)> &probe_function) {
+void Server_API::set_probe(const std::function<const std::map<std::string, std::string> *(const std::vector<std::string> &)> &probe_function) {
     Server_API::probe = probe_function;
 }
 
-void Server_API::set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function) {
+void Server_API::set_get(const std::function<const std::vector<unsigned char> *(const std::string &)> &get_function) {
     Server_API::get = get_function;
 }
 
@@ -53,7 +52,7 @@ void Server_API::set_push(const std::function<bool(const std::string &, const st
     Server_API::push = push_function;
 }
 
-void Server_API::set_restore(const std::function<const std::vector<std::string> &()> &restore_function) {
+void Server_API::set_restore(const std::function<const std::vector<std::string> *()> &restore_function) {
     Server_API::restore = restore_function;
 }
 

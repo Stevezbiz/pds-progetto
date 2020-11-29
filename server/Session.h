@@ -5,9 +5,10 @@
 #ifndef SERVER_SESSION_H
 #define SERVER_SESSION_H
 
-#include "../comm/Message.h"
 #include <boost/asio.hpp>
 #include <deque>
+#include <iostream>
+#include <sqlite3.h>
 #include "../comm/Server_API.h"
 
 class Session : public std::enable_shared_from_this<Session> {

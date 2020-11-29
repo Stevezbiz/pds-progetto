@@ -28,20 +28,20 @@ bool Server::login(const std::string &, const std::string &) {
     return true;
 }
 
-const std::map<std::string, std::string> &Server::probe(const std::vector<std::string> &) {
-    return std::map<std::string, std::string>();
+const std::map<std::string, std::string> *Server::probe(const std::vector<std::string> &) {
+    return new std::map<std::string, std::string>();
 }
 
-const std::vector<unsigned char> &Server::get(const std::string &) {
-    return std::vector<unsigned char>();
+const std::vector<unsigned char> *Server::get(const std::string &) {
+    return new std::vector<unsigned char>();
 }
 
 bool Server::push(const std::string &, const std::vector<unsigned char> &, const std::string &) {
     return true;
 }
 
-const std::vector<std::string> &Server::restore() {
-    return std::vector<std::string>();
+const std::vector<std::string> *Server::restore() {
+    return new std::vector<std::string>();
 }
 
 bool Server::end() {

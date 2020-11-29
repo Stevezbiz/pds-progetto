@@ -26,13 +26,13 @@ class Server {
      *
      * @return
      */
-    static const std::map<std::string, std::string> &probe(const std::vector<std::string> &);
+    static const std::map<std::string, std::string> *probe(const std::vector<std::string> &);
 
     /**
      *
      * @return
      */
-    static const std::vector<unsigned char> &get(const std::string &);
+    static const std::vector<unsigned char> *get(const std::string &);
 
     /**
      *
@@ -42,7 +42,7 @@ class Server {
     /**
      *
      */
-    static const std::vector<std::string> &restore();
+    static const std::vector<std::string> *restore();
 
     /**
      *

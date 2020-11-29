@@ -23,10 +23,10 @@ namespace fs = boost::filesystem;
 class Server_API : public API {
     // functions this class needs to manage client responses
     static std::function<bool(const std::string &, const std::string &)> login;
-    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
-    static std::function<const std::vector<unsigned char> &(const std::string &)> get;
+    static std::function<const std::map <std::string, std::string> *(const std::vector <std::string> &)> probe;
+    static std::function<const std::vector<unsigned char> *(const std::string &)> get;
     static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
-    static std::function<const std::vector <std::string> &()> restore;
+    static std::function<const std::vector <std::string> *()> restore;
     static std::function<bool()> end;
 
     /**
@@ -97,7 +97,7 @@ public:
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    static void set_probe(const std::function<const std::map <std::string, std::string> &( const std::vector <std::string> &)> &probe_function);
+    static void set_probe(const std::function<const std::map <std::string, std::string> *( const std::vector <std::string> &)> &probe_function);
 
     /**
      * set how to manage a get request
@@ -107,7 +107,7 @@ public:
      * - output:
      *      - const std::vector<unsigned char> &file, a vector of bytes
      */
-    static void set_get(const std::function<const std::vector<unsigned char> &(const std::string &)> &get_function);
+    static void set_get(const std::function<const std::vector<unsigned char> *(const std::string &)> &get_function);
 
     /**
      * set how to manage a push request
@@ -129,7 +129,7 @@ public:
      * - output:
      *      - const std::vector<std::string> &paths, a list of paths
      */
-    static void set_restore(const std::function<const std::vector <std::string> &()> &restore_function);
+    static void set_restore(const std::function<const std::vector<std::string> *()> &restore_function);
 
     /**
      * set how to manage a end request
@@ -152,23 +152,20 @@ std::function<bool(const std::string &, const std::string &)> Server_API::login 
     return true;
 };
 
-std::function<const std::map<std::string, std::string> &(const std::vector <std::string> &)> Server_API::probe = [](const std::vector <std::string> &) {
-    std::map<std::string, std::string> map;
-    return map;
+std::function<const std::map<std::string, std::string> *(const std::vector <std::string> &)> Server_API::probe = [](const std::vector <std::string> &) {
+    return new std::map<std::string, std::string>{};
 };
 
-std::function<const std::vector<unsigned char> &(const std::string &)> Server_API::get = [](const std::string &) {
-    std::vector<unsigned char> vet;
-    return vet;
+std::function<const std::vector<unsigned char> *(const std::string &)> Server_API::get = [](const std::string &) {
+    return new std::vector<unsigned char>{};
 };
 
 std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> Server_API::push = [](const std::string &, const std::vector<unsigned char> &, const std::string &) {
     return true;
 };
 
-std::function<const std::vector<std::string> &()> Server_API::restore = []() {
-    std::vector<std::string> vet{};
-    return vet;
+std::function<const std::vector<std::string> *()> Server_API::restore = []() {
+    return new std::vector<std::string>{};
 };
 
 std::function<bool()> Server_API::end = []() {

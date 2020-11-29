@@ -2,8 +2,6 @@
 // Created by stevezbiz on 07/11/20.
 //
 
-#include <iostream>
-#include <sqlite3.h>
 #include "Session.h"
 
 using namespace boost::asio;

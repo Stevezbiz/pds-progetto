@@ -4,8 +4,8 @@ set(Boost_INCLUDE_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/")
 set(Boost_LIBRARY_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/boost")
 set(Boost_LIBRARIES "/Users/paologastaldi/Downloads/boost_1_74_0/boost/libs")
 
-set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
-set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
+# set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
+# set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
 set(openssl_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
 set(openssl_LIBRARY_DIR "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
 
@@ -115,7 +115,7 @@ set(SERVER_SOURCE_FILES
         server/Session.h
 )
 add_executable(server ${SERVER_SOURCE_FILES} ${COMM_SOURCE_FILES})
-find_package(Boost REQUIRED serialization filesystem)
+find_package(Boost REQUIRED serialization filesystem thread)
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
