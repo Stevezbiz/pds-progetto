@@ -22,12 +22,12 @@ namespace fs = boost::filesystem;
  */
 class Server_API : public API {
     // functions this class needs to manage client responses
-    static std::function<bool(const std::string &, const std::string &)> &login;
-    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> &probe;
-    static std::function<const std::vector<unsigned char> &(const std::string &)> &get;
-    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push;
-    static std::function<const std::vector <std::string> &()> &restore;
-    static std::function<bool()> &end;
+    static std::function<bool(const std::string &, const std::string &)> login;
+    static std::function<const std::map <std::string, std::string> &(const std::vector <std::string> &)> probe;
+    static std::function<const std::vector<unsigned char> &(const std::string &)> get;
+    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
+    static std::function<const std::vector <std::string> &()> restore;
+    static std::function<bool()> end;
 
     /**
      * manage login protocol procedure
@@ -147,5 +147,32 @@ public:
     void run();
 };
 
+// default functions
+std::function<bool(const std::string &, const std::string &)> Server_API::login = [](const std::string &, const std::string &) {
+    return true;
+};
+
+std::function<const std::map<std::string, std::string> &(const std::vector <std::string> &)> Server_API::probe = [](const std::vector <std::string> &) {
+    std::map<std::string, std::string> map;
+    return map;
+};
+
+std::function<const std::vector<unsigned char> &(const std::string &)> Server_API::get = [](const std::string &) {
+    std::vector<unsigned char> vet;
+    return vet;
+};
+
+std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> Server_API::push = [](const std::string &, const std::vector<unsigned char> &, const std::string &) {
+    return true;
+};
+
+std::function<const std::vector<std::string> &()> Server_API::restore = []() {
+    std::vector<std::string> vet{};
+    return vet;
+};
+
+std::function<bool()> Server_API::end = []() {
+    return true;
+};
 
 #endif //SERVER_SERVER_API_H

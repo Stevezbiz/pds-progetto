@@ -37,7 +37,7 @@ Message *Server_API::do_end(Message *req) {
 Server_API::Server_API(Socket_API *socket_api, const std::string &user_root_path) : API(socket_api, user_root_path) {}
 
 void Server_API::set_login(const std::function<bool(const std::string &, const std::string &)> &login_function) {
-    Server_API::login = login_function;
+    login = login_function;
 }
 
 void Server_API::set_probe(const std::function<const std::map<std::string, std::string> &(
