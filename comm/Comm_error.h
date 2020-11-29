@@ -50,6 +50,13 @@ public:
      * @return serialized error
      */
     [[nodiscard]] std::string send() const;
+
+    /**
+     * build an error from a serialize string
+     * @param serialize
+     * @return error
+     */
+    static Comm_error *build(const std::string &serialized);
 };
 
 

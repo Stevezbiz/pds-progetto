@@ -23,3 +23,13 @@ std::string Comm_error::send() const {
     oa << this;
     return ostream.str();
 }
+
+Comm_error *Comm_error::build(const std::string &serialized) {
+    std::istringstream istream{ serialized };
+    boost::archive::text_iarchive ia{ istream };
+
+    Comm_error *comm_error;
+    ia >> comm_error;
+
+    return comm_error;
+}
