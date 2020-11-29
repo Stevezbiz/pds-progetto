@@ -49,6 +49,8 @@ public:
      * @return last error
      */
     Comm_error *get_last_error();
+
+    ~API();
 };
 
 

@@ -56,7 +56,12 @@ bool Socket_API::receive_content_() {
     return true;
 }
 
-Socket_API::Socket_API(boost::asio::ip::tcp::socket &&socket, ERROR_MANAGEMENT error_management, long retry_delay) : socket_(std::move(socket)), n_retry(error_management), retry_delay(retry_delay) {}
+Socket_API::Socket_API(boost::asio::ip::tcp::socket &&socket, ERROR_MANAGEMENT error_management, long retry_delay) :
+        socket_(std::move(socket)),
+        n_retry(error_management),
+        retry_delay(retry_delay),
+        message(nullptr),
+        comm_error(nullptr) {}
 
 void Socket_API::set_socket(boost::asio::ip::tcp::socket &&socket) {
     if(this->socket_.is_open())
@@ -112,5 +117,7 @@ Comm_error *Socket_API::get_last_error() {
 Socket_API::~Socket_API() {
     if(this->socket_.is_open())
         this->socket_.close();
+    delete this->message;
+    delete this->comm_error;
 }
 

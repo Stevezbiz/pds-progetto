@@ -19,3 +19,7 @@ Message *API::get_message() {
 Comm_error *API::get_last_error() {
     return this->api->get_last_error();
 }
+
+API::~API() {
+    delete this->api;
+}

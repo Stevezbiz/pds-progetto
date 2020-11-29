@@ -25,8 +25,8 @@ class Socket_API {
 
 protected:
     boost::asio::ip::tcp::socket socket_;
-    Message *message{};
-    Comm_error *comm_error{};
+    Message *message;
+    Comm_error *comm_error;
     int n_retry;
     long retry_delay;
 
