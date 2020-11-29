@@ -9,6 +9,8 @@
 #include <chrono>
 #include <unordered_map>
 #include <functional>
+#include <thread>
+#include <boost/filesystem.hpp>
 #include "FSElement.h"
 
 enum class ElementStatus {

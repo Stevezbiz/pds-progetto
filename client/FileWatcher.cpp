@@ -3,8 +3,6 @@
 //
 
 #include "FileWatcher.h"
-#include <thread>
-#include <boost/filesystem.hpp>
 
 namespace fs = boost::filesystem;
 
