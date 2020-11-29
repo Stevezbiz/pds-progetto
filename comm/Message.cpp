@@ -26,6 +26,7 @@ std::vector <boost::asio::const_buffer> Message::send() const {
 
     // serialize message content
     oa << this;
+    // oa << this->comm_error;
     auto value_data = value_stream.str();
 
     // fixed lengths for the "type" and "length" values
@@ -45,9 +46,9 @@ std::vector <boost::asio::const_buffer> Message::send() const {
 
 [[nodiscard]] bool Message::is_okay() const { return this->status; }
 
-Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr) {
-    if (code == ERROR)
-        status = false;
+Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{ ERROR, 0 }), content_buffer(nullptr), comm_error(new Comm_error{}) {
+    if(this->code == ERROR)
+        this->status = false;
 }
 
 Message *Message::okay() {
@@ -123,10 +124,11 @@ Message *Message::build() {
     }
 
     // else if the content as been received
-    std::stringstream ss{ this->content_buffer };
+    std::istringstream ss{ this->content_buffer };
     boost::archive::text_iarchive ia{ ss };
-    auto *new_message = new Message{};
-    ia >> *new_message; // de-serialization
+    Message *new_message;
+    ia >> new_message; // de-serialization
+    // ia >> new_message->comm_error;
     return new_message;
 }
 
