@@ -7,11 +7,11 @@
 
 #include <iostream>
 #include <utility>
-#include "FileWatcher.h"
+#include "./FileWatcher.h"
 #include "../comm/Client_API.h"
 #include "../comm/Client_socket_API.h"
 
-constexpr const long FW_DELAY = 1000 * 5; // 5 seconds
+constexpr int FW_DELAY = 1000 * 5; // 5 seconds
 
 class Stub_client {
     FileWatcher *fw;
@@ -53,8 +53,8 @@ public:
         boost::asio::connect(socket, endpoint_iterator);
 
         auto socket_api = new Client_socket_API{ std::move(socket) };
-        this->api = new Client_API{socket_api};
-        this->fw = new FileWatcher{ root_path, std::chrono::duration<int, std::milli>{ FW_DELAY }};
+        this->api = new Client_API{ socket_api };
+        this->fw = new FileWatcher{ root_path, std::chrono::milliseconds(FW_DELAY) };
 
         this->prepare_stub();
     }
@@ -64,7 +64,7 @@ public:
      */
     bool login(const std::string &username, const std::string &password) {
         if(!this->is_logged_in) {
-            this->is_logged_in = this->api->do_login(username, password);
+            this->is_logged_in = this->api->login(username, password);
             if(!this->is_logged_in)
                 Stub_client::error_handler_(this->api->get_last_error());
         }
@@ -78,10 +78,10 @@ public:
     bool normal() {
         if(!this->is_logged_in) return false;
 
-        this->api->do_probe(this->map);
-        this->fw->start([this](const std::string &path, const std::string &hash, ElementStatus es){
+        this->api->probe(this->map);
+        this->fw->start([this](const std::string &path, const std::string &hash, ElementStatus es) {
             auto file = Utils::read_from_file(path);
-            if(!this->api->do_push(file, path, hash))
+            if(!this->api->push(file, path, hash))
                 Stub_client::error_handler_(this->api->get_last_error());
         });
 
@@ -94,7 +94,7 @@ public:
     bool restore() {
         if(!this->is_logged_in) return false;
 
-        this->api->do_restore();
+        this->api->restore();
         this->normal();
 
         return true;

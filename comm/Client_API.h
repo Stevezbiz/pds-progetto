@@ -44,7 +44,7 @@ public:
      * @param password
      * @return status
      */
-    bool do_login(const std::string &username, const std::string &password);
+    bool login(const std::string &username, const std::string &password);
 
     /**
      * do the complete probe procedure:
@@ -55,7 +55,7 @@ public:
      * @param map - <path, hash> mapping
      * @return status
      */
-    bool do_probe(const std::map <std::string, std::string> &map);
+    bool probe(const std::map <std::string, std::string> &map);
 
     /**
      * do the complete push procedure:
@@ -67,7 +67,7 @@ public:
      * @param hash
      * @return status
      */
-    bool do_push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash);
+    bool push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash);
 
     /**
      * do the complete restore procedure:
@@ -77,7 +77,7 @@ public:
      *
      * @return status
      */
-    bool do_restore();
+    bool restore();
 
     /**
      * do the end procedure:
@@ -86,7 +86,7 @@ public:
      *
      * @return status
      */
-    bool do_end();
+    bool end();
 };
 
 

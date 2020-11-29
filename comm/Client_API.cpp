@@ -21,7 +21,7 @@ bool Client_API::get_and_save_(const std::string &path) {
 
 Client_API::Client_API(Socket_API *socket_api, const std::string &root_path) : API(socket_api, root_path) {}
 
-bool Client_API::do_login(const std::string &username, const std::string &password) {
+bool Client_API::login(const std::string &username, const std::string &password) {
     auto req = Message::login(username, password);
     this->api->send(req);
     if(!this->api->receive(OKAY))
@@ -31,7 +31,7 @@ bool Client_API::do_login(const std::string &username, const std::string &passwo
     return res->is_okay();
 }
 
-bool Client_API::do_probe(const std::map<std::string, std::string> &map) {
+bool Client_API::probe(const std::map<std::string, std::string> &map) {
     std::vector<std::string> paths;
     paths.reserve(map.size());
     for (auto const &item : map)
@@ -50,7 +50,7 @@ bool Client_API::do_probe(const std::map<std::string, std::string> &map) {
         auto it = map.find(path);
         if(it == map.end() || map.at(path) != item.second) { // check if the file not exists or if versions (hashes) are different
             // if the client has a different file than the server, the client starts a push procedure
-            if(!this->do_push(Utils::read_from_file(path), path, map.at(path))) {
+            if(!this->push(Utils::read_from_file(path), path, map.at(path))) {
                 return false;
             }
         }
@@ -59,7 +59,7 @@ bool Client_API::do_probe(const std::map<std::string, std::string> &map) {
     return true;
 }
 
-bool Client_API::do_push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash) {
+bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash) {
     auto req = Message::push(file, path, hash);
     this->api->send(req);
     if(!this->api->receive(OKAY))
@@ -69,7 +69,7 @@ bool Client_API::do_push(const std::vector<unsigned char> &file, const std::stri
     return res->is_okay();
 }
 
-bool Client_API::do_restore() {
+bool Client_API::restore() {
     auto req = Message::restore();
     this->api->send(req);
     if(!this->api->receive(RESTORE_CONTENT))
@@ -86,7 +86,7 @@ bool Client_API::do_restore() {
     return true;
 }
 
-bool Client_API::do_end() {
+bool Client_API::end() {
     auto req = Message::end();
     this->api->send(req);
     if(!this->api->receive(OKAY))
