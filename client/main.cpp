@@ -3,6 +3,7 @@
 #include <utility>
 #include "Client.h"
 #include "FileWatcher.h"
+#include "ConfigSetting.h"
 
 /**
  * Il file watcher viene avviato e lancerà le azioni da compiere nell'handler
@@ -41,14 +42,16 @@ void startFileWatcher(Client &client, std::string directory) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 4) {
+    /*if (argc != 4) {
         std::cerr << "Usage: " << argv[0] << " <directory> <host> <port>" << std::endl;
         exit(-1);
-    }
+    }*/
     try {
+        ConfigSettings c;
+        c.init_configuration();
         boost::asio::io_context ctx;
         boost::asio::ip::tcp::resolver resolver(ctx);
-        auto endpoint_iterator = resolver.resolve({argv[1], argv[2]});
+        auto endpoint_iterator = resolver.resolve({c.getAddress(), c.getPort()});
         Client client(ctx, endpoint_iterator);
         std::thread t([&ctx]() {
             ctx.run();
