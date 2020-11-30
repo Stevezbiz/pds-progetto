@@ -25,7 +25,7 @@ class Server_API : public API {
     static std::function<bool(const std::string &, const std::string &)> login;
     static std::function<const std::map <std::string, std::string> *(const std::vector <std::string> &)> probe;
     static std::function<const std::vector<unsigned char> *(const std::string &)> get;
-    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> push;
+    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push;
     static std::function<const std::vector <std::string> *()> restore;
     static std::function<bool()> end;
 
@@ -116,10 +116,11 @@ public:
      *      - const std::string &path
      *      - const std::vector<char> &file
      *      - const std::string &hash
+     *      - ElementStatus
      * - output:
      *      - bool is_okay
      */
-    static void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function);
+    static void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function);
 
     /**
      * set how to manage a restore request
