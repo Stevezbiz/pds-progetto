@@ -12,11 +12,9 @@ int main(int argc, char **argv) {
     }
 
     boost::asio::io_context ctx;
-    boost::asio::ip::tcp::resolver resolver(ctx);
-    auto endpoint_iterator = resolver.resolve({argv[2], argv[3]});
+    boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), std::stoi(argv[3]));
+    boost::asio::ip::tcp::acceptor acceptor{ctx, endpoint};
     boost::asio::ip::tcp::socket socket{ctx};
-    boost::asio::connect(socket, endpoint_iterator);
-
     auto api = new Server_API{new Socket_API{std::move(socket)}};
 
     Server_API::set_end([]() { return true; });

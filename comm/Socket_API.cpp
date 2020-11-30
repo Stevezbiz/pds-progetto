@@ -10,10 +10,10 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, 
     int retry_cont = 0;
     boost::system::error_code ec;
 
-    while(!stop && retry_cont < this->n_retry) {
+    while(!stop && retry_cont <= this->n_retry) {
         perform_this(this->socket_, ec);
 
-        if(!ec) {
+        if(!ec.failed()) {
             stop = true;
             status = true;
         }
