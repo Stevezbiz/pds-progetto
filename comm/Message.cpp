@@ -48,8 +48,8 @@ std::vector<boost::asio::const_buffer> Message::send() const {
     // fixed lengths for the "type" and "length" values
     type_stream << std::setw(type_length) << std::hex << this->code;
     length_stream << std::setw(length_length) << std::hex << value_data.length();
-    auto type_data = value_stream.str();
-    auto length_data = value_stream.str();
+    auto type_data = type_stream.str();
+    auto length_data = length_stream.str();
 
     // concat buffers into a vector
     std::vector <boost::asio::const_buffer> out_buffers{};
