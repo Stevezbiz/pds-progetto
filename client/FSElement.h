@@ -8,6 +8,8 @@
 #include <ctime>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <iostream>
+#include "../comm/Utils.h"
 
 class FSElement {
     boost::filesystem::path path_;

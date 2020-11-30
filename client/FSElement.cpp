@@ -3,8 +3,6 @@
 //
 
 #include "FSElement.h"
-#include <iostream>
-#include "../comm/Utils.h"
 
 namespace fs = boost::filesystem;
 

@@ -12,10 +12,7 @@
 #include <thread>
 #include <boost/filesystem.hpp>
 #include "FSElement.h"
-
-enum class ElementStatus {
-    createdFile, modifiedFile, erasedFile
-};
+#include "../comm/ElementStatus.h"
 
 class FileWatcher {
     std::string path_to_watch_;

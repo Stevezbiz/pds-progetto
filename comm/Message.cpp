@@ -6,7 +6,7 @@
 
 Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
                  std::vector<std::string> paths, std::map<std::string, std::string> hashes,
-                 std::vector<unsigned char> file, Comm_error *comm_error, bool status) :
+                 std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
         code(code),
         username(std::move(username)),
         password(std::move(password)),
@@ -15,6 +15,7 @@ Message::Message(MESSAGE_TYPE code, std::string username, std::string password, 
         paths(std::move(paths)),
         hashes(std::move(hashes)),
         file(std::move(file)),
+        elementStatus(elementStatus),
         comm_error(comm_error),
         status(status),
         header_buffer(nullptr),
@@ -30,6 +31,7 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->paths;
     ar & this->hashes;
     ar & this->file;
+    ar & this->elementStatus;
     ar & this->comm_error;
     ar & this->status; // = okay
 }
@@ -109,11 +111,12 @@ Message *Message::get_content(const std::vector<unsigned char> &file, const std:
     return message;
 }
 
-Message *Message::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash) {
+Message *Message::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
     auto message = new Message{ PUSH };
     message->file = file;
     message->path = path;
     message->hash = hash;
+    message->elementStatus = elementStatus;
     return message;
 }
 

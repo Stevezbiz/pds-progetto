@@ -19,6 +19,7 @@
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/vector.hpp>
 #include "Comm_error.h"
+#include "ElementStatus.h"
 
 /**
  * list of possible messages supported by the protocol
@@ -60,7 +61,7 @@ class Message {
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
 
-    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::map<std::string, std::string> hashes, std::vector<unsigned char> file, Comm_error *comm_error, bool status);
+    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::map<std::string, std::string> hashes, std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status);
 
     friend class boost::serialization::access;
 
@@ -71,6 +72,7 @@ public:
     std::vector<std::string> paths;
     std::map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
+    ElementStatus elementStatus;
     Comm_error *comm_error;
     bool status; // = okay
 
@@ -155,7 +157,7 @@ public:
      * @param hash
      * @return new message
      */
-    static Message *push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "");
+    static Message *push(const std::vector<unsigned char> &file, const std::string &path = "", const std::string &hash = "", ElementStatus elementStatus = ElementStatus::modifiedFile);
 
     /**
      * create a message for a restore request
