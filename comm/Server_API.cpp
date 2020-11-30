@@ -20,7 +20,7 @@ Message *Server_API::do_get(Message *req) {
 }
 
 Message *Server_API::do_push(Message *req) {
-    auto status = Server_API::push(req->path, req->file, req->hash);
+    auto status = Server_API::push(req->path, req->file, req->hash, req->elementStatus);
     return status ? Message::okay() : Message::error(new Comm_error{ FAILURE, "Server_API::do_push", "Unable to push the file" });
 }
 
@@ -48,7 +48,7 @@ void Server_API::set_get(const std::function<const std::vector<unsigned char> *(
     Server_API::get = get_function;
 }
 
-void Server_API::set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> &push_function) {
+void Server_API::set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function) {
     Server_API::push = push_function;
 }
 
@@ -110,7 +110,7 @@ std::function<const std::vector<unsigned char> *(const std::string &)> Server_AP
     return new std::vector<unsigned char>{};
 };
 
-std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &)> Server_API::push = [](const std::string &, const std::vector<unsigned char> &, const std::string &) {
+std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> Server_API::push = [](const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
     return true;
 };
 
