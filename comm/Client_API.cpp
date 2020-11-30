@@ -45,22 +45,32 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     if(!res->is_okay())
         return false;
 
+    // if the client has a different file than the server, the client starts a push procedure
     for(auto const &item : res->hashes) {
         auto path = item.first;
         auto it = map.find(path);
-        if(it == map.end() || map.at(path) != item.second) { // check if the file not exists or if versions (hashes) are different
-            // if the client has a different file than the server, the client starts a push procedure
-            if(!this->push(Utils::read_from_file(path), path, map.at(path))) {
+        if(it == map.end()) { // if the file does not exists, the file has been created
+            if (!this->push(Utils::read_from_file(path), path, map.at(path), ElementStatus::createdFile))
                 return false;
-            }
         }
+        else if(map.at(path) != item.second) // if versions (hashes) are different, the file has been modified
+            if(!this->push(Utils::read_from_file(path), path, map.at(path), ElementStatus::modifiedFile))
+                return false;
+    }
+
+    for(auto const &item : map) {
+        auto path = item.first;
+        auto it = map.find(path);
+        if(it == map.end()) // if the file does not exists, the file has been deleted
+            if (!this->push(Utils::read_from_file(path), path, "0x0", ElementStatus::erasedFile))
+                return false;
     }
 
     return true;
 }
 
-bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash) {
-    auto req = Message::push(file, path, hash);
+bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
+    auto req = Message::push(file, path, hash, elementStatus);
     this->api->send(req);
     if(!this->api->receive(OKAY))
         return false;

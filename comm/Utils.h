@@ -11,6 +11,7 @@
 #include <openssl/sha.h>
 #include <iomanip>
 #include <sstream>
+#include "ElementStatus.h"
 
 namespace fs = boost::filesystem;
 

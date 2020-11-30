@@ -67,7 +67,7 @@ public:
      * @param hash
      * @return status
      */
-    bool push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash);
+    bool push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus);
 
     /**
      * do the complete restore procedure:

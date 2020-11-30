@@ -1,13 +1,21 @@
 cmake_minimum_required(VERSION 3.17)
 
-#set(Boost_INCLUDE_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/")
-#set(Boost_LIBRARY_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/boost")
-#set(Boost_LIBRARIES "/Users/paologastaldi/Downloads/boost_1_74_0/boost/libs")
+if (APPLE)
+    message(STATUS "Using Apple configuration paths")
+    # set(Boost_INCLUDE_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/")
+    # set(Boost_LIBRARY_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/boost")
+    set(Boost_ROOT_DIR "/Users/paologastaldi/Downloads/boost_1_74_0/")
+    set(Boost_INCLUDE_DIR ${Boost_ROOT_DIR})
+    set(Boost_LIBRARY_DIR ${Boost_ROOT_DIR}/boost)
+    set(Boost_LIBRARIES ${Boost_ROOT_DIR}/boost/libs)
 
-#set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
-#set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
-#set(openssl_INCLUDE_DIR "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
-#set(openssl_LIBRARY_DIR "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
+    set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/include")
+    set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/Cellar/openssl@1.1/1.1.1h/lib")
+    set(openssl_ROOT_DIR "/usr/local/Cellar/openssl@1.1/1.1.1h/")
+    set(openssl_INCLUDE_DIR ${openssl_ROOT_DIR}/include)
+    set(openssl_LIBRARY_DIR ${openssl_ROOT_DIR}/lib)
+    set(OPENSSL_CRYPTO_LIBRARY ${OPENSSL_ROOT_DIR}/lib/libcrypto.dylib)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -26,6 +34,7 @@ set(CLIENT_COMM_SOURCE_FILES
         comm/Socket_API.h
         comm/Utils.cpp
         comm/Utils.h
+        comm/ElementStatus.h
         )
 
 set(SERVER_COMM_SOURCE_FILES
@@ -41,6 +50,7 @@ set(SERVER_COMM_SOURCE_FILES
         comm/Socket_API.h
         comm/Utils.cpp
         comm/Utils.h
+        comm/ElementStatus.h
         )
 
 set(STUB_CLIENT_SOURCE_FILES
@@ -101,7 +111,7 @@ endif ()
 ### client ###
 project(client)
 # add includes
-add_executable(client ${CLIENT_SOURCE_FILES} ${COMM_SOURCE_FILES})
+add_executable(client ${CLIENT_SOURCE_FILES} ${CLIENT_COMM_SOURCE_FILES})
 # add Boost
 find_package(Boost REQUIRED filesystem serialization thread)
 if (Boost_FOUND)

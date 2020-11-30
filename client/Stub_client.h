@@ -89,7 +89,7 @@ public:
         this->api->probe(this->map);
         this->fw->start([this](const std::string &path, const std::string &hash, ElementStatus es) {
             auto file = Utils::read_from_file(path);
-            if(!this->api->push(file, path, hash))
+            if(!this->api->push(file, path, hash, es))
                 Stub_client::error_handler_(this->api->get_last_error());
         });
 
