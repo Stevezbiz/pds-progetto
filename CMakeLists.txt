@@ -59,6 +59,8 @@ set(CLIENT_COMM_SOURCE_FILES
         comm/Comm_error.cpp
         comm/Comm_error.h
         comm/ElementStatus.h
+        comm/Logger.cpp
+        comm/Logger.h
         comm/Message.cpp
         comm/Message.h
         comm/Socket_API.cpp
@@ -73,6 +75,8 @@ set(SERVER_COMM_SOURCE_FILES
         comm/Comm_error.cpp
         comm/Comm_error.h
         comm/ElementStatus.h
+        comm/Logger.cpp
+        comm/Logger.h
         comm/Message.cpp
         comm/Message.h
         comm/Server_API.cpp
