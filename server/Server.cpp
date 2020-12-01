@@ -53,6 +53,7 @@ bool Server::end() {
 }
 
 void Server::handle_error(const Comm_error *comm_error) {
-    Logger::error(comm_error);
+    // Logger::error(comm_error);
+    Logger::error("Server::handle_error", comm_error->to_string(), PR_HIGH);
     // std::cout << comm_error->to_string() << std::endl;
 }

@@ -18,6 +18,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
+#include <stdexcept>
 #include "Comm_error.h"
 #include "ElementStatus.h"
 #include "Logger.h"
@@ -50,7 +52,7 @@ enum MESSAGE_TYPE : int {
  */
 class Message {
     enum lengths {
-        type_length = sizeof(typeof(MESSAGE_TYPE)),
+        type_length = sizeof(MESSAGE_TYPE),
         length_length = sizeof(size_t)
     };
 

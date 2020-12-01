@@ -41,8 +41,6 @@ bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size
 }
 
 bool Socket_API::receive_header_() {
-    this->message = new Message{};
-
     if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::read(this->socket_, this->message->get_header_buffer(), ec);
         })) {
@@ -84,8 +82,9 @@ boost::asio::ip::tcp::socket &&Socket_API::get_socket() {
 }
 
 bool Socket_API::send(Message *message) {
-    delete this->message;
-    delete this->comm_error;
+//    delete this->message;
+//    delete this->comm_error;
+    Logger::info("Socket_API::send", "Sending a message...", PR_LOW);
 
     if(!this->call_([&message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::write(socket, message->send(), ec);
@@ -93,37 +92,51 @@ bool Socket_API::send(Message *message) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::send", "Unable to write message" };
         return false;
     }
-    Logger::info("Socket_API::send", "Message correctly sent", PR_LOW);
+    Logger::info("Socket_API::send", "Sending a message... - done", PR_LOW);
+//    delete this->message;
 
     return true;
 }
 
 bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
-    delete this->message;
-    delete this->comm_error;
+//    delete this->message;
+//    delete this->comm_error;
 
     bool status = true;
     this->message = new Message{};
+    Logger::info("Socket_API::receive", "Receiving a message...", PR_LOW);
 
     if(!this->receive_header_())
-        return false;
+        return false; // it cannot do any other action here
 
-    this->message = this->message->build_header(); // build the header
+    try {
+        this->message = this->message->build_header(); // build the header
+    } catch(const std::exception &ec) {
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message header" };
+        return false; // it cannot do any other action here
+    }
 
     if(this->message->code == MSG_ERROR) {
         status = false;
     }
     else if(expectedMessage != MSG_UNDEFINED && message->code != expectedMessage) {
-        this->comm_error = new Comm_error{CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code : " + std::to_string(expectedMessage) };
+        this->comm_error = new Comm_error{CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) };
         this->message = Message::error(this->comm_error);
         status = false;
     }
 
     if(!this->receive_content_()) // read the message content in any case
-        status = false;
+        return false; // it cannot do any other action here
 
-    this->message = message->build_content(); // build the whole message
-    Logger::info("Socket_API::receive", "Message correctly received", PR_LOW);
+    try {
+        auto new_message = message->build_content(); // build the whole message
+//        delete this->message;
+        this->message = new_message;
+    } catch(const std::exception &ec) {
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message content" };
+        return false; // it cannot do any other action here
+    }
+    Logger::info("Socket_API::receive", "Receiving a message... - done", PR_LOW);
 
     return status;
 }
@@ -138,7 +151,7 @@ Comm_error *Socket_API::get_last_error() {
 Socket_API::~Socket_API() {
     if(this->socket_.is_open())
         this->socket_.close();
-    delete this->message;
-    delete this->comm_error;
+//    delete this->message;
+//    delete this->comm_error;
 }
 

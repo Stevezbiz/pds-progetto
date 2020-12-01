@@ -67,7 +67,7 @@ public:
      * @param comm_error
      * @param priority
      */
-    static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH);
+    // static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH);
 };
 
 
