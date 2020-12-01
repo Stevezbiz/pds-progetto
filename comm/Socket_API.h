@@ -86,14 +86,14 @@ public:
      * @param message
      * @return status
      */
-    bool send(Message *message = new Message{ ERROR });
+    bool send(Message *message = new Message{MSG_ERROR });
 
     /**
      * receive a message
      * @param expectedMessage
      * @return status
      */
-    bool receive(MESSAGE_TYPE expectedMessage = UNDEFINED);
+    bool receive(MESSAGE_TYPE expectedMessage = MSG_UNDEFINED);
 
     /**
      * getter
