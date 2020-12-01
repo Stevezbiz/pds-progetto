@@ -24,8 +24,7 @@ class Stub_client {
      * @param error
      */
     static void error_handler_(Comm_error *error) {
-        std::string s{ "[" + std::to_string(error->comm_errno) + "] " + error->message +  " (" + error->location + ")"};
-        std::cout << s << std::endl;
+        std::cout << error->to_string() << std::endl;
     }
 
     /**
