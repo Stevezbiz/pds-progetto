@@ -12,6 +12,9 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
     Server_API::set_probe(probe);
     Server_API::set_push(push);
     Server_API::set_restore(restore);
+    Server_API::set_end(end);
+    Server_API::set_handle_error(handle_error);
+
     do_accept();
 }
 
@@ -36,7 +39,7 @@ const std::vector<unsigned char> *Server::get(const std::string &) {
     return new std::vector<unsigned char>();
 }
 
-bool Server::push(const std::string &, const std::vector<unsigned char> &, const std::string &) {
+bool Server::push(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
     return true;
 }
 
@@ -46,4 +49,8 @@ const std::vector<std::string> *Server::restore() {
 
 bool Server::end() {
     return true;
+}
+
+void Server::handle_error(const Comm_error *comm_error) {
+    std::cout << comm_error->to_string() << std::endl;
 }

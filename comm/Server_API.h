@@ -28,6 +28,7 @@ class Server_API : public API {
     static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push;
     static std::function<const std::vector <std::string> *()> restore;
     static std::function<bool()> end;
+    static std::function<void(const Comm_error *)> handle_error;
 
     /**
      * manage login protocol procedure
@@ -70,6 +71,13 @@ class Server_API : public API {
     * @return response message
     */
     static Message *do_end(Message *req);
+
+    /**
+     * handle a communication error
+     * @param comm_error
+     * @return response message
+     */
+    static void do_handle_error(Comm_error *comm_error);
 
 public:
     /**
@@ -141,6 +149,16 @@ public:
      *      - bool status
      */
     static void set_end(const std::function<bool()> &end_function);
+
+    /**
+     *
+     * @param end_function
+     * - input:
+     *      - const Comm_error *communication error
+     * - output:
+     *      - (empty)
+     */
+    static void set_handle_error(const std::function<void(const Comm_error *)> &handle_error_function);
 
     /**
      * start handling requests

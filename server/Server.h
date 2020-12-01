@@ -37,7 +37,7 @@ class Server {
     /**
      *
      */
-    static bool push(const std::string &, const std::vector<unsigned char> &, const std::string &);
+    static bool push(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
 
     /**
      *
@@ -49,6 +49,11 @@ class Server {
      * @return
      */
     static bool end();
+
+    /**
+     * @param comm_error
+     */
+    static void handle_error(const Comm_error *);
 
 public:
     /**
