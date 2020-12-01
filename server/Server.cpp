@@ -21,6 +21,7 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::do_accept() {
     acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
         if (!ec) {
+            Logger::info("Server::do_accept", "New connection accepted", PR_LOW);
             std::make_shared<Session>(std::move(socket_))->start();
         }
         do_accept();

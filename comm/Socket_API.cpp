@@ -84,17 +84,24 @@ boost::asio::ip::tcp::socket &&Socket_API::get_socket() {
 }
 
 bool Socket_API::send(Message *message) {
+    delete this->message;
+    delete this->comm_error;
+
     if(!this->call_([&message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::write(socket, message->send(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::send", "Unable to write message" };
         return false;
     }
+    Logger::info("Socket_API::send", "Message correctly sent", PR_LOW);
 
     return true;
 }
 
 bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
+    delete this->message;
+    delete this->comm_error;
+
     bool status = true;
     this->message = new Message{};
 
@@ -116,6 +123,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
         status = false;
 
     this->message = message->build_content(); // build the whole message
+    Logger::info("Socket_API::receive", "Message correctly received", PR_LOW);
 
     return status;
 }

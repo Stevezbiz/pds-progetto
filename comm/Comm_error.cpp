@@ -11,9 +11,7 @@ void Comm_error::serialize(Archive &ar, const unsigned int version) {
     ar & this->location;
 }
 
-Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message) : comm_errno(comm_errno), location(std::move(location)), message(std::move(message)) {
-    Logger::error(this->location, this->to_string());
-}
+Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message) : comm_errno(comm_errno), location(std::move(location)), message(std::move(message)) {}
 
 std::string Comm_error::send() const {
     std::ostringstream ostream{};

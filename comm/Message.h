@@ -78,7 +78,7 @@ public:
     bool status; // = okay
 
     struct_header_buffer *header_buffer;
-    char *content_buffer;
+    std::vector<char> *content_buffer;
 
     /**
     * send this message

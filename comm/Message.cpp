@@ -18,8 +18,8 @@ Message::Message(MESSAGE_TYPE code, std::string username, std::string password, 
         elementStatus(elementStatus),
         comm_error(comm_error),
         status(status),
-        header_buffer(nullptr),
-        content_buffer(nullptr) {}
+        header_buffer(new struct_header_buffer{MSG_ERROR, 0 }),
+        content_buffer(new std::vector<char>{}) {}
 
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
@@ -65,7 +65,7 @@ std::vector<boost::asio::const_buffer> Message::send() const {
 
 [[nodiscard]] bool Message::is_okay() const { return this->status; }
 
-Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{MSG_ERROR, 0 }), content_buffer(nullptr), comm_error(nullptr) {
+Message::Message(MESSAGE_TYPE code) : code(code), status(true), header_buffer(new struct_header_buffer{MSG_ERROR, 0 }), content_buffer(new std::vector<char>{}), comm_error(nullptr) {
     if(this->code == MSG_ERROR)
         this->status = false;
 }
@@ -138,20 +138,27 @@ Message *Message::end() {
 
 Message *Message::build_header() {
     this->code = this->header_buffer->type;
+    /*
+    delete this->content_buffer;
     this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
     delete this->header_buffer; // not necessary anymore
-    Logger::info("Message::build_header", "New message header has been build correctly", PR_LOW);
+    */
+    this->content_buffer->resize(this->header_buffer->length);
+    Logger::info("Message::build_header", "New message header has been built correctly, code " + std::to_string(this->code) + " length " + std::to_string(this->header_buffer->length), PR_LOW);
 
     return this;
 }
 
 Message *Message::build_content() const {
-    std::istringstream ss{ this->content_buffer };
-    boost::archive::text_iarchive ia{ ss };
+    auto vet = *this->content_buffer;
+    std::string archive_data{ &vet[0], this->content_buffer->size() };
+    std::istringstream archive_stream{ archive_data };
+    // std::istringstream ss{ std::string{ this->content_buffer, this->header_buffer->length }};
+    boost::archive::text_iarchive ia{ archive_stream };
     Message *new_message;
     ia >> new_message; // de-serialization
-    delete this->content_buffer; // not necessary anymore
-    Logger::info("Message::build_content", "New message content has been build correctly", PR_LOW);
+    // delete this->content_buffer; // not necessary anymore
+    Logger::info("Message::build_content", "New message content has been built correctly, code " + std::to_string(new_message->code), PR_LOW);
 
     return new_message;
 }
@@ -161,7 +168,7 @@ Message *Message::build_content() const {
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->content_buffer, sizeof(this->header_buffer->length));
+    return boost::asio::mutable_buffer(this->content_buffer, this->header_buffer->length);
 }
 
 Message::~Message() {

@@ -15,11 +15,13 @@ enum LOG_CODE : int {
 };
 
 enum PRIORITY : int {
-    PR_VERY_LOW = 0,
-    PR_LOW = 1,
-    PR_NORMAL = 2,
-    PR_HIGH = 3,
-    PR_VERY_HIGH = 4
+    PR_NULL = 0,
+    PR_VERY_LOW = 1,
+    PR_LOW = 2,
+    PR_NORMAL = 3,
+    PR_HIGH = 4,
+    PR_VERY_HIGH = 5,
+    PR_TOP = 6
 };
 
 class Logger {
@@ -33,7 +35,8 @@ public:
      * @param priority
      */
     static void log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH) {
-        std::cout << "[Log code " + std::to_string(log_code) + "] " + message +  " (" + location + ") (priority " << priority << ")" << std::endl;
+        if(priority > PR_NULL)
+            std::cout << "[Log code " + std::to_string(log_code) + "] " + message +  " (" + location + ") (priority " << priority << ")" << std::endl;
     }
 
     /**
@@ -71,7 +74,7 @@ public:
      * @param comm_error
      * @param priority
      */
-    /*static void error(Comm_error *comm_error, PRIORITY priority = PR_HIGH) {
+    /*static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH) { // TODO: error: unknown type name 'Comm_error'
         Logger::log(LOG_ERROR, comm_error->location, comm_error->to_string(), priority);
     }*/
 };
