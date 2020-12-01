@@ -6,6 +6,7 @@
 #define TEST_STATIC_LOGGER_H
 
 #include <iostream>
+#include <sstream>
 #include "Comm_error.h"
 
 enum LOG_CODE : int {
@@ -27,6 +28,8 @@ enum PRIORITY : int {
 class Logger {
 
 public:
+    static PRIORITY min_priority;
+
     /**
      * create a new log
      * @param log_code
@@ -34,10 +37,7 @@ public:
      * @param message
      * @param priority
      */
-    static void log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH) {
-        if(priority > PR_NULL)
-            std::cout << "[Log code " + std::to_string(log_code) + "] " + message +  " (" + location + ") (priority " << priority << ")" << std::endl;
-    }
+    static void log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
 
     /**
      * create a new info log
@@ -45,19 +45,14 @@ public:
      * @param message
      * @param priority
      */
-    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH) {
-        Logger::log(LOG_INFO, location, message, priority);
-    }
-
+    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
     /**
      * create a new warning log
      * @param location
      * @param message
      * @param priority
      */
-    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH) {
-        Logger::log(LOG_WARNING, location, message, priority);
-    }
+    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
 
     /**
      * create a new error log
@@ -65,18 +60,14 @@ public:
      * @param message
      * @param priority
      */
-    static void error(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH) {
-        Logger::log(LOG_ERROR, location, message, priority);
-    }
+    static void error(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
 
     /**
      * create a new error log
      * @param comm_error
      * @param priority
      */
-    /*static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH) { // TODO: error: unknown type name 'Comm_error'
-        Logger::log(LOG_ERROR, comm_error->location, comm_error->to_string(), priority);
-    }*/
+    static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH);
 };
 
 

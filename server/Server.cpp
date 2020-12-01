@@ -21,7 +21,7 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::do_accept() {
     acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
         if (!ec) {
-            Logger::info("Server::do_accept", "New connection accepted", PR_LOW);
+            Logger::info("Server::do_accept", "New connection accepted", PR_HIGH);
             std::make_shared<Session>(std::move(socket_))->start();
         }
         do_accept();
@@ -53,5 +53,6 @@ bool Server::end() {
 }
 
 void Server::handle_error(const Comm_error *comm_error) {
-    std::cout << comm_error->to_string() << std::endl;
+    Logger::error(comm_error);
+    // std::cout << comm_error->to_string() << std::endl;
 }
