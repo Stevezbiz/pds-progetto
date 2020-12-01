@@ -20,6 +20,7 @@
 #include <boost/serialization/vector.hpp>
 #include "Comm_error.h"
 #include "ElementStatus.h"
+#include "Logger.h"
 
 /**
  * list of possible messages supported by the protocol
@@ -27,18 +28,18 @@
  * @version 1.0.0
  */
 enum MESSAGE_TYPE : int {
-    ERROR = -1,
-    UNDEFINED = 0,
-    OKAY = 1,
-    LOGIN = 2,
-    PROBE = 3,
-    PROBE_CONTENT = 4,
-    GET = 5,
-    GET_CONTENT = 6,
-    PUSH = 7,
-    RESTORE = 8,
-    RESTORE_CONTENT = 9,
-    END = 100
+    MSG_ERROR = -1,
+    MSG_UNDEFINED = 0,
+    MSG_OKAY = 1,
+    MSG_LOGIN = 2,
+    MSG_PROBE = 3,
+    MSG_PROBE_CONTENT = 4,
+    MSG_GET = 5,
+    MSG_GET_CONTENT = 6,
+    MSG_PUSH = 7,
+    MSG_RESTORE = 8,
+    MSG_RESTORE_CONTENT = 9,
+    MSG_END = 100
 };
 
 /**
@@ -96,7 +97,7 @@ public:
      * class constructor
      * @param code
      */
-    explicit Message(MESSAGE_TYPE code = ERROR);
+    explicit Message(MESSAGE_TYPE code = MSG_ERROR);
 
     /**
      * create a message to say everything is okay

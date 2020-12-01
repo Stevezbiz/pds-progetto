@@ -9,18 +9,20 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <utility>
+#include "Logger.h"
 
 /**
  * list of error numbers (error codes)
  */
 enum COMM_ERRNO : int {
-    NOT_AN_ERROR = -1,
-    GENERIC = 0,
-    FAILURE = 1,
-    UNEXPECTED_TYPE = 10,
-    UNEXPECTED_VALUE = 11,
-    WRONG_TYPE = 20,
-    WRONG_VALUE = 21
+    CE_NOT_AN_ERROR = -1,
+    CE_GENERIC = 0,
+    CE_FAILURE = 1,
+    CE_UNEXPECTED_TYPE = 10,
+    CE_UNEXPECTED_VALUE = 11,
+    CE_WRONG_TYPE = 20,
+    CE_WRONG_VALUE = 21
 };
 
 /**
@@ -43,7 +45,7 @@ public:
      * @param location
      * @param message
      */
-    explicit Comm_error(COMM_ERRNO comm_errno = GENERIC, std::string location = "System", std::string message = "Generic error");
+    explicit Comm_error(COMM_ERRNO comm_errno = CE_GENERIC, std::string location = "System", std::string message = "Generic error");
 
     /**
      * send an error
@@ -57,6 +59,12 @@ public:
      * @return error
      */
     static Comm_error *build(const std::string &serialized);
+
+    /**
+     * transform this error to a string
+     * @return string
+     */
+    std::string to_string() const;
 };
 
 
