@@ -262,7 +262,7 @@ set(test_static_SOURCE_FILES
         )
 
 add_executable(test_socket ${test_static_SOURCE_FILES})
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED thread)
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
