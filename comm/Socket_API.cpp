@@ -112,7 +112,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     try {
         this->message = this->message->build_header(); // build the header
     } catch(const std::exception &ec) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message header" };
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message header: " + std::string{ ec.what() }};
         return false; // it cannot do any other action here
     }
 
@@ -133,7 +133,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
 //        delete this->message;
         this->message = new_message;
     } catch(const std::exception &ec) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message content" };
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message content: " + std::string{ ec.what() }};
         return false; // it cannot do any other action here
     }
     Logger::info("Socket_API::receive", "Receiving a message... - done", PR_LOW);
