@@ -143,9 +143,9 @@ Message *Message::end() {
 
 Message *Message::build_header() {
     Logger::info("Message::build_header", "Building message header...", PR_LOW);
-    Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{ this->header_buffer_, sizeof(struct_header_buffer) } + "\"", PR_LOW);
+    Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{ this->header_buffer_, type_length+length_length } + "\"", PR_LOW);
     // auto buffer = reinterpret_cast<char *>(this->header_buffer);
-    std::istringstream is{ std::string{ this->header_buffer_, sizeof(struct_header_buffer) }};
+    std::istringstream is{ std::string{ this->header_buffer_, type_length+length_length }};
     int msg_code = MSG_ERROR;
     std::size_t content_length = 0;
     if(!(is >> msg_code))
@@ -189,7 +189,7 @@ Message *Message::build_content() const {
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->header_buffer_, sizeof(struct_header_buffer));
+    return boost::asio::mutable_buffer(this->header_buffer_, type_length+length_length);
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry

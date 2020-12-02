@@ -55,12 +55,12 @@ class Message {
         type_length = sizeof(MESSAGE_TYPE),
         length_length = sizeof(std::size_t)
     };
-    struct struct_header_buffer {
-        MESSAGE_TYPE type;
-        std::size_t length;
-    };
+//    struct struct_header_buffer {
+//        MESSAGE_TYPE type;
+//        std::size_t length;
+//    };
 
-    char *header_buffer_ = new char[sizeof(struct_header_buffer)]{};
+    char *header_buffer_ = new char[type_length+length_length]{};
     char *content_buffer_;
     std::size_t content_buffer_length_;
 
