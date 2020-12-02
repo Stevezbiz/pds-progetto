@@ -22,7 +22,7 @@ void Server::do_accept() {
     acceptor_.async_accept(socket_, [this](boost::system::error_code ec) {
         if (!ec) {
             Logger::info("Server::do_accept", "New connection accepted", PR_HIGH);
-            std::make_shared<Session>(std::move(socket_))->start();
+            std::make_shared<Session>(std::move(this->socket_))->start();
         }
         do_accept();
     });

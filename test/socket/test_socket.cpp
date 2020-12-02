@@ -71,7 +71,7 @@ public:
             return;
         }
         std::cerr << "(Client::start) read... - done" << std::endl;
-        std::cerr << "(Client::start) raw buffer content: \"" << std::string{ res_ary } << "\"" << std::endl;
+        std::cerr << "(Client::start) raw buffer content: \"" << std::string{ res_ary, BUFFER_SIZE } << "\"" << std::endl;
 
         std::cerr << "(Client::start) parsing response..." << std::endl;
         std::istringstream is{ std::string{ res_ary, BUFFER_SIZE }};
@@ -138,7 +138,7 @@ public:
                 return;
             }
             std::cerr << "(Server::run) read... - done" << std::endl;
-            std::cerr << "(Server::run) raw buffer content: \"" << std::string{ req_ary } << "\"" << std::endl;
+            std::cerr << "(Server::run) raw buffer content: \"" << std::string{ req_ary, BUFFER_SIZE } << "\"" << std::endl;
 
             std::cerr << "(Server::run) parsing request..." << std::endl;
             std::istringstream is{ std::string{ req_ary, BUFFER_SIZE }};
