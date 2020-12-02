@@ -252,3 +252,22 @@ else ()
     message(WARNING "Cannot find Boost")
 endif ()
 message(STATUS "preparing test_static... - done")
+
+# --- test_socket ---
+project(test_socket)
+message(STATUS "preparing test_socket...")
+
+set(test_static_SOURCE_FILES
+        test/socket/test_socket.cpp
+        )
+
+add_executable(test_socket ${test_static_SOURCE_FILES})
+find_package(Boost REQUIRED)
+
+if (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(test_socket ${Boost_LIBRARIES})
+else ()
+    message(WARNING "Cannot find Boost")
+endif ()
+message(STATUS "preparing test_socket... - done")
