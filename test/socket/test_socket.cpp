@@ -74,7 +74,7 @@ public:
         std::cerr << "(Client::start) raw buffer content: \"" << std::string{ res_ary } << "\"" << std::endl;
 
         std::cerr << "(Client::start) parsing response..." << std::endl;
-        std::istringstream is{ std::string{ res_ary, 4 }};
+        std::istringstream is{ std::string{ res_ary, BUFFER_SIZE }};
         std::string res;
         if(!(is >> res)) {
             std::cerr << "(Client::start) cannot read response content" << std::endl;
