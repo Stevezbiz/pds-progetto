@@ -53,13 +53,16 @@ enum MESSAGE_TYPE : int {
 class Message {
     enum lengths {
         type_length = sizeof(MESSAGE_TYPE),
-        length_length = sizeof(size_t)
+        length_length = sizeof(std::size_t)
     };
-
     struct struct_header_buffer {
         MESSAGE_TYPE type;
-        size_t length;
+        std::size_t length;
     };
+
+    char *header_buffer_ = new char[sizeof(struct_header_buffer)]{};
+    char *content_buffer_;
+    std::size_t content_buffer_length_;
 
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
@@ -78,9 +81,6 @@ public:
     ElementStatus elementStatus;
     Comm_error *comm_error;
     bool status; // = okay
-
-    struct_header_buffer *header_buffer;
-    std::vector<char> *content_buffer;
 
     /**
     * send this message

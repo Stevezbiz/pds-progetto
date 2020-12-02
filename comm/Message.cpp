@@ -18,8 +18,7 @@ Message::Message(MESSAGE_TYPE code, std::string username, std::string password, 
         elementStatus(elementStatus),
         comm_error(comm_error),
         status(status),
-        header_buffer(new struct_header_buffer{MSG_ERROR, 0 }),
-        content_buffer(new std::vector<char>{}) {}
+        content_buffer_(nullptr) {}
 
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
@@ -49,7 +48,7 @@ std::vector<boost::asio::const_buffer> Message::send() const {
     // fixed lengths for the "type" and "length" values
     int msg_code = this->code;
     header_stream << std::setw(type_length) << msg_code;
-    header_stream << std::setw(length_length) << content_data.size();
+    header_stream << std::setw(length_length) << std::hex << content_data.size();
     auto header_data = header_stream.str();
     Logger::info("Message::send", "Header " + header_data, PR_VERY_LOW);
     Logger::info("Message::send", "Content " + content_data, PR_VERY_LOW);
@@ -69,8 +68,8 @@ std::vector<boost::asio::const_buffer> Message::send() const {
 Message::Message(MESSAGE_TYPE code) :
         code(code),
         status(true),
-        header_buffer(new struct_header_buffer{MSG_ERROR, 0 }),
-        content_buffer(new std::vector<char>{}),
+//        header_buffer(new struct_header_buffer{MSG_ERROR, 0 }),
+        content_buffer_(nullptr),
         comm_error(nullptr) {
     if(this->code == MSG_ERROR)
         this->status = false;
@@ -144,16 +143,19 @@ Message *Message::end() {
 
 Message *Message::build_header() {
     Logger::info("Message::build_header", "Building message header...", PR_LOW);
-    auto buffer = reinterpret_cast<char *>(this->header_buffer);
-    std::istringstream is{ std::string{ buffer, sizeof(struct_header_buffer) }};
+    Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{ this->header_buffer_, sizeof(struct_header_buffer) } + "\"", PR_LOW);
+    // auto buffer = reinterpret_cast<char *>(this->header_buffer);
+    std::istringstream is{ std::string{ this->header_buffer_, sizeof(struct_header_buffer) }};
     int msg_code = MSG_ERROR;
-    size_t content_length = 0;
+    std::size_t content_length = 0;
     if(!(is >> msg_code))
         throw std::invalid_argument( "Cannot read content code");
-    if(!(is >> content_length))
+    if(!(is >> std::hex >> content_length))
         throw std::invalid_argument( "Cannot read content length");
     this->code = static_cast<MESSAGE_TYPE>(msg_code);
-    this->content_buffer->resize(content_length);
+    this->content_buffer_length_ = content_length;
+    this->content_buffer_ = new char[content_length]{};
+//    this->content_buffer->resize(content_length);
 
     /*
     this->code = this->header_buffer->type;
@@ -164,8 +166,8 @@ Message *Message::build_header() {
     this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
     delete this->header_buffer; // not necessary anymore
     */
-    Logger::info("Message::build_header", "Content code " + std::to_string(this->code), PR_VERY_LOW);
-    Logger::info("Message::build_header", "Content length " + std::to_string(this->header_buffer->length), PR_VERY_LOW);
+    Logger::info("Message::build_header", "Content code " + std::to_string(msg_code), PR_VERY_LOW);
+    Logger::info("Message::build_header", "Content length " + std::to_string(content_length), PR_VERY_LOW);
     Logger::info("Message::build_header", "Building message header... - done", PR_LOW);
 
     return this;
@@ -173,8 +175,8 @@ Message *Message::build_header() {
 
 Message *Message::build_content() const {
     Logger::info("Message::build_content", "Building message content...", PR_LOW);
-    auto vet = reinterpret_cast<char *>(&this->content_buffer[0]);
-    std::string archive_data{ vet, this->content_buffer->size() };
+//    auto vet = reinterpret_cast<char *>(&this->content_buffer[0]);
+    std::string archive_data{ this->content_buffer_, this->content_buffer_length_ };
     std::istringstream archive_stream{ archive_data };
     // std::istringstream ss{ std::string{ this->content_buffer, this->header_buffer->length }};
     boost::archive::text_iarchive ia{ archive_stream };
@@ -187,15 +189,15 @@ Message *Message::build_content() const {
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->header_buffer, sizeof(struct_header_buffer));
+    return boost::asio::mutable_buffer(this->header_buffer_, sizeof(struct_header_buffer));
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(&this->content_buffer[0], this->header_buffer->length);
+    return boost::asio::mutable_buffer(this->content_buffer_, this->content_buffer_length_);
 }
 
 Message::~Message() {
     delete this->comm_error;
-    delete this->header_buffer;
-    delete this->content_buffer;
+    delete[] this->header_buffer_;
+    delete[] this->content_buffer_;
 }
