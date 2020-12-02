@@ -51,9 +51,9 @@ bool Socket_API::receive_header_() {
     return true;
 }
 bool Socket_API::receive_content_() {
-    char s[10];
-    boost::system::error_code ec;
-    boost::asio::read(this->socket_, boost::asio::mutable_buffer(s, 10), ec);
+//    char s[10];
+//    boost::system::error_code ec;
+//    boost::asio::read(this->socket_, boost::asio::mutable_buffer(s, 10), ec);
     if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::read(socket, this->message->get_content_buffer(), ec);
         })) {
