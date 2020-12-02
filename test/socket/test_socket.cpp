@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <utility>
 #include <vector>
 #include <map>
 #include <utility>
@@ -27,6 +28,7 @@ class Client {
 
 public:
     Client(const std::string &ip, const std::string &port) {
+        std::cerr << "(Client::Client) connect..." << std::endl;
         try {
             boost::asio::io_context ctx;
             boost::asio::ip::tcp::resolver resolver(ctx);
@@ -34,15 +36,17 @@ public:
             this->socket_ = new boost::asio::ip::tcp::socket{ ctx };
             boost::asio::connect(*this->socket_, endpoint_iterator);
         } catch(const std::exception &e) {
-            std::cerr << "(Client::Client) " << e.what() << std::endl;
-            exit(-1);
+            std::cerr << "(Client::Client) connect error: " << e.what() << std::endl;
+            return;
         }
+        std::cerr << "(Client::Client) connect... - done " << std::endl;
     }
 
     void start() {
         boost::system::error_code ec;
 
         // --- write ----
+        std::cerr << "(Client::start) write..." << std::endl;
         std::string req{ "test" };
         std::ostringstream req_stream{};
         req_stream << std::setw(BUFFER_SIZE) << req;
@@ -53,8 +57,11 @@ public:
         boost::asio::write(*this->socket_, req_buffers, ec);
         if(ec)
             std::cerr << "(Client::start) write error: " << ec << std::endl;
+        else
+            std::cerr << "(Client::start) write... - done" << std::endl;
 
         // --- read ----
+        std::cerr << "(Client::start) read..." << std::endl;
         char res_ary[BUFFER_SIZE];
         auto res_buffer = boost::asio::mutable_buffer(res_ary, BUFFER_SIZE);
         boost::asio::read(*this->socket_, res_buffer, ec);
@@ -65,6 +72,8 @@ public:
         std::string res;
         if(!(is >> res))
             std::cerr << "(Client::start) cannot read response content" << std::endl;
+        else
+            std::cerr << "(Client::start) read... - done" << std::endl;
 
         std::cerr << "(Client::start) done: " << res << std::endl;
    }
@@ -82,7 +91,7 @@ class Server {
     std::string port_;
 
 public:
-    Server(const std::string &port) : port_(port) {};
+    Server(std::string port) : port_(std::move(port)) {};
 
     void start() {
         try {
@@ -90,13 +99,17 @@ public:
             boost::asio::ip::tcp::endpoint endpoint{ boost::asio::ip::tcp::v4(), static_cast<unsigned short>(std::stoi(this->port_)) };
             this->socket_ = new boost::asio::ip::tcp::socket{ ctx };
             this->acceptor_ = new boost::asio::ip::tcp::acceptor{ ctx, endpoint };
+
+            std::cerr << "(Server::start) accept..." << std::endl;
             this->acceptor_->async_accept(*this->socket_, [this](boost::system::error_code ec) {
                 if(!ec) {
                     std::cerr << "(Server::start) accept error: " << ec << std::endl;
                     return;
                 }
+                else
+                    std::cerr << "(Server::start) accept... - done" << std::endl;
 
-                this->run();
+                this->run(); // accept only once
             });
             ctx.run();
         } catch (std::exception &e) {
@@ -110,6 +123,7 @@ public:
             boost::system::error_code ec;
 
             // --- read ----
+            std::cerr << "(Server::run) read..." << std::endl;
             char req_ary[BUFFER_SIZE];
             auto req_buffer = boost::asio::mutable_buffer(req_ary, BUFFER_SIZE);
             boost::asio::read(*this->socket_, req_buffer, ec);
@@ -120,8 +134,11 @@ public:
             std::string req;
             if(!(is >> req))
                 std::cerr << "(Server::run) cannot read request content" << std::endl;
+            else
+                std::cerr << "(Server::run) read... - done" << std::endl;
 
             // --- write ----
+            std::cerr << "(Server::run) write..." << std::endl;
             std::string res{ "test done" };
             std::ostringstream res_stream{};
             res_stream << std::setw(BUFFER_SIZE) << res;
@@ -132,6 +149,8 @@ public:
             boost::asio::write(*this->socket_, res_buffers, ec);
             if(ec)
                 std::cerr << "(Server::run) write error: " << ec << std::endl;
+            else
+                std::cerr << "(Server::run) write... - done" << std::endl;
 
             std::cerr << "(Server::run) done: " << res << std::endl;
         }
