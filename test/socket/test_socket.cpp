@@ -71,7 +71,7 @@ public:
             return;
         }
         std::cerr << "(Client::start) read... - done" << std::endl;
-        std::cerr << "(Client::start) raw buffer content: " << std::string{ res_ary } << std::endl;
+        std::cerr << "(Client::start) raw buffer content: \"" << std::string{ res_ary } << "\"" << std::endl;
 
         std::cerr << "(Client::start) parsing response..." << std::endl;
         std::istringstream is{ std::string{ res_ary, 4 }};
@@ -82,7 +82,7 @@ public:
         }
         std::cerr << "(Client::start) parsing response... - done" << std::endl;
 
-        std::cerr << "(Client::start) done: " << res << std::endl;
+        std::cerr << "(Client::start) done: \"" << res << "\"" << std::endl;
    }
 
     ~Client() {
@@ -138,10 +138,10 @@ public:
                 return;
             }
             std::cerr << "(Server::run) read... - done" << std::endl;
-            std::cerr << "(Server::run) raw buffer content: " << std::string{ req_ary } << std::endl;
+            std::cerr << "(Server::run) raw buffer content: \"" << std::string{ req_ary } << "\"" << std::endl;
 
             std::cerr << "(Server::run) parsing request..." << std::endl;
-            std::istringstream is{ std::string{ req_ary, 4 }};
+            std::istringstream is{ std::string{ req_ary, BUFFER_SIZE }};
             std::string req;
             if(!(is >> req)) {
                 std::cerr << "(Server::run) cannot read request content" << std::endl;
@@ -165,7 +165,7 @@ public:
             }
             std::cerr << "(Server::run) write... - done" << std::endl;
 
-            std::cerr << "(Server::run) done: " << res << std::endl;
+            std::cerr << "(Server::run) done: \"" << req  << "\"" << std::endl;
         }
         catch (std::exception &e) {
             std::cerr << "(Server::run) " << e.what() << std::endl;
@@ -188,7 +188,7 @@ int main(int argc, char *argv[0]) {
     }
 
     auto mode = std::string{ argv[1] };
-    std::cout << "Running mode: " << mode << std::endl;
+    std::cout << "Running mode: " << mode << "..." << std::endl;
     Client *client;
     Server *server;
     if(!mode.compare("client")) {
@@ -203,6 +203,7 @@ int main(int argc, char *argv[0]) {
         std::cerr << "ERROR: wrong mode" << std::endl;
         exit(-1);
     }
+    std::cerr << "Running mode: " << mode << "... - done" << std::endl;
 
     delete client;
     delete server;
