@@ -52,7 +52,7 @@ enum MESSAGE_TYPE : int {
  */
 class Message {
     enum lengths {
-        type_length = sizeof(MESSAGE_TYPE),
+        code_length = sizeof(MESSAGE_TYPE),
         length_length = sizeof(std::size_t)
     };
 //    struct struct_header_buffer {
@@ -60,7 +60,7 @@ class Message {
 //        std::size_t length;
 //    };
 
-    char *header_buffer_ = new char[type_length+length_length]{};
+    char *header_buffer_ = new char[code_length + length_length]{};
     char *content_buffer_;
     std::size_t content_buffer_length_;
 

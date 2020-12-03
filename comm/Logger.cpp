@@ -7,8 +7,9 @@
 PRIORITY Logger::min_priority = PR_NULL;
 
 void Logger::log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority) {
-    if(priority > Logger::min_priority)
+    if(priority > Logger::min_priority) {
         std::cout << "[Log code " + std::to_string(log_code) + "] " + message +  " (" + location + ") (priority " << priority << ")" << std::endl;
+    }
 }
 
 void Logger::info(const std::string &location, const std::string &message, PRIORITY priority) {

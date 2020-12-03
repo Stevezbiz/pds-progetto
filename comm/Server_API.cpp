@@ -136,6 +136,6 @@ std::function<bool()> Server_API::end = []() {
     return true;
 };
 
-std::function<void(const Comm_error *)> Server_API::handle_error = [](const Comm_error *) {
-    return;
+std::function<void(const Comm_error *)> Server_API::handle_error = [](const Comm_error *comm_error) {
+    std::cerr << comm_error->to_string() << std::endl;
 };
