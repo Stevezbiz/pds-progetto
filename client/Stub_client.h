@@ -76,7 +76,7 @@ public:
             Logger::info("Stub_client::login", "Login request...", PR_LOW);
             this->is_logged_in = this->api->login(username, password);
             if(!this->is_logged_in)
-                Stub_client::error_handler_(this->api->get_last_error());
+                Stub_client::error_handler_(this->api->get_message()->comm_error);
             Logger::info("Stub_client::login", "Login request - done", PR_LOW);
         }
 
