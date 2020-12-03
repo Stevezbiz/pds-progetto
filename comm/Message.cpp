@@ -35,7 +35,7 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->status; // = okay
 }
 
-std::vector<boost::asio::const_buffer> Message::send() const {
+std::vector<boost::asio::const_buffer> Message::send() {
     std::ostringstream header_stream{};
     std::ostringstream content_stream{};
     boost::archive::text_oarchive oa{ content_stream };
@@ -43,22 +43,22 @@ std::vector<boost::asio::const_buffer> Message::send() const {
     // serialize message content
     Logger::info("Message::send", "Serializing new message...", PR_LOW);
     oa << this;
-    auto content_data = content_stream.str();
+    this->content_data_ = content_stream.str();
 
     // fixed lengths for the "type" and "length" values
     int msg_code = this->code;
     header_stream << std::setw(code_length) << msg_code;
-    header_stream << std::setw(length_length) << std::hex << content_data.size();
-    auto header_data = header_stream.str();
-    Logger::info("Message::send", "Header " + header_data, PR_VERY_LOW);
-    Logger::info("Message::send", "Content " + content_data, PR_VERY_LOW);
+    header_stream << std::setw(length_length) << std::hex << content_data_.length();
+    this->header_data_ = header_stream.str();
+    Logger::info("Message::send", "Header " + this->header_data_, PR_VERY_LOW);
+    Logger::info("Message::send", "Content " + this->content_data_, PR_VERY_LOW);
 
     // concat buffers into a vector
     std::vector<boost::asio::const_buffer> out_buffers{};
     out_buffers.reserve(2);
-    out_buffers.emplace_back(boost::asio::buffer(header_data, code_length+length_length));
-    out_buffers.emplace_back(boost::asio::buffer(content_data, content_data.size()));
-    Logger::info("Message::send", "Serializing new message... - done, code " + std::to_string(this->code) + " length " + std::to_string(content_data.size()), PR_LOW);
+    out_buffers.emplace_back(boost::asio::buffer(this->header_data_, code_length + length_length));
+    out_buffers.emplace_back(boost::asio::buffer(this->content_data_, this->content_data_.length()));
+    Logger::info("Message::send", "Serializing new message... - done, code " + std::to_string(this->code) + " length " + std::to_string(this->content_data_.size()), PR_LOW);
 
     return out_buffers;
 }
@@ -154,7 +154,7 @@ Message *Message::build_header() {
         throw std::invalid_argument( "Cannot read content length");
     this->code = static_cast<MESSAGE_TYPE>(msg_code);
     this->content_buffer_length_ = content_length;
-    this->content_buffer_ = new char[content_length]{};
+    this->content_buffer_ = new char[content_length]();
 //    this->content_buffer->resize(content_length);
 
     /*
@@ -189,11 +189,11 @@ Message *Message::build_content() const {
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->header_buffer_, code_length + length_length);
+    return boost::asio::buffer(this->header_buffer_, code_length + length_length);
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_content_buffer() const { // generic pointer, sorry
-    return boost::asio::mutable_buffer(this->content_buffer_, this->content_buffer_length_);
+    return boost::asio::buffer(this->content_buffer_, this->content_buffer_length_);
 }
 
 Message::~Message() {

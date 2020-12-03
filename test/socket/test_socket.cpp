@@ -50,7 +50,8 @@ public:
         std::string req{ "test" };
         std::ostringstream req_stream{};
         req_stream << std::setw(BUFFER_SIZE) << req;
-        auto req_data = req_stream.str();
+        auto tmp = req_stream.str();
+        auto req_data = tmp.c_str();
         std::vector<boost::asio::const_buffer> req_buffers{};
         req_buffers.emplace_back(boost::asio::buffer(req_data, BUFFER_SIZE));
 
@@ -154,7 +155,8 @@ public:
             std::string res{ "test done" };
             std::ostringstream res_stream{};
             res_stream << std::setw(BUFFER_SIZE) << res;
-            auto req_data = res_stream.str();
+            auto tmp = res_stream.str();
+            auto req_data = tmp.c_str();
             std::vector<boost::asio::const_buffer> res_buffers{};
             res_buffers.emplace_back(boost::asio::buffer(req_data, BUFFER_SIZE));
 

@@ -6,9 +6,9 @@ if (APPLE)
     # Boost configuration
     set(Boost_INCLUDE_DIR "/Users/paologastaldi/Downloads/boost_1_74_0/") # the only path needed for Boost
 
-#    set(Boost_INCLUDE_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/")
-#    set(Boost_LIBRARY_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/boost/")
-#    set(Boost_LIBRARIES "/Users/paologastaldi/Downloads/boost_1_74_0/libs/")
+    set(Boost_INCLUDE_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/")
+    set(Boost_LIBRARY_DIRS "/Users/paologastaldi/Downloads/boost_1_74_0/boost/")
+    set(Boost_LIBRARIES "/Users/paologastaldi/Downloads/boost_1_74_0/libs/")
 
 #    set(Boost_ROOT_DIR /Users/paologastaldi/Downloads/boost_1_74_0)
 #    set(Boost_DIR ${Boost_ROOT_DIR})

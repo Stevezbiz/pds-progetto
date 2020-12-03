@@ -29,7 +29,7 @@
  * @author Gastaldi Paolo
  * @version 1.0.0
  */
-enum MESSAGE_TYPE : int {
+enum MESSAGE_TYPE : std::int32_t {
     MSG_ERROR = -1,
     MSG_UNDEFINED = 0,
     MSG_OKAY = 1,
@@ -60,9 +60,11 @@ class Message {
 //        std::size_t length;
 //    };
 
-    char *header_buffer_ = new char[code_length + length_length]{};
-    char *content_buffer_;
-    std::size_t content_buffer_length_;
+    char *header_buffer_ = new char[code_length + length_length]();
+    char *content_buffer_ = nullptr;
+    std::size_t content_buffer_length_ = 0;
+    std::string header_data_;
+    std::string content_data_;
 
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
@@ -87,7 +89,7 @@ public:
     * using a TLV format (type, length, value)
     * @return a list of asio buffers
     */
-    [[nodiscard]] std::vector<boost::asio::const_buffer> send() const;
+    [[nodiscard]] std::vector<boost::asio::const_buffer> send();
 
     /**
      * check if the inner status is okay
