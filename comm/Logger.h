@@ -45,14 +45,14 @@ public:
      * @param message
      * @param priority
      */
-    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
+    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_VERY_LOW);
     /**
      * create a new warning log
      * @param location
      * @param message
      * @param priority
      */
-    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
+    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_NORMAL);
 
     /**
      * create a new error log
