@@ -14,6 +14,7 @@
 #include "Socket_API.h"
 #include "Message.h"
 #include "Comm_error.h"
+#include "../server/Session.h"
 
 namespace fs = boost::filesystem;
 
@@ -22,62 +23,83 @@ namespace fs = boost::filesystem;
  */
 class Server_API : public API {
     // functions this class needs to manage client responses
-    static std::function<bool(const std::string &, const std::string &)> login;
-    static std::function<const std::map <std::string, std::string> *(const std::vector <std::string> &)> probe;
-    static std::function<const std::vector<unsigned char> *(const std::string &)> get;
-    static std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push;
-    static std::function<const std::vector <std::string> *()> restore;
-    static std::function<bool()> end;
-    static std::function<void(const Comm_error *)> handle_error;
+    std::function<bool(Session &, const std::string &, const std::string &)> login_ = [](const std::string &, const std::string &) {
+            return true;
+        };
+    std::function<const std::map <std::string, std::string> *(Session &, const std::vector <std::string> &)> probe_ = [](const std::vector <std::string> &) {
+            return new std::map<std::string, std::string>{};
+        };
+    std::function<const std::vector<unsigned char> *(Session &, const std::string &)> get_ = [](const std::string &) {
+            return new std::vector<unsigned char>{};
+        };
+    std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push_ = [](const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
+            return true;
+        };
+    std::function<const std::vector <std::string> *(Session &)> restore_ = []() {
+            return new std::vector<std::string>{};
+        };
+    std::function<bool(Session &)> end_ = []() {
+            return true;
+        };
+    std::function<void(Session &, const Comm_error *)> handle_error_ = [](const Comm_error *comm_error) {
+            std::cerr << comm_error->to_string() << std::endl;
+        };
 
     /**
      * manage login protocol procedure
+     * @param session
      * @param request message
      * @return response message
      */
-    static Message *do_login(Message *req);
+    Message *do_login_(Session &session, Message *req);
 
     /**
      * manage probe protocol procedure
+     * @param session
      * @param request message
      * @return response message
      */
-    static Message *do_probe(Message *req);
+    Message *do_probe_(Session &session, Message *req);
 
     /**
      * manage get protocol procedure
+     * @param session
      * @param request message
      * @return response message
      */
-    static Message *do_get(Message *req);
+    Message *do_get_(Session &session, Message *req);
 
     /**
      * manage push protocol procedure
+     * @param session
      * @param request message
      * @return response message
      */
-    static Message *do_push(Message *req);
+    Message *do_push_(Session &session, Message *req);
 
     /**
      * manage restore protocol procedure
+     * @param session
      * @param request message
      * @return response message
      */
-    static Message *do_restore(Message *req);
+    Message *do_restore_(Session &session, Message *req);
 
     /**
     * manage end protocol procedure
+     * @param session
     * @param request message
     * @return response message
     */
-    static Message *do_end(Message *req);
+    Message *do_end_(Session &session, Message *req);
 
     /**
      * handle a communication error
+     * @param session
      * @param comm_error
      * @return response message
      */
-    static void do_handle_error(Comm_error *comm_error);
+    void do_handle_error_(Session &session, Comm_error *comm_error);
 
 public:
     /**
@@ -85,7 +107,7 @@ public:
      * @param socket_api
      * @param user_root_path
      */
-    explicit Server_API(Socket_API *socket_api, const std::string &user_root_path = ".");
+    explicit Server_API(const std::string &user_root_path = ".");
 
     /**
      * set how to manage a login request
@@ -95,7 +117,7 @@ public:
      *      - const std::string &password
      * - output: bool is_okay
      */
-    static void set_login(const std::function<bool(const std::string &, const std::string &)> &login_function);
+    void set_login(const std::function<bool(Session &, const std::string &, const std::string &)> &login_function);
 
     /**
      * set how to manage a probe request
@@ -105,7 +127,7 @@ public:
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    static void set_probe(const std::function<const std::map <std::string, std::string> *( const std::vector <std::string> &)> &probe_function);
+    void set_probe(const std::function<const std::map <std::string, std::string> *(Session &, const std::vector <std::string> &)> &probe_function);
 
     /**
      * set how to manage a get request
@@ -115,7 +137,7 @@ public:
      * - output:
      *      - const std::vector<unsigned char> &file, a vector of bytes
      */
-    static void set_get(const std::function<const std::vector<unsigned char> *(const std::string &)> &get_function);
+    void set_get(const std::function<const std::vector<unsigned char> *(Session &, const std::string &)> &get_function);
 
     /**
      * set how to manage a push request
@@ -128,7 +150,7 @@ public:
      * - output:
      *      - bool is_okay
      */
-    static void set_push(const std::function<bool(const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function);
+    void set_push(const std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function);
 
     /**
      * set how to manage a restore request
@@ -138,7 +160,7 @@ public:
      * - output:
      *      - const std::vector<std::string> &paths, a list of paths
      */
-    static void set_restore(const std::function<const std::vector<std::string> *()> &restore_function);
+    void set_restore(const std::function<const std::vector<std::string> *(Session &)> &restore_function);
 
     /**
      * set how to manage a end request
@@ -148,7 +170,7 @@ public:
      * - output:
      *      - bool status
      */
-    static void set_end(const std::function<bool()> &end_function);
+    void set_end(const std::function<bool(Session &)> &end_function);
 
     /**
      *
@@ -158,12 +180,13 @@ public:
      * - output:
      *      - (empty)
      */
-    static void set_handle_error(const std::function<void(const Comm_error *)> &handle_error_function);
+    void set_handle_error(const std::function<void(Session &, const Comm_error *)> &handle_error_function);
 
     /**
      * start handling requests
+     * @param session
      */
-    void run();
+    void run(Session &session);
 };
 
 #endif //SERVER_SERVER_API_H

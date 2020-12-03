@@ -6,10 +6,10 @@
 
 bool Client_API::get_and_save_(const std::string &path) {
     auto req = Message::get(path);
-    this->api->send(req);
-    if(!this->api->receive(MSG_GET_CONTENT))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_GET_CONTENT))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
     if (!res->is_okay())
         return false;
 
@@ -23,10 +23,10 @@ Client_API::Client_API(Socket_API *socket_api, const std::string &root_path) : A
 
 bool Client_API::login(const std::string &username, const std::string &password) {
     auto req = Message::login(username, password);
-    this->api->send(req);
-    if(!this->api->receive(MSG_OKAY))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_OKAY))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
 
     return res->is_okay();
 }
@@ -37,10 +37,10 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     for (auto const &item : map)
         paths.push_back(item.first);
     auto req = Message::probe(paths);
-    this->api->send(req);
-    if(!this->api->receive(MSG_PROBE_CONTENT))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_PROBE_CONTENT))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
 
     if(!res->is_okay())
         return false;
@@ -71,20 +71,20 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
 
 bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
     auto req = Message::push(file, path, hash, elementStatus);
-    this->api->send(req);
-    if(!this->api->receive(MSG_OKAY))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_OKAY))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
 
     return res->is_okay();
 }
 
 bool Client_API::restore() {
     auto req = Message::restore();
-    this->api->send(req);
-    if(!this->api->receive(MSG_RESTORE_CONTENT))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_RESTORE_CONTENT))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
 
     if(!res->is_okay())
         return false;
@@ -98,10 +98,10 @@ bool Client_API::restore() {
 
 bool Client_API::end() {
     auto req = Message::end();
-    this->api->send(req);
-    if(!this->api->receive(MSG_OKAY))
+    this->api_->send(req);
+    if(!this->api_->receive(MSG_OKAY))
         return false;
-    auto res = this->api->get_message();
+    auto res = this->api_->get_message();
 
     return res->is_okay();
 }
