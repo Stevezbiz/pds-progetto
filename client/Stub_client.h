@@ -17,7 +17,7 @@ class Stub_client {
     FileWatcher *fw;
     Client_API *api;
     bool is_logged_in = false;
-    std::map<std::string, std::string> map;
+    std::map<std::string, std::string> map; // stub map
 
     /**
      * manage errors
