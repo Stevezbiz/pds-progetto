@@ -11,7 +11,6 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/string.hpp>
 #include <utility>
-#include "Logger.h"
 
 /**
  * list of error numbers (error codes)

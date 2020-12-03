@@ -24,6 +24,6 @@ void Logger::error(const std::string &location, const std::string &message, PRIO
     Logger::log(LOG_ERROR, location, message, priority);
 }
 
-/*void Logger::error(const Comm_error *comm_error, PRIORITY priority) { // TODO: error: unknown type name 'Comm_error'
+void Logger::error(const Comm_error *comm_error, PRIORITY priority) {
     Logger::error(comm_error->location, comm_error->to_string(), priority);
-}*/
+}
