@@ -36,13 +36,28 @@ public:
      * Convert every answer into a boolean
      */
     static bool checkAnswerOK(std::string& answer, bool& result);
+    /**
+     * Show the configuration of the server
+     */
+    void showConfig();
+    /**
+     * Manage the menu and all the possible answers
+     */
+    void menu();
+    /**
+     * Manage the answers of the menu
+     */
+    int question_menu();
+    /**
+     * Show the the choices from menu
+     */
+    void showChoice();
 
     std::string getAddress();
 
     int getPort();
 
     boost::filesystem::path getDirPath();
-
 };
 
 

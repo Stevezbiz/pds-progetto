@@ -16,7 +16,7 @@ void ConfigSettings::read_config() {
         else if (line.find("path") != -1)
             sin >> dir_path;
     }
-    std::cout<<"address = "<<address<<"\nport = "<<port << "\npath = "<< dir_path<<std::endl;
+    showConfig();
 }
 
 bool ConfigSettings::exist_file(const std::string &name) {
@@ -32,7 +32,7 @@ void ConfigSettings::write_config() {
     boost::system::error_code ec;
     std::string work_directory;
     do{
-        std::cout << "Address: " << std::flush;
+        std::cout << "Server address: " << std::flush;
         std::getline(std::cin, address);
         boost::asio::ip::address::from_string(address, ec);
         if (ec) {
@@ -82,6 +82,7 @@ void ConfigSettings::write_config() {
     conf << "path = " << dir_path << std::endl;
     // Close the file
     conf.close();
+    showConfig();
 }
 
 bool ConfigSettings::question_yesno(const std::string &message) {
@@ -111,8 +112,9 @@ bool ConfigSettings::checkAnswerOK(std::string &answer, bool &result) {
             (answer == "y")   ||
             (answer == "n")   ||
             (answer == "yes") ||
-            (answer == "no");
-
+            (answer == "no")  ||
+            (answer == "q")   ||
+            (answer == "quit");
     result = answer_valid && answer[0] == 'y';
     return answer_valid;
 }
@@ -153,3 +155,77 @@ int ConfigSettings::getPort() {
 boost::filesystem::path ConfigSettings::getDirPath() {
     return this->dir_path;
 }
+
+void ConfigSettings::menu() {
+    //unsigned short response = 0;
+    unsigned short  response;
+    bool menuQuit = false;
+    showChoice();
+    while (!menuQuit)
+    {
+        response = question_menu();
+        switch (response) {
+            case 1:
+                std::cout << "server synchronization ...\n";
+                /**
+                 * normal mode
+                 */
+                break;
+
+            case 2:
+                if (!question_yesno("Are you sure to recover all files and folders from the Server")) {
+                    showChoice();
+                }else {
+                    /**
+                     * restore mode
+                     */
+                }
+                break;
+
+            case 0:
+                if (question_yesno("Are you sure you want to exit?")) {
+                    std::cout << "Exiting....\n";
+                    menuQuit = true;
+                }
+                break;
+        }
+    }
+
+}
+
+void ConfigSettings::showConfig() {
+    std::cout << R"(
+    +---------------------------------------+
+    |  Address = )"<<address<<R"(
+    |  Port = )"<<port<<R"(
+    |  Path = )"<<dir_path<<R"(
+    +---------------------------------------+
+        )" << '\n';
+}
+
+void ConfigSettings::showChoice() {
+    std::cout << "What action would you like to take?\n"
+              << " 1) Normal mode (keeps the remote backup server updated of any changes)\n"
+              << " 2) Restore all (recover all files and folders from Remote Backup Server)\n"
+              << " q) Exit\n"
+              << ": ";
+}
+
+int ConfigSettings::question_menu() {
+    std::string answer;
+    bool result;
+    
+    while(std::cin >> answer && (!checkAnswerOK(answer, result) && (answer != "1" && answer != "2")))
+    {
+        std::cout << "Invalid answer: " << answer << " ... Please try again\n:";
+    }
+    if (!std::cin) {
+        // We never got an answer.
+        // Not much we can do here. Probably give up?
+        throw std::runtime_error("User Input read failed");
+    }
+    if (isdigit(answer[0])) return std::stoi(answer);
+    return 0;
+}
+
+
