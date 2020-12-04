@@ -6,9 +6,10 @@
 
 #include <utility>
 
-Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db) : acceptor_(ctx, endpoint),
-                                                                                               socket_(ctx), api_(std::move(db)),
-                                                                                               stop_(false) {
+Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db)
+        : acceptor_(ctx, endpoint),
+          socket_(ctx), api_(), db_(std::move(db)),
+          stop_(false) {
     server_init();
     accept();
 }
@@ -23,10 +24,11 @@ void Server::accept() {
     }
 }
 
-bool Server::login(Session &session, const std::string &username, const std::string &password) {
+bool Server::login(Session &session, const std::string &username, const std::string &password,
+                   const std::string &database_path) {
     sqlite3 *db;
     // open the database
-    if (sqlite3_open_v2("???", &db, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_open_v2(database_path.data(), &db, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK) return false;
     // define the query
     sqlite3_stmt *query;
     if (sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM USERS WHERE Username = ? AND Password = ?",
@@ -45,7 +47,7 @@ bool Server::login(Session &session, const std::string &username, const std::str
     return true;
 }
 
-const std::map<std::string, std::string> *Server::probe(Session &, const std::vector<std::string> &) {
+const std::map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
     return new std::map<std::string, std::string>();
 }
 
@@ -73,12 +75,26 @@ void Server::handle_error(Session &session, const Comm_error *comm_error) {
 }
 
 void Server::server_init() {
-    api_.set_login(login);
-    api_.set_end(end);
-    api_.set_get(get);
-    api_.set_probe(probe);
-    api_.set_push(push);
-    api_.set_restore(restore);
-    api_.set_end(end);
-    api_.set_handle_error(handle_error);
+    api_.set_login([this](Session &session, const std::string &username, const std::string &password) {
+        return login(session, username, password, db_);
+    });
+    api_.set_end([this](Session &session) {
+        return end(session);
+    });
+    api_.set_get([this](Session &session, const std::string &path) {
+        return get(session, path);
+    });
+    api_.set_probe([this](Session &session, const std::vector<std::string> &paths) {
+        return probe(session, paths);
+    });
+    api_.set_push([this](Session &session, const std::string &path, const std::vector<unsigned char> &file,
+                         const std::string &hash, ElementStatus status) {
+        return push(session, path, file, hash, status);
+    });
+    api_.set_restore([this](Session &session) {
+        return restore(session);
+    });
+    api_.set_handle_error([this](Session &session, const Comm_error *comm_error) {
+        return handle_error(session, comm_error);
+    });
 }

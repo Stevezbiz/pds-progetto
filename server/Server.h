@@ -12,6 +12,7 @@ class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
     Server_API api_;
+    std::string db_;
     bool stop_;
 
     /**
@@ -23,7 +24,7 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &, const std::string &, const std::string &);
+    static bool login(Session &session, const std::string &username, const std::string &password, const std::string &database_path);
 
     /**
      *
@@ -40,8 +41,7 @@ class Server {
     /**
      *
      */
-    static bool
-    push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
+    static bool push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
 
     /**
      *
