@@ -74,12 +74,12 @@ void Server_API::run(Session &session) {
     bool stop = false;
 
     while(!stop) {
-        if(!session->api->receive(MSG_UNDEFINED)) {
-            Server_API::do_handle_error_(Session session, session->api->get_last_error());
-            session->api->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error" }));
+        if(!session.receive(MSG_UNDEFINED)) {
+            this->do_handle_error_(session, session.get_last_error());
+            session.send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error" }));
             continue;
         }
-        auto req = session->api->get_message();
+        auto req = session.get_message();
         Message *res;
 
         // manage the request and produce a response message
@@ -107,6 +107,6 @@ void Server_API::run(Session &session) {
                 res = Message::error(new Comm_error{CE_UNEXPECTED_TYPE, "Server_API::run", "Message code not valid"});
         }
 
-        session->api->send(res);
+        session.send(res);
     }
 }

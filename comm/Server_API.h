@@ -23,27 +23,32 @@ namespace fs = boost::filesystem;
  */
 class Server_API : public API {
     // functions this class needs to manage client responses
-    std::function<bool(Session &, const std::string &, const std::string &)> login_ = [](const std::string &, const std::string &) {
-            return true;
-        };
-    std::function<const std::map <std::string, std::string> *(Session &, const std::vector <std::string> &)> probe_ = [](const std::vector <std::string> &) {
-            return new std::map<std::string, std::string>{};
-        };
-    std::function<const std::vector<unsigned char> *(Session &, const std::string &)> get_ = [](const std::string &) {
-            return new std::vector<unsigned char>{};
-        };
-    std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push_ = [](const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
-            return true;
-        };
-    std::function<const std::vector <std::string> *(Session &)> restore_ = []() {
-            return new std::vector<std::string>{};
-        };
-    std::function<bool(Session &)> end_ = []() {
-            return true;
-        };
-    std::function<void(Session &, const Comm_error *)> handle_error_ = [](const Comm_error *comm_error) {
-            std::cerr << comm_error->to_string() << std::endl;
-        };
+    std::function<bool(Session &, const std::string &, const std::string &)> login_ =
+            [](Session &, const std::string &, const std::string &) {
+                return true;
+            };
+    std::function<const std::map<std::string, std::string> *(Session &, const std::vector<std::string> &)> probe_ =
+            [](Session &, const std::vector<std::string> &) {
+                return new std::map<std::string, std::string>{};
+            };
+    std::function<const std::vector<unsigned char> *(Session &, const std::string &)> get_ =
+            [](Session &, const std::string &) {
+                return new std::vector<unsigned char>{};
+            };
+    std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &,
+                       ElementStatus)> push_ =
+            [](Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
+                return true;
+            };
+    std::function<const std::vector<std::string> *(Session &)> restore_ = [](Session &) {
+        return new std::vector<std::string>{};
+    };
+    std::function<bool(Session &)> end_ = [](Session &) {
+        return true;
+    };
+    std::function<void(Session &, const Comm_error *)> handle_error_ = [](Session &, const Comm_error *comm_error) {
+        std::cerr << comm_error->to_string() << std::endl;
+    };
 
     /**
      * manage login protocol procedure
@@ -127,7 +132,8 @@ public:
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    void set_probe(const std::function<const std::map <std::string, std::string> *(Session &, const std::vector <std::string> &)> &probe_function);
+    void set_probe(const std::function<const std::map<std::string, std::string> *(Session &,
+                                                                                  const std::vector<std::string> &)> &probe_function);
 
     /**
      * set how to manage a get request
@@ -150,7 +156,8 @@ public:
      * - output:
      *      - bool is_okay
      */
-    void set_push(const std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function);
+    void set_push(const std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &,
+                                           const std::string &, ElementStatus)> &push_function);
 
     /**
      * set how to manage a restore request

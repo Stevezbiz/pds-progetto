@@ -22,7 +22,37 @@ public:
      */
     Session(boost::asio::ip::tcp::socket socket);
 
+    /**
+     *
+     * @param user
+     */
     void set_user(std::string user);
+
+    /**
+     *
+     * @param expectedMessage
+     * @return
+     */
+    bool receive(MESSAGE_TYPE expectedMessage);
+
+    /**
+     *
+     * @return
+     */
+    Comm_error *get_last_error();
+
+    /**
+     *
+     * @param message
+     * @return
+     */
+    bool send(Message *message);
+
+    /**
+     *
+     * @return
+     */
+    Message *get_message();
 };
 
 #endif //SERVER_SESSION_H
