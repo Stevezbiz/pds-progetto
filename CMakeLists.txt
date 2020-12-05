@@ -119,6 +119,8 @@ set(SERVER_SOURCE_FILES
         server/Server.h
         server/Session.cpp
         server/Session.h
+        server/Database_API.cpp
+        server/Database_API.h
         )
 
 ### stub client ###
