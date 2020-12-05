@@ -29,3 +29,7 @@ bool Session::send(Message *message) {
 Message *Session::get_message() {
     return api_.get_message();
 }
+
+std::string Session::get_user() {
+    return user_;
+}

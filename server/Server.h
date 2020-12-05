@@ -25,8 +25,7 @@ class Server {
      *
      * @return
      */
-    static bool
-    login(Session &session, const std::string &username, const std::string &password, const std::string &database_path);
+    static bool login(Session &, const std::string &, const std::string &, const std::string &);
 
     /**
      *
@@ -43,8 +42,8 @@ class Server {
     /**
      *
      */
-    static bool
-    push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
+    static bool push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &,
+                     ElementStatus, const std::string &);
 
     /**
      *

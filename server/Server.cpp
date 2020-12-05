@@ -55,16 +55,20 @@ const std::vector<unsigned char> *Server::get(Session &session, const std::strin
 }
 
 bool Server::push(Session &session, const std::string &path, const std::vector<unsigned char> &file,
-                  const std::string &hash, ElementStatus status) {
+                  const std::string &hash, ElementStatus status, const std::string &root_path) {
+    boost::filesystem::path dest_path{root_path};
+    dest_path.append(session.get_user());
+    dest_path.append(path);
     switch (status) {
         case ElementStatus::createdFile:
-
+            Utils::write_on_file(dest_path, file);
             break;
         case ElementStatus::modifiedFile:
-
+            if (!boost::filesystem::remove(dest_path)) return false;
+            Utils::write_on_file(path, file);
             break;
         case ElementStatus::erasedFile:
-
+            if (!boost::filesystem::remove(dest_path)) return false;
             break;
         default:
             return false;
@@ -101,7 +105,7 @@ void Server::server_init() {
     });
     api_.set_push([this](Session &session, const std::string &path, const std::vector<unsigned char> &file,
                          const std::string &hash, ElementStatus status) {
-        return push(session, path, file, hash, status);
+        return push(session, path, file, hash, status, root_path_);
     });
     api_.set_restore([this](Session &session) {
         return restore(session);

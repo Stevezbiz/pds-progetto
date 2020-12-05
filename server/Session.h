@@ -53,6 +53,12 @@ public:
      * @return
      */
     Message *get_message();
+
+    /**
+     *
+     * @return
+     */
+    std::string get_user();
 };
 
 #endif //SERVER_SESSION_H
