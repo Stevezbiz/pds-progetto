@@ -6,8 +6,8 @@
 
 #include <utility>
 
-Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db,
-               std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), api_(), db_(std::move(db)),
+Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
+               std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), api_(), db_(std::move(db_path)),
                                         root_path_(std::move(root_path)), stop_(false) {
     server_init();
     accept();
@@ -24,26 +24,12 @@ void Server::accept() {
 }
 
 bool Server::login(Session &session, const std::string &username, const std::string &password,
-                   const std::string &database_path) {
-    sqlite3 *db;
-    // open the database
-    if (sqlite3_open_v2(database_path.data(), &db, SQLITE_OPEN_READONLY, nullptr) != SQLITE_OK) return false;
-    // define the query
-    sqlite3_stmt *query;
-    if (sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM USERS WHERE Username = ? AND Password = ?",
-                           -1, &query, nullptr) != SQLITE_OK)
-        return false;
-    if (sqlite3_bind_text(query, 1, username.data(), -1, nullptr) != SQLITE_OK) return false;
-    if (sqlite3_bind_text(query, 2, password.data(), -1, nullptr) != SQLITE_OK) return false;
-    // execute the query
-    if (sqlite3_step(query) != SQLITE_OK) return false;
-    // verify the result of the query
-    int count = sqlite3_column_int(query, 0);
-    if (count != 1) return false;
-    if (sqlite3_finalize(query) != SQLITE_OK) return false;
-    if (sqlite3_close_v2(db) != SQLITE_OK) return false;
-    session.set_user(username);
-    return true;
+                   const Database_API& database) {
+    if(database.login_query(username,password)){
+        session.set_user(username);
+        return true;
+    }
+    return false;
 }
 
 const std::map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {

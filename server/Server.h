@@ -7,12 +7,13 @@
 
 #include "Session.h"
 #include "../comm/Server_API.h"
+#include "Database_API.h"
 
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
     Server_API api_;
-    std::string db_;
+    Database_API db_;
     std::string root_path_;
     bool stop_;
 
@@ -25,7 +26,7 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &, const std::string &, const std::string &, const std::string &);
+    static bool login(Session &, const std::string &, const std::string &, const Database_API &);
 
     /**
      *
@@ -75,7 +76,7 @@ public:
      * @param db: database path
      * @param root_path: root directory for saving bakup
      */
-    Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db,
+    Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
            std::string root_path);
 };
 
