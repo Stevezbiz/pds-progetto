@@ -24,8 +24,8 @@ void Server::accept() {
 }
 
 bool Server::login(Session &session, const std::string &username, const std::string &password,
-                   const Database_API& database) {
-    if(database.login_query(username,password)){
+                   const Database_API &database) {
+    if (database.login_query(username, password)) {
         session.set_user(username);
         return true;
     }
@@ -48,13 +48,23 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
     switch (status) {
         case ElementStatus::createdFile:
             Utils::write_on_file(dest_path, file);
+            if (!session.create_file(path, hash)) {
+                // TODO: error management
+                return false;
+            }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(dest_path)) return false;
+            if (!boost::filesystem::remove(dest_path) || !session.modify_file(path, hash)) {
+                // TODO: error management
+                return false;
+            }
             Utils::write_on_file(path, file);
             break;
         case ElementStatus::erasedFile:
-            if (!boost::filesystem::remove(dest_path)) return false;
+            if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
+                // TODO: error management
+                return false;
+            }
             break;
         default:
             return false;
@@ -63,7 +73,7 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
 }
 
 const std::vector<std::string> *Server::restore(Session &session) {
-    return new std::vector<std::string>();
+    return session.get_paths();
 }
 
 bool Server::end(Session &session) {

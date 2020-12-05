@@ -14,6 +14,14 @@
 class Session : public std::enable_shared_from_this<Session> {
     std::string user_;
     Socket_API api_;
+    std::unordered_map<std::string, std::string> files_;
+
+    /**
+     *
+     * @param key
+     * @return
+     */
+    bool files_contains(const std::string &key);
 
 public:
     /**
@@ -59,6 +67,35 @@ public:
      * @return
      */
     std::string get_user();
+
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     */
+    bool create_file(const std::string &path, const std::string &hash);
+
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     */
+    bool modify_file(const std::string &path, const std::string &hash);
+
+    /**
+     *
+     * @param path
+     * @return
+     */
+    bool remove_file(const std::string &path);
+
+    /**
+     *
+     * @return
+     */
+    const std::vector<std::string> *get_paths();
 };
 
 #endif //SERVER_SESSION_H
