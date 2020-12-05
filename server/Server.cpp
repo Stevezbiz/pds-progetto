@@ -6,10 +6,9 @@
 
 #include <utility>
 
-Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db)
-        : acceptor_(ctx, endpoint),
-          socket_(ctx), api_(), db_(std::move(db)),
-          stop_(false) {
+Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db,
+               std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), api_(), db_(std::move(db)),
+                                        root_path_(std::move(root_path)), stop_(false) {
     server_init();
     accept();
 }
@@ -52,11 +51,24 @@ const std::map<std::string, std::string> *Server::probe(Session &session, const 
 }
 
 const std::vector<unsigned char> *Server::get(Session &session, const std::string &path) {
-    return new std::vector<unsigned char>();
+    return new std::vector<unsigned char>(Utils::read_from_file(path));
 }
 
 bool Server::push(Session &session, const std::string &path, const std::vector<unsigned char> &file,
                   const std::string &hash, ElementStatus status) {
+    switch (status) {
+        case ElementStatus::createdFile:
+
+            break;
+        case ElementStatus::modifiedFile:
+
+            break;
+        case ElementStatus::erasedFile:
+
+            break;
+        default:
+            return false;
+    }
     return true;
 }
 

@@ -13,6 +13,7 @@ class Server {
     boost::asio::ip::tcp::socket socket_;
     Server_API api_;
     std::string db_;
+    std::string root_path_;
     bool stop_;
 
     /**
@@ -24,7 +25,8 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &session, const std::string &username, const std::string &password, const std::string &database_path);
+    static bool
+    login(Session &session, const std::string &username, const std::string &password, const std::string &database_path);
 
     /**
      *
@@ -41,7 +43,8 @@ class Server {
     /**
      *
      */
-    static bool push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
+    static bool
+    push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus);
 
     /**
      *
@@ -71,8 +74,10 @@ public:
      * @param ctx: i servizi di I/O forniti
      * @param endpoint: l'indirizzo e la porta a cui lanciare il server
      * @param db: database path
+     * @param root_path: root directory for saving bakup
      */
-    Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db);
+    Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db,
+           std::string root_path);
 };
 
 #endif //SERVER_SERVER_H
