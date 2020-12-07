@@ -111,6 +111,8 @@ set(CLIENT_SOURCE_FILES
 
 set(STUB_SERVER_SOURCE_FILES
         server/stub_main.cpp
+        server/Session.cpp
+        server/Session.h
         )
 
 set(SERVER_SOURCE_FILES
