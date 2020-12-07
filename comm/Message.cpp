@@ -29,7 +29,13 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->hash;
     ar & this->paths;
     ar & this->hashes;
-    ar & this->file;
+    std::ostringstream file_stream;
+    for(unsigned char c: this->file) {
+        file_stream << c;
+    }
+    std::string file_string{ file_stream.str() };
+    // ar & this->file;
+    ar & file_string;
     ar & this->elementStatus;
     ar & this->comm_error;
     ar & this->status; // = okay
