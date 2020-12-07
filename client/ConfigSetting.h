@@ -3,6 +3,11 @@
 #include <thread>
 #include <boost/filesystem.hpp>
 #include <utility>
+
+enum Command{
+    end, normal, restore
+};
+
 class ConfigSettings
 {
     std::string address;
@@ -43,7 +48,7 @@ public:
     /**
      * Manage the menu and all the possible answers
      */
-    void menu();
+    Command menu();
     /**
      * Manage the answers of the menu
      */
@@ -55,9 +60,9 @@ public:
 
     std::string getAddress();
 
-    int getPort();
+    std::string getPort();
 
-    boost::filesystem::path getDirPath();
+    std::string getDirPath();
 };
 
 

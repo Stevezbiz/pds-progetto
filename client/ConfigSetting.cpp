@@ -31,7 +31,7 @@ bool ConfigSettings::exist_file(const std::string &name) {
 void ConfigSettings::write_config() {
     boost::system::error_code ec;
     std::string work_directory;
-    do{
+    do {
         std::cout << "Server address: " << std::flush;
         std::getline(std::cin, address);
         boost::asio::ip::address::from_string(address, ec);
@@ -40,11 +40,11 @@ void ConfigSettings::write_config() {
             std::cin.clear();
         }
         //std::this_thread::sleep_for (std::chrono::milliseconds(40));
-    }while (ec);
+    } while (ec);
     // Get the port.
     for (;;) {
         std::cout << "Port: ";
-        if (std::cin >> port && ((port > 0 ? (int) log10 ((double) port) + 1 : 1 ) == 4)) {
+        if (std::cin >> port && ((port > 0 ? (int) log10((double) port) + 1 : 1) == 4)) {
             break;
         } else {
             std::cout << "Please enter a valid port." << std::endl;
@@ -53,22 +53,23 @@ void ConfigSettings::write_config() {
         }
     }
     //insert working directory
-    while(true) {
+    while (true) {
         std::cout << "Insert the folder path to perform the remote backup: ";
-        std::cin >> work_directory ;
+        std::cin >> work_directory;
 
         dir_path = boost::filesystem::path(work_directory);
 
-        if (!boost::filesystem::is_directory(dir_path) || !boost::filesystem::exists(dir_path)) { // Check if src folder exists
+        if (!boost::filesystem::is_directory(dir_path) ||
+            !boost::filesystem::exists(dir_path)) { // Check if src folder exists
             std::cout << "The folder doesn't not exist" << std::endl;
 
             if (question_yesno("Would you like to create the folder")) {
-                std::cout << "The " << work_directory << " folder is created."<<std::endl;
+                std::cout << "The " << work_directory << " folder is created." << std::endl;
                 boost::filesystem::create_directory(dir_path); // create src folder
                 break;
             }
 
-        }else {
+        } else {
             break;
         }
     }
@@ -87,11 +88,10 @@ void ConfigSettings::write_config() {
 
 bool ConfigSettings::question_yesno(const std::string &message) {
     std::string answer;
-    bool        result;
+    bool result;
 
     std::cout << message << "? [Y/n] ";
-    while(std::cin >> answer && !checkAnswerOK(answer, result))
-    {
+    while (std::cin >> answer && !checkAnswerOK(answer, result)) {
         std::cout << "Invalid answer: " << answer << " ... Please try again\n"
                   << message << "? [Y/n] ";
     }
@@ -105,15 +105,14 @@ bool ConfigSettings::question_yesno(const std::string &message) {
 }
 
 bool ConfigSettings::checkAnswerOK(std::string &answer, bool &result) {
-    std::transform(answer.begin(), answer.end(), answer.begin(),
-                   [](unsigned char x){return ::tolower(x);});
+    std::transform(answer.begin(), answer.end(), answer.begin(), [](unsigned char x) { return ::tolower(x); });
 
     bool answer_valid =
-            (answer == "y")   ||
-            (answer == "n")   ||
+            (answer == "y") ||
+            (answer == "n") ||
             (answer == "yes") ||
-            (answer == "no")  ||
-            (answer == "q")   ||
+            (answer == "no") ||
+            (answer == "q") ||
             (answer == "quit");
     result = answer_valid && answer[0] == 'y';
     return answer_valid;
@@ -127,13 +126,13 @@ void ConfigSettings::init_configuration() {
         |   / _|| |\/| | (_) || | | _|  | _ \/ _ \ (__| ' <| |_| |  _/
         |_|_\___|_|  |_|\___/ |_| |___| |___/_/ \_\___|_|\_\\___/|_|
         )" << '\n';
-    while(true) {
+    while (true) {
         if (exist_config) {
 
             if (question_yesno("A configuration file already exists, do you want to use that")) {
                 read_config();
                 break;
-            }else{
+            } else {
                 //used to ignore the N/n caracther to the next input
                 std::cin.ignore(1);
             }
@@ -148,46 +147,37 @@ std::string ConfigSettings::getAddress() {
     return this->address;
 }
 
-int ConfigSettings::getPort() {
-    return this->port;
+std::string ConfigSettings::getPort() {
+    return std::to_string(port);
 }
 
-boost::filesystem::path ConfigSettings::getDirPath() {
-    return this->dir_path;
+std::string ConfigSettings::getDirPath() {
+    return this->dir_path.string();
 }
 
-void ConfigSettings::menu() {
+Command ConfigSettings::menu() {
     //unsigned short response = 0;
-    unsigned short  response;
-    bool menuQuit = false;
-    showChoice();
-    while (!menuQuit)
-    {
+    unsigned short response;
+    while (true) {
+        showChoice();
         response = question_menu();
         switch (response) {
-            case 1:
-                std::cout << "server synchronization ...\n";
-                /**
-                 * normal mode
-                 */
-                break;
-
-            case 2:
-                if (!question_yesno("Are you sure to recover all files and folders from the Server")) {
-                    showChoice();
-                }else {
-                    /**
-                     * restore mode
-                     */
-                }
-                break;
-
             case 0:
                 if (question_yesno("Are you sure you want to exit?")) {
                     std::cout << "Exiting....\n";
-                    menuQuit = true;
+                    return Command::end;
                 }
                 break;
+            case 1:
+                std::cout << "server synchronization ...\n";
+                return Command::normal;
+            case 2:
+                if (question_yesno("Are you sure to recover all files and folders from the Server")) {
+                    return Command::restore;
+                }
+                break;
+            default:
+                std::cout << "unrecognized command\n";
         }
     }
 
@@ -196,9 +186,9 @@ void ConfigSettings::menu() {
 void ConfigSettings::showConfig() {
     std::cout << R"(
     +---------------------------------------+
-    |  Address = )"<<address<<R"(
-    |  Port = )"<<port<<R"(
-    |  Path = )"<<dir_path<<R"(
+    |  Address = )" << address << R"(
+    |  Port = )" << port << R"(
+    |  Path = )" << dir_path << R"(
     +---------------------------------------+
         )" << '\n';
 }
@@ -214,9 +204,8 @@ void ConfigSettings::showChoice() {
 int ConfigSettings::question_menu() {
     std::string answer;
     bool result;
-    
-    while(std::cin >> answer && (!checkAnswerOK(answer, result) && (answer != "1" && answer != "2")))
-    {
+
+    while (std::cin >> answer && (!checkAnswerOK(answer, result) && (answer != "1" && answer != "2"))) {
         std::cout << "Invalid answer: " << answer << " ... Please try again\n:";
     }
     if (!std::cin) {
