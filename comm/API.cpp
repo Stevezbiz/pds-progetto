@@ -8,8 +8,9 @@ API::API(Socket_API *socket_api, const std::string &root_path) : api_(socket_api
 API::API(const std::string &root_path) : root_path(root_path) {}
 
 bool API::save_file_(Message *message) {
-    fs::path full_path = this->root_path / fs::path{ message->path };
-    Utils::write_on_file(full_path, message->file);
+    //fs::path full_path = this->root_path / fs::path{ message->path };
+    // Utils::write_on_file(full_path, message->file);
+    Utils::write_on_file(fs::path{ message->path }, message->file);
     return true;
 }
 

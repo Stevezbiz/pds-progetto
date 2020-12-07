@@ -31,7 +31,7 @@ class Stub_client {
      * fill stub values
      */
     void prepare_stub() {
-        std::vector<std::string> paths{ "a.txt", "b.txt" }; // see these files in cmake-build-debug
+        std::vector<std::string> paths{ "./client_files/a.txt", "./client_files/b.txt" }; // see these files in cmake-build-debug
 
         for(const auto &path : paths)
             this->map.insert(std::pair<std::string, std::string>{ path, Utils::SHA256(path) });
