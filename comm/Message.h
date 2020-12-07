@@ -115,6 +115,7 @@ public:
     ElementStatus elementStatus;
     Comm_error *comm_error;
     bool status; // = okay
+    std::string cookie;
 
     /**
     * send this message
