@@ -66,11 +66,42 @@ class Message {
     std::size_t content_buffer_length_ = 0;
     std::string header_data_;
     std::string content_data_;
+    std::string file_string_;
 
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
 
-    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes, std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status);
+    /**
+     * class constructor
+     * @param code
+     * @param username
+     * @param password
+     * @param path
+     * @param hash
+     * @param paths
+     * @param hashes
+     * @param file
+     * @param elementStatus
+     * @param comm_error
+     * @param status
+     */
+//    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes, std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status);
+
+    /**
+     * class constructor
+     * @param code
+     * @param username
+     * @param password
+     * @param path
+     * @param hash
+     * @param paths
+     * @param hashes
+     * @param file_string
+     * @param elementStatus
+     * @param comm_error
+     * @param status
+     */
+//    Message(MESSAGE_TYPE code, const std::string& username, const std::string& password, std::string path, std::string hash, const std::vector<std::string>& paths, const std::unordered_map<std::string, std::string>& hashes, const std::string& file_string, ElementStatus elementStatus, Comm_error *comm_error, bool status);
 
     friend class boost::serialization::access;
 

@@ -4,21 +4,33 @@
 
 #include "Message.h"
 
-Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
-                 std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes,
-                 std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
-        code(code),
-        username(std::move(username)),
-        password(std::move(password)),
-        path(std::move(path)),
-        hash(std::move(hash)),
-        paths(std::move(paths)),
-        hashes(std::move(hashes)),
-        file(std::move(file)),
-        elementStatus(elementStatus),
-        comm_error(comm_error),
-        status(status),
-        content_buffer_(nullptr) {}
+#include <utility>
+
+//Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
+//                 std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes,
+//                 std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
+//        code(code),
+//        username(std::move(username)),
+//        password(std::move(password)),
+//        path(std::move(path)),
+//        hash(std::move(hash)),
+//        paths(std::move(paths)),
+//        hashes(std::move(hashes)),
+//        file(std::move(file)),
+//        elementStatus(elementStatus),
+//        comm_error(comm_error),
+//        status(status),
+//        content_buffer_(nullptr) {}
+
+//Message::Message(MESSAGE_TYPE code, const std::string &username, const std::string &password, std::string path, std::string hash,
+//                 const std::vector<std::string> &paths, const std::unordered_map<std::string, std::string> &hashes,
+//                 const std::string &file_string, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
+//         Message(code, username, password, std::move(path), std::move(hash), paths, hashes, std::vector<unsigned char>{ file_string.begin(), file_string.end() }, elementStatus, comm_error, status) {
+//    Logger::info("Message::Message", "file content: \"" + file_string + "\"", PR_VERY_LOW);
+//    std::vector<unsigned char> vet{ file_string.begin(), file_string.end() };
+//    Logger::info("Message::Message", "file length: " + file_string.length(), PR_VERY_LOW);
+//    Logger::info("Message::Message", "file vector length: " + vet.size(), PR_VERY_LOW);
+//}
 
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
@@ -29,13 +41,8 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->hash;
     ar & this->paths;
     ar & this->hashes;
-    std::ostringstream file_stream;
-    for(unsigned char c: this->file) {
-        file_stream << c;
-    }
-    std::string file_string{ file_stream.str() };
-    // ar & this->file;
-    ar & file_string;
+    ar & this->file_string_;
+//    ar & this->file;
     ar & this->elementStatus;
     ar & this->comm_error;
     ar & this->status; // = okay
@@ -45,6 +52,14 @@ std::vector<boost::asio::const_buffer> Message::send() {
     std::ostringstream header_stream{};
     std::ostringstream content_stream{};
     boost::archive::text_oarchive oa{ content_stream };
+
+    // prepare data
+    std::ostringstream file_stream;
+    for(unsigned char c: this->file) {
+        file_stream << c;
+    }
+    std::string file_string{ file_stream.str() };
+    this->file_string_ = file_string;
 
     // serialize message content
     Logger::info("Message::send", "Serializing new message...", PR_LOW);
@@ -181,6 +196,7 @@ Message *Message::build_header() {
 
 Message *Message::build_content() const {
     Logger::info("Message::build_content", "Building message content...", PR_LOW);
+    Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{ this->content_buffer_, this->content_buffer_length_ } + "\"", PR_LOW);
 //    auto vet = reinterpret_cast<char *>(&this->content_buffer[0]);
     std::string archive_data{ this->content_buffer_, this->content_buffer_length_ };
     std::istringstream archive_stream{ archive_data };
@@ -188,6 +204,11 @@ Message *Message::build_content() const {
     boost::archive::text_iarchive ia{ archive_stream };
     Message *new_message;
     ia >> new_message; // de-serialization
+    new_message->file.clear();
+    std::vector<unsigned char>file_vet{ new_message->file_string_.begin(), new_message->file_string_.end() };
+    new_message->file.clear();
+    new_message->file = file_vet;
+    new_message->file_string_.clear();
     // delete this->content_buffer; // not necessary anymore
     Logger::info("Message::build_content", "Building message content... - done", PR_LOW);
 
