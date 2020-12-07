@@ -59,6 +59,8 @@ public:
     void start(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
 
     void init();
+
+    std::unordered_map<std::string, std::string> get_files();
 };
 
 
