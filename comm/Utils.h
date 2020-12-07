@@ -59,9 +59,26 @@ public:
      */
     static void write_on_file(std::ostream &os, const std::vector<unsigned char> &file);
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     static std::string SHA256(const std::string &path);
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     static std::string SHA256(const boost::filesystem::path &path);
+
+    /**
+     *
+     * @param input
+     * @return
+     */
+    static std::string hash(const std::string &input);
 
 };
 
