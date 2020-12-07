@@ -5,7 +5,7 @@
 #include "Message.h"
 
 Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
-                 std::vector<std::string> paths, std::map<std::string, std::string> hashes,
+                 std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes,
                  std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
         code(code),
         username(std::move(username)),
@@ -98,7 +98,7 @@ Message *Message::probe(const std::vector<std::string> &paths) {
     return message;
 }
 
-Message *Message::probe_content(const std::map<std::string, std::string> &hashes) {
+Message *Message::probe_content(const std::unordered_map<std::string, std::string> &hashes) {
     auto message = new Message{MSG_PROBE_CONTENT };
     message->hashes = hashes;
     return message;

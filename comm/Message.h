@@ -69,7 +69,7 @@ class Message {
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version);
 
-    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::map<std::string, std::string> hashes, std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status);
+    Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash, std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes, std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status);
 
     friend class boost::serialization::access;
 
@@ -78,7 +78,7 @@ public:
     std::string username, password;
     std::string path, hash;
     std::vector<std::string> paths;
-    std::map<std::string, std::string> hashes;
+    std::unordered_map<std::string, std::string> hashes;
     std::vector<unsigned char> file;
     ElementStatus elementStatus;
     Comm_error *comm_error;
@@ -138,7 +138,7 @@ public:
      * @param hashes - <path, version>
      * @return new message
      */
-    static Message *probe_content(const std::map <std::string, std::string> &hashes);
+    static Message *probe_content(const std::unordered_map <std::string, std::string> &hashes);
 
     /**
      * create a message to retrieve a file with a specific path

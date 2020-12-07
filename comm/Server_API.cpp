@@ -46,7 +46,7 @@ void Server_API::set_login(const std::function<bool(Session &, const std::string
     this->login_ = login_function;
 }
 
-void Server_API::set_probe(const std::function<const std::map<std::string, std::string> *(Session &, const std::vector<std::string> &)> &probe_function) {
+void Server_API::set_probe(const std::function<const std::unordered_map<std::string, std::string> *(Session &, const std::vector<std::string> &)> &probe_function) {
     this->probe_ = probe_function;
 }
 

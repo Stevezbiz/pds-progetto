@@ -27,9 +27,9 @@ class Server_API : public API {
             [](Session &, const std::string &, const std::string &) {
                 return true;
             };
-    std::function<const std::map<std::string, std::string> *(Session &, const std::vector<std::string> &)> probe_ =
+    std::function<const std::unordered_map<std::string, std::string> *(Session &, const std::vector<std::string> &)> probe_ =
             [](Session &, const std::vector<std::string> &) {
-                return new std::map<std::string, std::string>{};
+                return new std::unordered_map<std::string, std::string>{};
             };
     std::function<const std::vector<unsigned char> *(Session &, const std::string &)> get_ =
             [](Session &, const std::string &) {
@@ -132,7 +132,7 @@ public:
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    void set_probe(const std::function<const std::map<std::string, std::string> *(Session &,
+    void set_probe(const std::function<const std::unordered_map<std::string, std::string> *(Session &,
                                                                                   const std::vector<std::string> &)> &probe_function);
 
     /**
