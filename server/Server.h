@@ -32,13 +32,13 @@ class Server {
      *
      * @return
      */
-    static const std::map<std::string, std::string> *probe(Session &, const std::vector<std::string> &);
+    static const std::unordered_map<std::string, std::string> *probe(Session &, const std::vector<std::string> &);
 
     /**
      *
      * @return
      */
-    static const std::vector<unsigned char> *get(Session &, const std::string &);
+    static const std::vector<unsigned char> *get(Session &, const std::string &, const std::string &);
 
     /**
      *

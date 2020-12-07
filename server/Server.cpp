@@ -32,12 +32,15 @@ bool Server::login(Session &session, const std::string &username, const std::str
     return false;
 }
 
-const std::map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
-    return new std::map<std::string, std::string>();
+const std::unordered_map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
+    return session.get_files();
 }
 
-const std::vector<unsigned char> *Server::get(Session &session, const std::string &path) {
-    return new std::vector<unsigned char>(Utils::read_from_file(path));
+const std::vector<unsigned char> *Server::get(Session &session, const std::string &path, const std::string &root_path) {
+    boost::filesystem::path dest_path{root_path};
+    dest_path.append(session.get_user());
+    dest_path.append(path);
+    return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
 }
 
 bool Server::push(Session &session, const std::string &path, const std::vector<unsigned char> &file,
@@ -90,23 +93,23 @@ void Server::server_init() {
     api_.set_login([this](Session &session, const std::string &username, const std::string &password) {
         return login(session, username, password, db_);
     });
-    api_.set_end([this](Session &session) {
+    api_.set_end([](Session &session) {
         return end(session);
     });
     api_.set_get([this](Session &session, const std::string &path) {
-        return get(session, path);
+        return get(session, path, root_path_);
     });
-    api_.set_probe([this](Session &session, const std::vector<std::string> &paths) {
+    api_.set_probe([](Session &session, const std::vector<std::string> &paths) {
         return probe(session, paths);
     });
     api_.set_push([this](Session &session, const std::string &path, const std::vector<unsigned char> &file,
                          const std::string &hash, ElementStatus status) {
         return push(session, path, file, hash, status, root_path_);
     });
-    api_.set_restore([this](Session &session) {
+    api_.set_restore([](Session &session) {
         return restore(session);
     });
-    api_.set_handle_error([this](Session &session, const Comm_error *comm_error) {
+    api_.set_handle_error([](Session &session, const Comm_error *comm_error) {
         return handle_error(session, comm_error);
     });
 }
