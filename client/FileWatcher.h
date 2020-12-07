@@ -57,6 +57,8 @@ public:
      * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
      */
     void start(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
+
+    void init();
 };
 
 

@@ -8,12 +8,7 @@ namespace fs = boost::filesystem;
 
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
         path_to_watch_(std::move(path_to_watch)), delay_(delay), running_(true) {
-    for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
-        if (fs::is_regular_file(el.path())) {
-            FSElement file{el.path(), fs::last_write_time(el.path())};
-            paths_.insert(std::make_pair(el.path().string(), file));
-        }
-    }
+    init();
 }
 
 void FileWatcher::start(const std::function<void(std::string, std::string hash, ElementStatus)> &action) {
@@ -56,6 +51,16 @@ void FileWatcher::findCreatedOrModified(const std::function<void(std::string, st
                     }
                 }
             }
+        }
+    }
+}
+
+void FileWatcher::init() {
+    paths_.clear();
+    for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
+        if (fs::is_regular_file(el.path())) {
+            FSElement file{el.path(), fs::last_write_time(el.path())};
+            paths_.insert(std::make_pair(el.path().string(), file));
         }
     }
 }
