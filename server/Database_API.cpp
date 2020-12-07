@@ -19,13 +19,14 @@ Database_API::~Database_API() {
 bool Database_API::login_query(const std::string &username, const std::string &password) const {
     // define the query
     sqlite3_stmt *query;
-    if (sqlite3_prepare_v2(db_, "SELECT COUNT(*) FROM USERS WHERE Username = ? AND Password = ?",
+    if (sqlite3_prepare_v2(db_, "SELECT COUNT(*) FROM USERS WHERE username = ? AND password = ?",
                            -1, &query, nullptr) != SQLITE_OK)
         return false;
     if (sqlite3_bind_text(query, 1, username.data(), -1, nullptr) != SQLITE_OK) return false;
     if (sqlite3_bind_text(query, 2, password.data(), -1, nullptr) != SQLITE_OK) return false;
     // execute the query
-    if (sqlite3_step(query) != SQLITE_OK) return false;
+    int rc=sqlite3_step(query);
+    if (rc != SQLITE_DONE && rc != SQLITE_ROW) return false;
     // verify the result of the query
     int count = sqlite3_column_int(query, 0);
     if (count != 1) return false;
