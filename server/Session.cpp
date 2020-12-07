@@ -62,3 +62,7 @@ const std::vector<std::string> *Session::get_paths() {
     }
     return new std::vector<std::string>(std::move(paths));
 }
+
+const std::unordered_map<std::string, std::string> *Session::get_files() {
+    return new std::unordered_map<std::string, std::string>(files_);
+}

@@ -98,6 +98,11 @@ public:
      * @return
      */
     const std::vector<std::string> *get_paths();
+
+    /**
+     *
+     */
+    const std::unordered_map<std::string, std::string> *get_files();
 };
 
 #endif //SERVER_SESSION_H

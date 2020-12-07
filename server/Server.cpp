@@ -32,8 +32,8 @@ bool Server::login(Session &session, const std::string &username, const std::str
     return false;
 }
 
-const std::map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
-    return new std::map<std::string, std::string>();
+const std::unordered_map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
+    return session.get_files();
 }
 
 const std::vector<unsigned char> *Server::get(Session &session, const std::string &path, const std::string &root_path) {
