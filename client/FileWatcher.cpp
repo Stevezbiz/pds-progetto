@@ -11,7 +11,7 @@ FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, s
     init();
 }
 
-void FileWatcher::start(const std::function<void(std::string, std::string hash, ElementStatus)> &action) {
+void FileWatcher::start(const std::function<void(std::string, std::string, ElementStatus)> &action) {
     while (running_) {
         std::this_thread::sleep_for(delay_);
         findErased(action);
@@ -24,7 +24,7 @@ bool FileWatcher::contains(const std::string &key) {
     return el != paths_.end();
 }
 
-void FileWatcher::findErased(const std::function<void(std::string, std::string hash, ElementStatus)> &action) {
+void FileWatcher::findErased(const std::function<void(std::string, std::string, ElementStatus)> &action) {
     auto it = paths_.begin();
     while (it != paths_.end()) {
         if (!fs::exists(it->first)) {
@@ -36,7 +36,7 @@ void FileWatcher::findErased(const std::function<void(std::string, std::string h
     }
 }
 
-void FileWatcher::findCreatedOrModified(const std::function<void(std::string, std::string hash, ElementStatus)> &action) {
+void FileWatcher::findCreatedOrModified(const std::function<void(std::string, std::string, ElementStatus)> &action) {
     for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
         if (fs::is_regular_file(el.path())) {
             time_t lwt = fs::last_write_time(el);
