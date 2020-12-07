@@ -55,7 +55,7 @@ public:
      * @param map - <path, hash> mapping
      * @return status
      */
-    bool probe(const std::map <std::string, std::string> &map);
+    bool probe(const std::unordered_map<std::string, std::string> &map);
 
     /**
      * do the complete push procedure:

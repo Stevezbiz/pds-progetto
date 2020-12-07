@@ -31,7 +31,7 @@ bool Client_API::login(const std::string &username, const std::string &password)
     return res->is_okay();
 }
 
-bool Client_API::probe(const std::map<std::string, std::string> &map) {
+bool Client_API::probe(const std::unordered_map<std::string, std::string> &map) {
     Logger::info("Client_API::probe", "Probe check started...", PR_LOW);
 
     std::vector<std::string> paths;
@@ -68,7 +68,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
         auto it = map.find(path);
         if(it == map.end()) { // if the file does not exists, the file has been deleted
             Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
-            if (!this->push(Utils::read_from_file(path), path, "0x0", ElementStatus::erasedFile))
+            if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
                 return false;
         }
     }
