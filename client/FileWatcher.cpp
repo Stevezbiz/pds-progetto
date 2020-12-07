@@ -64,3 +64,11 @@ void FileWatcher::init() {
         }
     }
 }
+
+std::unordered_map<std::string, std::string> FileWatcher::get_files() {
+    std::unordered_map<std::string,std::string> map;
+    for(auto it : paths_){
+        map.insert(std::make_pair(it.first, it.second.getHash()));
+    }
+    return map;
+}
