@@ -8,6 +8,11 @@ namespace fs = boost::filesystem;
 
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
         path_to_watch_(std::move(path_to_watch)), delay_(delay), running_(true) {
+    path_offset_ = path_to_watch_.size();
+    if (path_to_watch_[path_offset_ - 1] != '/') {
+        path_to_watch_ += '/';
+        path_offset_++;
+    }
     init();
 }
 
@@ -28,7 +33,7 @@ void FileWatcher::findErased(const std::function<void(std::string, std::string, 
     auto it = paths_.begin();
     while (it != paths_.end()) {
         if (!fs::exists(it->first)) {
-            action(it->first, "", ElementStatus::erasedFile);
+            action(parse_path(it->first), "", ElementStatus::erasedFile);
             it = paths_.erase(it);
         } else {
             it++;
@@ -43,11 +48,12 @@ void FileWatcher::findCreatedOrModified(const std::function<void(std::string, st
             if (!contains(el.path().string())) {
                 FSElement new_file{el.path(), lwt};
                 paths_.insert(std::make_pair(el.path().string(), new_file));
-                action(el.path().string(), new_file.getHash(), ElementStatus::createdFile);
+                action(parse_path(el.path().string()), new_file.getHash(), ElementStatus::createdFile);
             } else {
                 if (paths_.find(el.path().string())->second.isOld(lwt)) {
                     if (paths_.find(el.path().string())->second.needUpdate()) {
-                        action(el.path().string(), paths_.find(el.path().string())->second.getHash(), ElementStatus::modifiedFile);
+                        action(parse_path(el.path().string()), paths_.find(el.path().string())->second.getHash(),
+                               ElementStatus::modifiedFile);
                     }
                 }
             }
@@ -66,9 +72,13 @@ void FileWatcher::init() {
 }
 
 std::unordered_map<std::string, std::string> FileWatcher::get_files() {
-    std::unordered_map<std::string,std::string> map;
-    for(auto it : paths_){
+    std::unordered_map<std::string, std::string> map;
+    for (auto it : paths_) {
         map.insert(std::make_pair(it.first, it.second.getHash()));
     }
     return map;
+}
+
+std::string FileWatcher::parse_path(const boost::filesystem::path &path) const {
+    return path.string().substr(path_offset_, path.string().size());
 }

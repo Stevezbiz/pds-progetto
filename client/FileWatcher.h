@@ -19,6 +19,7 @@ class FileWatcher {
     std::chrono::duration<int, std::milli> delay_;
     std::unordered_map<std::string, FSElement> paths_;
     bool running_;
+    int path_offset_;
 
     /**
      * Verifica se la mappa contiene la chiave
@@ -61,6 +62,8 @@ public:
     void init();
 
     std::unordered_map<std::string, std::string> get_files();
+
+    std::string parse_path(const boost::filesystem::path &path) const;
 };
 
 
