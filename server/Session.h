@@ -7,8 +7,10 @@
 
 #include <boost/asio.hpp>
 #include <deque>
+#include <utility>
 #include <iostream>
 #include <sqlite3.h>
+#include <unordered_map>
 #include "../comm/Socket_API.h"
 
 class Session : public std::enable_shared_from_this<Session> {
