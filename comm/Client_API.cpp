@@ -50,11 +50,11 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
         auto path = item.first;
         auto it = map.find(path);
         if(it == map.end()) { // if the file does not exists, the file has been created
-            if (!this->push(Utils::read_from_file(path), path, map.at(path), ElementStatus::createdFile))
+            if (!this->push(Utils::read_from_file(this->root_path / path), path, map.at(path), ElementStatus::createdFile))
                 return false;
         }
         else if(map.at(path) != item.second) // if versions (hashes) are different, the file has been modified
-            if(!this->push(Utils::read_from_file(path), path, map.at(path), ElementStatus::modifiedFile))
+            if(!this->push(Utils::read_from_file(this->root_path / path), path, map.at(path), ElementStatus::modifiedFile))
                 return false;
     }
 
@@ -62,7 +62,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
         auto path = item.first;
         auto it = map.find(path);
         if(it == map.end()) // if the file does not exists, the file has been deleted
-            if (!this->push(Utils::read_from_file(path), path, "0x0", ElementStatus::erasedFile))
+            if (!this->push(Utils::read_from_file(this->root_path / path), path, "0x0", ElementStatus::erasedFile))
                 return false;
     }
 
