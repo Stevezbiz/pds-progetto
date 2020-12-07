@@ -3,72 +3,46 @@
 //
 
 #include "Client.h"
+
 #include <utility>
 
-using namespace boost::asio;
+Client::Client(const std::string &root_path, boost::asio::ip::tcp::socket socket)
+        : root_path_(root_path), api_(new Socket_API{std::move(socket)}),
+          fw_(root_path, std::chrono::duration<int, std::milli>(FW_DELAY)) {}
 
-Client::Client(io_context &ctx, ip::tcp::resolver::iterator endpoint_iterator)
-        : ctx_(ctx), socket_(ctx) {
-    do_connect(std::move(endpoint_iterator));
+bool Client::login(const std::string &username, const std::string &password) {
+    return api_.login(username, password);
 }
 
-void Client::write(const Message &msg) {
-    ctx_.post([this, msg]() {
-        bool write_in_progress = !write_msgs_.empty();
-        write_msgs_.push_back(msg);
-        if (!write_in_progress) {
-            do_write();
+bool Client::probe() {
+    fw_.init();
+    return api_.probe(fw_.get_files());
+}
+
+bool Client::push(const std::string &path, const std::string &hash, ElementStatus status) {
+    std::vector<unsigned char> file;
+    boost::filesystem::path dest_path{root_path_};
+    dest_path.append(path);
+    if (status != ElementStatus::erasedFile) {
+        file = Utils::read_from_file(dest_path);
+    }
+    return api_.push(file, path, hash, status);
+}
+
+bool Client::restore() {
+    bool ret = api_.restore();
+    fw_.init();
+    return ret;
+}
+
+bool Client::close() {
+    return api_.end();
+}
+
+void Client::run() {
+    fw_.start([this](std::string path, std::string hash, ElementStatus status) {
+        if(!push(path, hash, status)){
+            // TODO: error management
         }
     });
-}
-
-void Client::close() {
-    ctx_.post([this]() { socket_.close(); });
-}
-
-void Client::do_connect(ip::tcp::resolver::iterator endpoint_iterator) {
-    async_connect(socket_, std::move(endpoint_iterator),
-                  [this](boost::system::error_code ec, const ip::tcp::resolver::iterator &it) {
-                      if (!ec) {
-                          do_read_header();
-                      }
-                  });
-}
-
-void Client::do_read_header() {
-    async_read(socket_, buffer(read_msg_.getData(), Message::header_length),
-               [this](boost::system::error_code ec, std::size_t length) {
-                   if (!ec && read_msg_.decodeHeader()) {
-                       do_read_body();
-                   } else {
-                       socket_.close();
-                   }
-               });
-}
-
-void Client::do_read_body() {
-    async_read(socket_, buffer(read_msg_.getBody(), read_msg_.getBodyLength()),
-               [this](boost::system::error_code ec, std::size_t length) {
-                   if (!ec) {
-                       std::cout.write(read_msg_.getBody(), read_msg_.getBodyLength());
-                       std::cout << "\n";
-                       do_read_header();
-                   } else {
-                       socket_.close();
-                   }
-               });
-}
-
-void Client::do_write() {
-    async_write(socket_, buffer(write_msgs_.front().getData(), write_msgs_.front().getLength()),
-                [this](boost::system::error_code ec, std::size_t length) {
-                    if (!ec) {
-                        write_msgs_.pop_front();
-                        if (!write_msgs_.empty()) {
-                            do_write();
-                        }
-                    } else {
-                        socket_.close();
-                    }
-                });
 }
