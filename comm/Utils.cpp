@@ -30,7 +30,7 @@ void Utils::write_on_file(const fs::path &path, const std::vector<unsigned char>
 }
 
 void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &file) {
-    auto file_buffer = reinterpret_cast<char *>(file[0]); // TODO: check this
+    auto file_buffer = file.data();
     os << file_buffer;
 }
 
