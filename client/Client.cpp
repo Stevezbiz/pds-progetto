@@ -7,7 +7,7 @@
 #include <utility>
 
 Client::Client(const std::string &root_path, boost::asio::ip::tcp::socket socket)
-        : root_path_(root_path), api_(new Socket_API{std::move(socket)}),
+        : root_path_(root_path), api_(new Socket_API{std::move(socket)}, root_path),
           fw_(root_path, std::chrono::duration<int, std::milli>(FW_DELAY)) {}
 
 bool Client::login(const std::string &username, const std::string &password) {
