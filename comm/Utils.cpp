@@ -4,6 +4,8 @@
 
 #include "Utils.h"
 
+namespace fs = boost::filesystem;
+
 std::vector<unsigned char> Utils::read_from_file(const std::string &path) {
     return Utils::read_from_file(fs::path{path});
 }

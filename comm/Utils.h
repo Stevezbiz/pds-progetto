@@ -13,8 +13,6 @@
 #include <sstream>
 #include "ElementStatus.h"
 
-namespace fs = boost::filesystem;
-
 class Utils {
 
 public:
@@ -30,7 +28,7 @@ public:
      * @param input path
      * @return vector of bytes
      */
-    static std::vector<unsigned char> read_from_file(const fs::path &path);
+    static std::vector<unsigned char> read_from_file(const boost::filesystem::path &path);
 
     /**
      * read a vector of bytes from a file
@@ -51,7 +49,7 @@ public:
      * @param output path
      * @param vector of bytes
      */
-    static void write_on_file(const fs::path &path, const std::vector<unsigned char> &file);
+    static void write_on_file(const boost::filesystem::path &path, const std::vector<unsigned char> &file);
     /**
      * write a vector of bytes on a file
      * @param output stream
