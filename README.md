@@ -2,6 +2,7 @@
 
 Client-server backup application using TCP socket connection. 
 
+
 ## Dependencies
 
     C++17: Robust support for most language features.
@@ -42,9 +43,12 @@ brew install openssl
 
   3.1+, consider using the latest version of CMake because it supports recent versions of libraries
 
-* [Boost](https://www.boost.org)
+* [Boost](https://www.boost.org/users/download/)
 
-  1.47+, the latest tested version is 1.74
+  - Download boost( or zip) and unzip somewhere.
+* [OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
+  - Download Win32 OpenSSL v1.0.2h and Win64 OpenSSL v1.0.2h
+  - Run Win32OpenSSL-1_0_2h.exe and Win64OpenSSL-1_0_2h.exe and install to openssl directory(ex. C\lib\openssl)
   
 ## Build Instructions
 
@@ -71,5 +75,12 @@ $ ./build.sh
   ```
   ./client
   ```
+
+## Description
+
+### Client
+It is not necessary to pass arguments, it is possible to insert the configuration parameter at the first start on the command line.
+
+
 
  
