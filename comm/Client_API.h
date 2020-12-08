@@ -10,8 +10,8 @@
 #include <functional>
 #include <boost/filesystem.hpp>
 #include "API.h"
-#include "Socket_API.h"
 #include "Utils.h"
+#include "Client_socket_API.h"
 
 namespace fs = boost::filesystem;
 
@@ -33,7 +33,7 @@ public:
      * @param socket_api
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api);
+    explicit Client_API(Client_socket_API *socket_api);
 
     /**
      * do the login complete procedure:

@@ -19,7 +19,7 @@ bool Client_API::get_and_save_(const std::string &path) {
     return true;
 }
 
-Client_API::Client_API(Socket_API *socket_api) : API(socket_api) {}
+Client_API::Client_API(Client_socket_API *socket_api) : API(socket_api) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
     auto req = Message::login(username, password);

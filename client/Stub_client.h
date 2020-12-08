@@ -30,13 +30,6 @@ class Stub_client {
      */
     void prepare_stub();
 
-    /**
-     * open a connection
-     * @param ip
-     * @param port
-     */
-    void open_conn_(const std::string &ip, const std::string &port);
-
 public:
     /**
      * class constructor
