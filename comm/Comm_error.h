@@ -11,6 +11,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/string.hpp>
 #include <utility>
+#include <boost/asio/error.hpp>
+#include <boost/system/error_code.hpp>
 
 /**
  * list of error numbers (error codes)
@@ -39,14 +41,16 @@ public:
     COMM_ERRNO comm_errno;
     std::string location;
     std::string message;
+    boost::system::error_code original_ec;
 
     /**
      * class constructor
      * @param errno
      * @param location
      * @param message
+     * @param original_ec
      */
-    explicit Comm_error(COMM_ERRNO comm_errno = CE_GENERIC, std::string location = "System", std::string message = "Generic error");
+    explicit Comm_error(COMM_ERRNO comm_errno = CE_GENERIC, std::string location = "System", std::string message = "Generic error", boost::system::error_code original_ec = boost::asio::error::fault);
 
     /**
      * send an error
