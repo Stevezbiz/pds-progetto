@@ -9,6 +9,7 @@
 #include "../comm/Message.h"
 #include "../comm/Client_API.h"
 #include "FileWatcher.h"
+#define MAX_ATTEMPTS 2
 
 constexpr int FW_DELAY = 1000 * 5;
 
@@ -31,6 +32,8 @@ public:
     bool close();
 
     void run();
+
+    bool pwdAttempts();
 };
 
 

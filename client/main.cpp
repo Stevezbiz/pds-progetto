@@ -17,16 +17,14 @@ int main(int argc, char **argv) {
         std::thread t([&ctx]() {
             ctx.run();
         });
-        std::string username, password;
-        std::cout << "Please, log-in" << std::endl;
-        std::cout << "Username: ";
-        std::cin >> username;
-        std::cout << "Password: ";
-        std::cin >> password;
-        if (!client.login(username, Utils::hash(password))) {
+
+        if(!client.pwdAttempts()){
+            Logger::info("main", "No attempts remaining... terminate the program", PR_HIGH);
+            t.join();
+            client.close();
             exit(-1);
         }
-        std::cout << "Welcome " << username << std::endl;
+
         Command cmd = c.menu();
         switch (cmd) {
             case normal:
