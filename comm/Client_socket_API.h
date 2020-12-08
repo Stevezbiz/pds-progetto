@@ -10,9 +10,9 @@
 #include "Socket_API.h"
 
 class Client_socket_API : public Socket_API {
+    std::string cookie_{};
 
 public:
-
     /**
      * class constructor
      * @param ip
