@@ -25,7 +25,7 @@ protected:
      * class constructor
      * @param socket_api
      */
-    explicit API(Socket_API *socket_api);
+    explicit API(Socket_API *socket_api = nullptr);
 
     /**
      * save a file on disk
