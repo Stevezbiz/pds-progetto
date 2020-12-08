@@ -22,13 +22,17 @@ enum ERROR_MANAGEMENT : int {
  * to manage Message type message and standard Comm_error type errors
  */
 class Socket_API {
+    int n_retry_;
+    long retry_delay_;
+    bool keep_alive_;
 
 protected:
-    boost::asio::ip::tcp::socket socket_;
-    Message *message;
-    Comm_error *comm_error;
-    int n_retry;
-    long retry_delay;
+    boost::asio::ip::tcp::socket *socket_ = nullptr;
+
+    /**
+     * class constructor
+     */
+    Socket_API() = default;
 
     /**
      * (sync) call read/write functions and manage errors
@@ -59,25 +63,26 @@ protected:
     bool receive_content_();
 
 public:
+    std::string ip;
+    std::string port;
+    Message *message = nullptr;
+    Comm_error *comm_error = nullptr;
+
     /**
      * class constructor
-     * @param socket
+     * @param ip
+     * @param port
      * @param error_management
      * @param retry_delay
+     * @param keep_alive
      */
-    explicit Socket_API(boost::asio::ip::tcp::socket &&socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000);
+    explicit Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
 
     /**
-     * socket setter
-     * @param socket
+     * open a connection towards the specified ip and port
+     * @return status
      */
-    void set_socket(boost::asio::ip::tcp::socket &&socket);
-
-    /**
-     * socket getter
-     * @return socket
-     */
-    boost::asio::ip::tcp::socket &&get_socket();
+    bool open_conn();
 
     /**
      * send a Message
@@ -96,16 +101,22 @@ public:
     bool receive(MESSAGE_TYPE expectedMessage = MSG_UNDEFINED);
 
     /**
+     * close current connection
+     * @return status
+     */
+    bool close_conn();
+
+    /**
      * getter
      * @return last message
      */
-    Message *get_message();
+    Message *get_message() const;
 
     /**
      * getter
      * @return last error
      */
-    Comm_error *get_last_error();
+    Comm_error *get_last_error() const;
 
     ~Socket_API();
 };
