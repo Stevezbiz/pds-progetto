@@ -27,5 +27,7 @@ bool Session_manager::remove_session(Session *session) {
 }
 
 Session_manager::~Session_manager() {
-    std::all_of(this->sessions_.begin(), this->sessions_.end(), [](Session *session) { delete session; });
+    for(const auto &item : this->sessions_) {
+        delete item.second;
+    }
 }

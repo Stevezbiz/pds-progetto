@@ -19,9 +19,9 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while(!stop_) {
         acceptor_.accept(socket_);
-        std::thread thread([](Server_API &api, boost::asio::ip::tcp::socket socket) {
-            api.run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 });
-        }, std::ref(api_), std::move(socket_));
+        std::thread thread([](Server_API *api, boost::asio::ip::tcp::socket socket) {
+            api->run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 });
+        }, this->api_, std::move(socket_));
         thread.detach();
     }
 }
@@ -48,7 +48,7 @@ const std::vector<unsigned char> *Server::get(Session *session, const std::strin
 bool Server::push(Session *session, const std::string &path, const std::vector<unsigned char> &file,
                   const std::string &hash, ElementStatus status, const std::string &root_path) {
     boost::filesystem::path dest_path{root_path};
-    dest_path.append(session->user());
+    dest_path.append(session->user);
     dest_path.append(path);
     switch (status) {
         case ElementStatus::createdFile:
