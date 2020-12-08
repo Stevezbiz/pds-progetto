@@ -86,3 +86,11 @@ std::string Utils::hash(const std::string &input) {
     }
     return os.str();
 }
+
+std::string Utils::sign_cookie(std::string plain_cookie) { // TODO: make this more secure
+    return plain_cookie;
+}
+
+std::string Utils::verify_cookie(std::string cipher_cookie) { // TODO: make this more secure
+    return cipher_cookie;
+}
