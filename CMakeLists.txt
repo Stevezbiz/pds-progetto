@@ -55,6 +55,7 @@ set(CLIENT_COMM_SOURCE_FILES
         comm/API.h
         comm/Client_API.cpp
         comm/Client_API.h
+        comm/Client_socket_API.cpp
         comm/Client_socket_API.h
         comm/Comm_error.cpp
         comm/Comm_error.h
@@ -117,12 +118,14 @@ set(STUB_SERVER_SOURCE_FILES
 
 set(SERVER_SOURCE_FILES
         server/main.cpp
+        server/Database_API.cpp
+        server/Database_API.h
         server/Server.cpp
         server/Server.h
         server/Session.cpp
         server/Session.h
-        server/Database_API.cpp
-        server/Database_API.h
+        server/Session_manager.cpp
+        server/Session_manager.h
         )
 
 ### stub client ###
