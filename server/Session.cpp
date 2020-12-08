@@ -57,7 +57,6 @@ const std::vector<std::string> *Session::get_paths() {
     std::vector<std::string> paths;
     paths.reserve(files_.size());
     for(const auto& it : files_){
-        paths.push_back(it.first);
         paths.emplace_back(it.first);
     }
     return new std::vector<std::string>(std::move(paths));
