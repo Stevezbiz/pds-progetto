@@ -67,7 +67,7 @@ void FileWatcher::findCreatedOrModified(const std::function<void(std::string, st
                 }
             }
         } else if (fs::is_directory(el.path())) {
-            if (dirs_.find(el.path().string()) != dirs_.end()) {
+            if (dirs_.find(el.path().string()) == dirs_.end()) {
                 dirs_.insert(el.path().string());
                 action(parse_path(el.path().string()), "", ElementStatus::createdDir);
             }
