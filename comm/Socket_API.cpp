@@ -39,7 +39,7 @@ bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size
 
 bool Socket_API::receive_header_() {
     if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::read(this->socket_, this->message->get_header_buffer(), ec);
+            boost::asio::read(*this->socket_, this->message->get_header_buffer(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_header_", "Unable to read message header" };
         return false;
@@ -50,7 +50,7 @@ bool Socket_API::receive_header_() {
 
 bool Socket_API::receive_content_() {
     if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::read(socket, this->message->get_content_buffer(), ec);
+            boost::asio::read(*this->socket_, this->message->get_content_buffer(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_content_", "Unable to read message content" };
         return false;
