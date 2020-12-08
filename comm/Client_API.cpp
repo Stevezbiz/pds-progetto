@@ -13,13 +13,13 @@ bool Client_API::get_and_save_(const std::string &path) {
     if (!res->is_okay())
         return false;
 
-    if (!this->save_file_(res))
+    if (!Client_API::save_file_(res))
         return false;
 
     return true;
 }
 
-Client_API::Client_API(Socket_API *socket_api, const std::string &root_path) : API(socket_api, root_path) {}
+Client_API::Client_API(Socket_API *socket_api) : API(socket_api) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
     auto req = Message::login(username, password);
@@ -99,9 +99,8 @@ bool Client_API::restore() {
     if(!res->is_okay())
         return false;
 
-    for(const auto &path : res->paths)
-        if (!this->get_and_save_(path))
-            return false;
+    if(!(std::all_of(res->paths.begin(), res->paths.end(), [this](const std::string &path) { if (!this->get_and_save_(path)) return false; })))
+        return false;
 
     return true;
 }

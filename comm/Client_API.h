@@ -33,7 +33,7 @@ public:
      * @param socket_api
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api, const std::string &root_path = ".");
+    explicit Client_API(Socket_API *socket_api);
 
     /**
      * do the login complete procedure:
