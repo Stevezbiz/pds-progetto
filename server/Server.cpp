@@ -19,6 +19,7 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while(!stop_) {
         acceptor_.accept(socket_);
+        socket_.set_option(boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO>{ SOCKET_TIMEOUT });
         std::thread thread([](Server_API *api, boost::asio::ip::tcp::socket socket) {
             api->run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 });
         }, this->api_, std::move(socket_));

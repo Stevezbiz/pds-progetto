@@ -9,6 +9,8 @@
 #include "../comm/Server_API.h"
 #include "Database_API.h"
 
+constexpr int SOCKET_TIMEOUT = 1000 * 60; // 1 min
+
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
