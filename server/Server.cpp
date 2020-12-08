@@ -31,6 +31,8 @@ bool Server::login(Session &session, const std::string &username, const std::str
         dest_path.append(username);
         if(!boost::filesystem::exists(dest_path)){
             boost::filesystem::create_directory(dest_path);
+        } else {
+//            session.get_path_schema(database);
         }
         return true;
     }
@@ -97,8 +99,8 @@ const std::vector<std::string> *Server::restore(Session &session) {
     return session.get_paths();
 }
 
-bool Server::end(Session &session) {
-    return true;
+bool Server::end(Session &session, const Database_API &database) {
+    return session.save_path_schema(database);
 }
 
 void Server::handle_error(Session &session, const Comm_error *comm_error) {
@@ -111,8 +113,8 @@ void Server::server_init() {
     api_.set_login([this](Session &session, const std::string &username, const std::string &password) {
         return login(session, username, password, db_, root_path_);
     });
-    api_.set_end([](Session &session) {
-        return end(session);
+    api_.set_end([this](Session &session) {
+        return end(session,db_);
     });
     api_.set_get([this](Session &session, const std::string &path) {
         return get(session, path, root_path_);

@@ -4,12 +4,14 @@
 
 #include "Session.h"
 
+#include <utility>
+
 using namespace boost::asio;
 
 Session::Session(ip::tcp::socket socket) : api_(std::move(socket)) {}
 
 void Session::set_user(std::string user) {
-    this->user_ = user;
+    this->user_ = std::move(user);
 }
 
 bool Session::receive(MESSAGE_TYPE expectedMessage) {
@@ -64,4 +66,12 @@ const std::vector<std::string> *Session::get_paths() {
 
 const std::unordered_map<std::string, std::string> *Session::get_files() {
     return new std::unordered_map<std::string, std::string>(files_);
+}
+
+bool Session::save_path_schema(const Database_API &database) {
+    return database.save_path_schema(files_,user_);
+}
+
+void Session::get_path_schema(const Database_API &database) {
+    files_=database.get_path_schema(user_);
 }

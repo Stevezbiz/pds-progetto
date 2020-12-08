@@ -34,7 +34,7 @@ bool Database_API::login_query(const std::string &username, const std::string &p
     return true;
 }
 
-std::unordered_map<std::string, std::string> Database_API::get_path_schema(const std::string &username) {
+std::unordered_map<std::string, std::string> Database_API::get_path_schema(const std::string &username) const {
     sqlite3_stmt *query;
     // select
     std::unordered_map<std::string, std::string> map;
@@ -55,7 +55,7 @@ std::unordered_map<std::string, std::string> Database_API::get_path_schema(const
     return map;
 }
 
-bool Database_API::save_path_schema(const std::unordered_map<std::string, std::string> &map, const std::string &username) {
+bool Database_API::save_path_schema(const std::unordered_map<std::string, std::string> &map, const std::string &username) const {
     sqlite3_stmt *query;
     // delete
     if (sqlite3_prepare_v2(db_, "DELETE FROM SESSIONS WHERE user = ?", -1, &query, nullptr) !=

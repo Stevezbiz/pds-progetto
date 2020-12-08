@@ -12,6 +12,7 @@
 #include <sqlite3.h>
 #include <unordered_map>
 #include "../comm/Socket_API.h"
+#include "Database_API.h"
 
 class Session : public std::enable_shared_from_this<Session> {
     std::string user_;
@@ -103,6 +104,10 @@ public:
      *
      */
     const std::unordered_map<std::string, std::string> *get_files();
+
+    void get_path_schema(const Database_API &database);
+
+    bool save_path_schema(const Database_API &database);
 };
 
 #endif //SERVER_SESSION_H
