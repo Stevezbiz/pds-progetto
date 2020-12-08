@@ -15,6 +15,7 @@
 #include "Message.h"
 #include "Comm_error.h"
 #include "../server/Session.h"
+#include "../server/Session_manager.h"
 
 namespace fs = boost::filesystem;
 
@@ -22,33 +23,34 @@ namespace fs = boost::filesystem;
  * easy class to manage server-side protocol usage
  */
 class Server_API : public API {
+    Session_manager *session_manager_;
+
     // functions this class needs to manage client responses
-    std::function<bool(Session &, const std::string &, const std::string &)> login_ =
-            [](Session &, const std::string &, const std::string &) {
+    std::function<bool(Session *, const std::string &, const std::string &)> login_ =
+            [](Session *, const std::string &, const std::string &) {
                 return true;
             };
-    std::function<const std::unordered_map<std::string, std::string> *(Session &, const std::vector<std::string> &)> probe_ =
-            [](Session &, const std::vector<std::string> &) {
+    std::function<const std::unordered_map<std::string, std::string> *(Session *, const std::vector<std::string> &)> probe_ =
+            [](Session *, const std::vector<std::string> &) {
                 return new std::unordered_map<std::string, std::string>{};
             };
-    std::function<const std::vector<unsigned char> *(Session &, const std::string &)> get_ =
-            [](Session &, const std::string &) {
+    std::function<const std::vector<unsigned char> *(Session *, const std::string &)> get_ =
+            [](Session *, const std::string &) {
                 return new std::vector<unsigned char>{};
             };
-    std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &,
-                       ElementStatus)> push_ =
-            [](Session &, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
+    std::function<bool(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push_ =
+            [](Session *, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus) {
                 return true;
             };
-    std::function<const std::vector<std::string> *(Session &)> restore_ = [](Session &) {
-        return new std::vector<std::string>{};
-    };
-    std::function<bool(Session &)> end_ = [](Session &) {
-        return true;
-    };
-    std::function<void(Session &, const Comm_error *)> handle_error_ = [](Session &, const Comm_error *comm_error) {
-        std::cerr << comm_error->to_string() << std::endl;
-    };
+    std::function<const std::vector<std::string> *(Session *)> restore_ = [](Session *) {
+            return new std::vector<std::string>{};
+        };
+    std::function<bool(Session *)> end_ = [](Session *) {
+            return true;
+        };
+    std::function<void(Session *, const Comm_error *)> handle_error_ = [](Session *, const Comm_error *comm_error) {
+            Logger::error(comm_error);
+        };
 
     /**
      * manage login protocol procedure
@@ -56,7 +58,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_login_(Session &session, Message *req);
+    Message *do_login_(Session *session, Message *req);
 
     /**
      * manage probe protocol procedure
@@ -64,7 +66,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_probe_(Session &session, Message *req);
+    Message *do_probe_(Session *session, Message *req);
 
     /**
      * manage get protocol procedure
@@ -72,7 +74,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_get_(Session &session, Message *req);
+    Message *do_get_(Session *session, Message *req);
 
     /**
      * manage push protocol procedure
@@ -80,7 +82,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_push_(Session &session, Message *req);
+    Message *do_push_(Session *session, Message *req);
 
     /**
      * manage restore protocol procedure
@@ -88,15 +90,15 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_restore_(Session &session, Message *req);
+    Message *do_restore_(Session *session, Message *req);
 
     /**
     * manage end protocol procedure
-     * @param session
+    * @param session
     * @param request message
     * @return response message
     */
-    Message *do_end_(Session &session, Message *req);
+    Message *do_end_(Session *session, Message *req);
 
     /**
      * handle a communication error
@@ -104,51 +106,53 @@ class Server_API : public API {
      * @param comm_error
      * @return response message
      */
-    void do_handle_error_(Session &session, Comm_error *comm_error);
+    void do_handle_error_(Session *session, Comm_error *comm_error);
 
 public:
     /**
      * class constructor
-     * @param socket_api
-     * @param user_root_path
+     * @param session_manager
      */
-    explicit Server_API(const std::string &user_root_path = ".");
+    explicit Server_API(Session_manager *session_manager);
 
     /**
      * set how to manage a login request
      * @param login_function
      * - input:
+     *      - Session *session
      *      - const std::string &username
      *      - const std::string &password
      * - output: bool is_okay
      */
-    void set_login(const std::function<bool(Session &, const std::string &, const std::string &)> &login_function);
+    void set_login(const std::function<bool(Session *, const std::string &, const std::string &)> &login_function);
 
     /**
      * set how to manage a probe request
      * @param probe_function
      * - input:
+     *      - Session *session
      *      - const std::vector<std::string> &, a list of paths
      * - output:
      *      - const std::map<std::string, std::string> &, a map of <path, hash>
      */
-    void set_probe(const std::function<const std::unordered_map<std::string, std::string> *(Session &,
-                                                                                  const std::vector<std::string> &)> &probe_function);
+    void set_probe(const std::function<const std::unordered_map<std::string, std::string> *(Session *, const std::vector<std::string> &)> &probe_function);
 
     /**
      * set how to manage a get request
      * @param get_function
      * - input:
+     *      - Session *session
      *      - const std::string &path
      * - output:
      *      - const std::vector<unsigned char> &file, a vector of bytes
      */
-    void set_get(const std::function<const std::vector<unsigned char> *(Session &, const std::string &)> &get_function);
+    void set_get(const std::function<const std::vector<unsigned char> *(Session *, const std::string &)> &get_function);
 
     /**
      * set how to manage a push request
      * @param push_function
      * - input:
+     *      - Session *session
      *      - const std::string &path
      *      - const std::vector<char> &file
      *      - const std::string &hash
@@ -156,28 +160,27 @@ public:
      * - output:
      *      - bool is_okay
      */
-    void set_push(const std::function<bool(Session &, const std::string &, const std::vector<unsigned char> &,
-                                           const std::string &, ElementStatus)> &push_function);
+    void set_push(const std::function<bool(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> &push_function);
 
     /**
      * set how to manage a restore request
      * @param restore_function
      * - input:
-     *      - (empty)
+     *      - Session *session
      * - output:
      *      - const std::vector<std::string> &paths, a list of paths
      */
-    void set_restore(const std::function<const std::vector<std::string> *(Session &)> &restore_function);
+    void set_restore(const std::function<const std::vector<std::string> *(Session *)> &restore_function);
 
     /**
      * set how to manage a end request
      * @param restore_function
      * - input:
-     *      - (empty)
+     *      - Session *session
      * - output:
      *      - bool status
      */
-    void set_end(const std::function<bool(Session &)> &end_function);
+    void set_end(const std::function<bool(Session *)> &end_function);
 
     /**
      *
@@ -187,13 +190,15 @@ public:
      * - output:
      *      - (empty)
      */
-    void set_handle_error(const std::function<void(Session &, const Comm_error *)> &handle_error_function);
+    void set_handle_error(const std::function<void(Session *, const Comm_error *)> &handle_error_function);
 
     /**
      * start handling requests
-     * @param session
+     * @param api
      */
-    void run(Session &session);
+    void run(Socket_API *api);
+
+    ~Server_API();
 };
 
 #endif //SERVER_SERVER_API_H
