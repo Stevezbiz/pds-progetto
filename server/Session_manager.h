@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <map>
+#include <locale>
 #include "../comm/Message.h"
 #include "./Session.h"
 #include "../comm/Utils.h"

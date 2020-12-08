@@ -6,9 +6,13 @@
 
 Session *Session_manager::retrieve_session(const Message *message) {
     auto plain_cookie = Utils::verify_cookie(message->cookie);
-    auto it = this->sessions_.find(std::stoi(plain_cookie));
-    if(it != this->sessions_.end()) // if already exists
-        return it->second;
+    std::locale loc;
+    if(std::isdigit(plain_cookie[0], loc)) {
+        Logger::info("Session_manager::retrieve_session", "cookie: " + plain_cookie, PR_VERY_LOW);
+        auto it = this->sessions_.find(std::stoi(plain_cookie));
+        if (it != this->sessions_.end()) // if already exists
+            return it->second;
+    }
 
     int new_session_id = this->session_counter_++;
     auto new_session = new Session(new_session_id);
