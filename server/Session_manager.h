@@ -25,6 +25,13 @@ public:
      */
     Session *retrieve_session(const Message *message);
 
+    /**
+     * remove a session from the list
+     * @param session
+     * @return status
+     */
+    bool remove_session(Session *session);
+
     ~Session_manager();
 };
 

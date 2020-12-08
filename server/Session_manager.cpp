@@ -16,6 +16,16 @@ Session *Session_manager::retrieve_session(const Message *message) {
     return new_session;
 }
 
+bool Session_manager::remove_session(Session *session) {
+    auto it = this->sessions_.find(session->session_id);
+    if(it == this->sessions_.end())
+        return false;
+
+    delete it->second;
+    this->sessions_.erase(session->session_id);
+    return true;
+}
+
 Session_manager::~Session_manager() {
     std::all_of(this->sessions_.begin(), this->sessions_.end(), [](Session *session) { delete session; });
 }
