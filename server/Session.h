@@ -5,104 +5,34 @@
 #ifndef SERVER_SESSION_H
 #define SERVER_SESSION_H
 
-#include <boost/asio.hpp>
-#include <deque>
-#include <utility>
 #include <iostream>
-#include <sqlite3.h>
-#include <unordered_map>
-#include "../comm/Socket_API.h"
+#include "../comm/Utils.h"
 
-class Session : public std::enable_shared_from_this<Session> {
-    std::string user_;
-    Socket_API api_;
-    std::unordered_map<std::string, std::string> files_;
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    bool files_contains(const std::string &key);
+class Session {
+    int session_id_{ -1 };
+    bool login_status_{ false };
 
 public:
-    /**
-     * Inizializza i campi dell'oggetto
-     * @param socket: socket su cui aprire la connessione
-     */
-    Session(boost::asio::ip::tcp::socket socket);
+    std::string user;
 
     /**
-     *
-     * @param user
+     * class constructor
+     * @param session_id
      */
-    void set_user(std::string user);
+    explicit Session(int session_id);
 
     /**
-     *
-     * @param expectedMessage
-     * @return
+     * genereate a cookie to identify this session
+     * @return cookie
      */
-    bool receive(MESSAGE_TYPE expectedMessage);
+    std::string get_cookie();
 
     /**
-     *
-     * @return
+     * check if login has been performed
+     * @return login status
      */
-    Comm_error *get_last_error();
+    bool is_logged_in();
 
-    /**
-     *
-     * @param message
-     * @return
-     */
-    bool send(Message *message);
-
-    /**
-     *
-     * @return
-     */
-    Message *get_message();
-
-    /**
-     *
-     * @return
-     */
-    std::string get_user();
-
-    /**
-     *
-     * @param path
-     * @param hash
-     * @return
-     */
-    bool create_file(const std::string &path, const std::string &hash);
-
-    /**
-     *
-     * @param path
-     * @param hash
-     * @return
-     */
-    bool modify_file(const std::string &path, const std::string &hash);
-
-    /**
-     *
-     * @param path
-     * @return
-     */
-    bool remove_file(const std::string &path);
-
-    /**
-     *
-     * @return
-     */
-    const std::vector<std::string> *get_paths();
-
-    /**
-     *
-     */
-    const std::unordered_map<std::string, std::string> *get_files();
 };
 
 #endif //SERVER_SESSION_H
