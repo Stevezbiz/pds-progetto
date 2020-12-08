@@ -9,7 +9,7 @@ std::vector<unsigned char> Utils::read_from_file(const std::string &path) {
 }
 
 std::vector<unsigned char> Utils::read_from_file(const fs::path &path) {
-    auto is = fs::ifstream{path};
+    auto is = fs::ifstream{path, std::ios::binary};
     auto file = Utils::read_from_file(is);
     is.close();
     return file;
@@ -24,7 +24,7 @@ void Utils::write_on_file(const std::string &path, const std::vector<unsigned ch
 }
 
 void Utils::write_on_file(const fs::path &path, const std::vector<unsigned char> &file) {
-    auto os = fs::ofstream{path};
+    auto os = fs::ofstream{path, std::ios::binary};
     Utils::write_on_file(os, file);
     os.close();
 }
