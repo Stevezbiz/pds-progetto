@@ -79,6 +79,15 @@ public:
     explicit Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
 
     /**
+     * class constructor
+     * @param socket
+     * @param error_management
+     * @param retry_delay
+     * @param keep_alive
+     */
+    explicit Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
+
+    /**
      * open a connection towards the specified ip and port
      * @return status
      */

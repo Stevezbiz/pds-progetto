@@ -27,41 +27,40 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &, const std::string &, const std::string &, const Database_API &);
+    static bool login(Session *, const std::string &, const std::string &, const Database_API &database);
 
     /**
      *
      * @return
      */
-    static const std::unordered_map<std::string, std::string> *probe(Session &, const std::vector<std::string> &);
+    static const std::unordered_map<std::string, std::string> *probe(Session *, const std::vector<std::string> &);
 
     /**
      *
      * @return
      */
-    static const std::vector<unsigned char> *get(Session &, const std::string &, const std::string &);
+    static const std::vector<unsigned char> *get(Session *, const std::string &, const std::string &);
 
     /**
      *
      */
-    static bool push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &,
-                     ElementStatus, const std::string &);
+    static bool push(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus, const std::string &);
 
     /**
      *
      */
-    static const std::vector<std::string> *restore(Session &);
+    static const std::vector<std::string> *restore(Session *);
 
     /**
      *
      * @return
      */
-    static bool end(Session &);
+    static bool end(Session *);
 
     /**
      * @param comm_error
      */
-    static void handle_error(Session &, const Comm_error *);
+    static void handle_error(Session *, const Comm_error *);
 
     /**
      *

@@ -66,6 +66,13 @@ Socket_API::Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_
         retry_delay_(retry_delay),
         keep_alive_(keep_alive) {}
 
+Socket_API::Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management, long retry_delay, bool keep_alive) :
+        n_retry_(error_management),
+        retry_delay_(retry_delay),
+        keep_alive_(keep_alive) {
+    this->socket_ = new boost::asio::ip::tcp::socket{ std::move(socket) };
+}
+
 bool Socket_API::open_conn() {
     if(this->keep_alive_ && this->socket_->is_open())
         return true;
