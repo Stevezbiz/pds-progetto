@@ -17,7 +17,8 @@ int main(int argc, char **argv) {
     boost::asio::ip::tcp::socket socket{ctx};
     acceptor.accept(socket);
     // auto api = new Server_API{new Socket_API{std::move(socket)}};
-    auto api = new Server_API{};
+    auto api = new Server_API{}
+    (nullptr, nullptr);
     // api->set_end([](const Session &session) { return true; });
     api->set_login([](const Session &session, const std::string &username, const std::string &password) {
         return username == "Bellofigo";
