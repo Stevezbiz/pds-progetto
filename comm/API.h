@@ -20,20 +20,12 @@ class API {
 
 protected:
     Socket_API *api_;
-    boost::filesystem::path root_path;
 
     /**
      * class constructor
      * @param socket_api
-     * @param root_path
      */
-    explicit API(Socket_API *socket_api, const std::string &root_path = ".");
-
-    /**
-     * class constructor
-     * @param root_path
-     */
-    explicit API(const std::string &root_path = ".");
+    explicit API(Socket_API *socket_api);
 
     /**
      * save a file on disk
@@ -41,7 +33,7 @@ protected:
      * @param message
      * @return status
      */
-    bool save_file_(Message *message);
+    static bool save_file_(Message *message);
 
 public:
     /**
