@@ -24,9 +24,14 @@ void Server::accept() {
 }
 
 bool Server::login(Session &session, const std::string &username, const std::string &password,
-                   const Database_API &database) {
+                   const Database_API &database, const std::string &root_path) {
     if (database.login_query(username, password)) {
         session.set_user(username);
+        boost::filesystem::path dest_path{root_path};
+        dest_path.append(username);
+        if(!boost::filesystem::exists(dest_path)){
+            boost::filesystem::create_directory(dest_path);
+        }
         return true;
     }
     return false;
@@ -69,6 +74,19 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
                 return false;
             }
             break;
+        case ElementStatus::createdDir:
+            boost::filesystem::create_directory(dest_path);
+            if (!session.create_file(path, hash)) {
+                // TODO: error management
+                return false;
+            }
+            break;
+        case ElementStatus::erasedDir:
+            if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
+                // TODO: error management
+                return false;
+            }
+            break;
         default:
             return false;
     }
@@ -91,7 +109,7 @@ void Server::handle_error(Session &session, const Comm_error *comm_error) {
 
 void Server::server_init() {
     api_.set_login([this](Session &session, const std::string &username, const std::string &password) {
-        return login(session, username, password, db_);
+        return login(session, username, password, db_, root_path_);
     });
     api_.set_end([](Session &session) {
         return end(session);

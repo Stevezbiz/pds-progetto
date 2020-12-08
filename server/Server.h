@@ -26,7 +26,7 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &, const std::string &, const std::string &, const Database_API &);
+    static bool login(Session &, const std::string &, const std::string &, const Database_API &, const std::string &);
 
     /**
      *
