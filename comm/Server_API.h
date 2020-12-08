@@ -197,8 +197,6 @@ public:
      * @param api
      */
     void run(Socket_API *api);
-
-    ~Server_API();
 };
 
 #endif //SERVER_SERVER_API_H
