@@ -9,7 +9,7 @@
  * file status
  */
 enum class ElementStatus {
-    createdFile, modifiedFile, erasedFile
+    createdFile, modifiedFile, erasedFile, createdDir, erasedDir
 };
 
 #endif //STUB_CLIENT_ELEMENTSTATUS_H

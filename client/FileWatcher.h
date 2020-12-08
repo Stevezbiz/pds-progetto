@@ -11,13 +11,15 @@
 #include <functional>
 #include <thread>
 #include <boost/filesystem.hpp>
+#include <unordered_set>
 #include "FSElement.h"
 #include "../comm/ElementStatus.h"
 
 class FileWatcher {
     std::string path_to_watch_;
     std::chrono::duration<int, std::milli> delay_;
-    std::unordered_map<std::string, FSElement> paths_;
+    std::unordered_map<std::string, FSElement> files_;
+    std::unordered_set<std::string> dirs_;
     bool running_;
     int path_offset_;
 

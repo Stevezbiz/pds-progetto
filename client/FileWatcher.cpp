@@ -25,18 +25,27 @@ void FileWatcher::start(const std::function<void(std::string, std::string, Eleme
 }
 
 bool FileWatcher::contains(const std::string &key) {
-    auto el = paths_.find(key);
-    return el != paths_.end();
+    auto el = files_.find(key);
+    return el != files_.end();
 }
 
 void FileWatcher::findErased(const std::function<void(std::string, std::string, ElementStatus)> &action) {
-    auto it = paths_.begin();
-    while (it != paths_.end()) {
+    auto it = files_.begin();
+    while (it != files_.end()) {
         if (!fs::exists(it->first)) {
             action(parse_path(it->first), "", ElementStatus::erasedFile);
-            it = paths_.erase(it);
+            it = files_.erase(it);
         } else {
             it++;
+        }
+    }
+    auto it2 = dirs_.begin();
+    while (it2 != dirs_.end()) {
+        if (!fs::exists(it2->data())) {
+            action(parse_path(it2->data()), "", ElementStatus::erasedDir);
+            it2 = dirs_.erase(it2);
+        } else {
+            it2++;
         }
     }
 }
@@ -47,33 +56,41 @@ void FileWatcher::findCreatedOrModified(const std::function<void(std::string, st
             time_t lwt = fs::last_write_time(el);
             if (!contains(el.path().string())) {
                 FSElement new_file{el.path(), lwt};
-                paths_.insert(std::make_pair(el.path().string(), new_file));
+                files_.insert(std::make_pair(el.path().string(), new_file));
                 action(parse_path(el.path().string()), new_file.getHash(), ElementStatus::createdFile);
             } else {
-                if (paths_.find(el.path().string())->second.isOld(lwt)) {
-                    if (paths_.find(el.path().string())->second.needUpdate()) {
-                        action(parse_path(el.path().string()), paths_.find(el.path().string())->second.getHash(),
+                if (files_.find(el.path().string())->second.isOld(lwt)) {
+                    if (files_.find(el.path().string())->second.needUpdate()) {
+                        action(parse_path(el.path().string()), files_.find(el.path().string())->second.getHash(),
                                ElementStatus::modifiedFile);
                     }
                 }
+            }
+        } else if (fs::is_directory(el.path())) {
+            if (dirs_.find(el.path().string()) != dirs_.end()) {
+                dirs_.insert(el.path().string());
+                action(parse_path(el.path().string()), "", ElementStatus::createdDir);
             }
         }
     }
 }
 
 void FileWatcher::init() {
-    paths_.clear();
+    files_.clear();
+    dirs_.clear();
     for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
         if (fs::is_regular_file(el.path())) {
             FSElement file{el.path(), fs::last_write_time(el.path())};
-            paths_.insert(std::make_pair(el.path().string(), file));
+            files_.insert(std::make_pair(el.path().string(), file));
+        } else if (fs::is_directory(el.path())) {
+            dirs_.insert(el.path().string());
         }
     }
 }
 
 std::unordered_map<std::string, std::string> FileWatcher::get_files() {
     std::unordered_map<std::string, std::string> map;
-    for (auto it : paths_) {
+    for (auto it : files_) {
         map.insert(std::make_pair(it.first, it.second.getHash()));
     }
     return map;
