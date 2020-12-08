@@ -23,7 +23,7 @@ bool Client::push(const std::string &path, const std::string &hash, ElementStatu
     std::vector<unsigned char> file;
     boost::filesystem::path dest_path{root_path_};
     dest_path.append(path);
-    if (status != ElementStatus::erasedFile) {
+    if (status == ElementStatus::createdFile || status == ElementStatus::modifiedFile) {
         file = Utils::read_from_file(dest_path);
     }
     return api_.push(file, path, hash, status);
@@ -41,7 +41,7 @@ bool Client::close() {
 
 void Client::run() {
     fw_.start([this](std::string path, std::string hash, ElementStatus status) {
-        if(!push(path, hash, status)){
+        if (!push(path, hash, status)) {
             // TODO: error management
         }
     });
