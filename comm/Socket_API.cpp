@@ -23,7 +23,8 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, 
                 std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay_));
 
             retry_cont++;
-            Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont), PR_NORMAL);
+            if(!stop)
+                Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont), PR_NORMAL);
         }
     } catch(const std::exception &ec) {
         // this->comm_error = new Comm_error{ GENERIC, "Socket_API::call_", "Exception caught: " + std::string{ ec.what() }}; // never used
