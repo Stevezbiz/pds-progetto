@@ -6,10 +6,20 @@
 #define SERVER_SESSION_H
 
 #include <iostream>
+#include <unordered_map>
 #include "../comm/Utils.h"
 
 class Session {
-    
+    std::unordered_map<std::string, std::string> files_;
+
+    /**
+     *
+     * @param key
+     * @return
+     * @deprecated
+     */
+    bool files_contains(const std::string &key);
+
 public:
     int session_id{ -1 };
     std::string user;
@@ -33,6 +43,44 @@ public:
      */
     bool is_logged_in() const;
 
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     * @deprecated
+     */
+    bool create_file(const std::string &path, const std::string &hash);
+
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     * @deprecated
+     */
+    bool modify_file(const std::string &path, const std::string &hash);
+
+    /**
+     *
+     * @param path
+     * @return
+     * @deprecated
+     */
+    bool remove_file(const std::string &path);
+
+    /**
+     *
+     * @return
+     * @deprecated
+     */
+    const std::vector<std::string> *get_paths();
+
+    /**
+     *
+     * @deprecated
+     */
+    const std::unordered_map<std::string, std::string> *get_files();
 };
 
 #endif //SERVER_SESSION_H

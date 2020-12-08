@@ -35,7 +35,7 @@ bool Server::login(Session *session, const std::string &username, const std::str
 }
 
 const std::unordered_map<std::string, std::string> *Server::probe(Session *session, const std::vector<std::string> &paths) {
-    return session.get_files();
+    return session->get_files();
 }
 
 const std::vector<unsigned char> *Server::get(Session *session, const std::string &path, const std::string &root_path) {
@@ -53,20 +53,20 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
     switch (status) {
         case ElementStatus::createdFile:
             Utils::write_on_file(dest_path, file);
-            if (!session.create_file(path, hash)) {
+            if (!session->create_file(path, hash)) {
                 // TODO: error management
                 return false;
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(dest_path) || !session.modify_file(path, hash)) {
+            if (!boost::filesystem::remove(dest_path) || !session->modify_file(path, hash)) {
                 // TODO: error management
                 return false;
             }
             Utils::write_on_file(path, file);
             break;
         case ElementStatus::erasedFile:
-            if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
+            if (!boost::filesystem::remove(dest_path) || !session->remove_file(path)) {
                 // TODO: error management
                 return false;
             }
@@ -78,7 +78,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
 }
 
 const std::vector<std::string> *Server::restore(Session *session) {
-    return session.get_paths();
+    return session->get_paths();
 }
 
 bool Server::end(Session *session) {
