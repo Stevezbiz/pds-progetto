@@ -6,11 +6,14 @@
 #define PDS_PROGETTO_CLIENT_SOCKET_API_H
 
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/error.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/system/system_error.hpp>
 #include <utility>
 #include "Socket_API.h"
 
 class Client_socket_API : public Socket_API {
-    std::string cookie_{};
+    std::string cookie_ = "";
 
 public:
     /**

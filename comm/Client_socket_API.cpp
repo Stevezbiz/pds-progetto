@@ -11,8 +11,19 @@ bool Client_socket_API::send(Message *message) {
     Logger::info("Client_socket_API::send", "Sending a message...", PR_VERY_LOW);
     if(!Socket_API::open_conn())
         return false;
+    Logger::info("Client_socket_API::send", "Set cookie...", PR_VERY_LOW);
     message->cookie = this->cookie_;
     auto ret_val = Socket_API::send(message);
+
+    if(!ret_val) {
+        if(this->get_last_error()->original_ec == boost::asio::error::not_connected) { // if connection timeout
+            if(!Socket_API::open_conn(true))
+                return false;
+            ret_val = Socket_API::send(message);
+        }
+        else
+            return false;
+    }
     Logger::info("Client_socket_API::send", "Sending a message... - done", PR_VERY_LOW);
     return ret_val;
 }
@@ -20,7 +31,21 @@ bool Client_socket_API::send(Message *message) {
 bool Client_socket_API::receive(MESSAGE_TYPE expected_message) {
     Logger::info("Client_socket_API::receive", "Receiving a message...", PR_VERY_LOW);
     auto ret_val = Socket_API::receive(expected_message);
-    this->cookie_ = Socket_API::get_message()->cookie;
+
+    if(!ret_val) {
+        if(this->get_last_error()->original_ec == boost::asio::error::not_connected) { // if connection timeout
+            if(!Socket_API::open_conn(true))
+                return false;
+            ret_val = Socket_API::receive(expected_message);
+        }
+        else
+            return false;
+    }
+    if(ret_val) {
+        Logger::info("Client_socket_API::send", "Get cookie...", PR_VERY_LOW);
+        this->cookie_ = Socket_API::get_message()->cookie;
+    }
+
     if(!Socket_API::close_conn())
         return false;
     Logger::info("Client_socket_API::receive", "Receiving a message... - done", PR_VERY_LOW);
