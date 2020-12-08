@@ -4,8 +4,8 @@
 
 #include "Stub_client.h"
 
-void Stub_client::error_handler_(Comm_error *error) {
-    std::cout << error->to_string() << std::endl;
+void Stub_client::error_handler_(Comm_error *error = new Comm_error{}) {
+    std::cout << "Error handling: " + error->to_string() << std::endl;
 }
 
 void Stub_client::prepare_stub() {

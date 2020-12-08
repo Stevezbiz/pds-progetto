@@ -16,6 +16,7 @@ bool Client_socket_API::send(Message *message) {
     auto ret_val = Socket_API::send(message);
 
     if(!ret_val) {
+        Logger::info("Client_socket_API::send", "Open the connection again and retry...", PR_VERY_LOW);
         if(this->get_last_error()->original_ec == boost::asio::error::not_connected) { // if connection timeout
             if(!Socket_API::open_conn(true))
                 return false;
@@ -33,6 +34,7 @@ bool Client_socket_API::receive(MESSAGE_TYPE expected_message) {
     auto ret_val = Socket_API::receive(expected_message);
 
     if(!ret_val) {
+        Logger::info("Client_socket_API::receive", "Open the connection again and retry...", PR_VERY_LOW);
         if(this->get_last_error()->original_ec == boost::asio::error::not_connected) { // if connection timeout
             if(!Socket_API::open_conn(true))
                 return false;
