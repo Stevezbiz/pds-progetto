@@ -48,9 +48,28 @@ brew install openssl
   
 ## Build Instructions
 
-Prerequisites: CMake, Boost, OpenSSL, sqlite3
-
 ```
 $ cd build
 $ ./build.sh
 ```
+
+## Usage 
+
+- Server
+
+  ```
+  ./server <Port>
+  ```
+
+  - Backup directory
+    backup folders for each user
+    /server/???
+    
+
+- Client 
+
+  ```
+  ./client
+  ```
+
+ 
