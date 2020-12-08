@@ -24,6 +24,8 @@ public:
      * @return session
      */
     Session *retrieve_session(const Message *message);
+
+    ~Session_manager();
 };
 
 

@@ -15,3 +15,7 @@ Session *Session_manager::retrieve_session(const Message *message) {
     this->sessions_.insert_or_assign(new_session_id, new_session);
     return new_session;
 }
+
+Session_manager::~Session_manager() {
+    std::all_of(this->sessions_.begin(), this->sessions_.end(), [](Session *session) { delete session; });
+}
