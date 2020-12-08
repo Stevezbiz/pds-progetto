@@ -22,7 +22,8 @@ enum COMM_ERRNO : int {
     CE_UNEXPECTED_TYPE = 10,
     CE_UNEXPECTED_VALUE = 11,
     CE_WRONG_TYPE = 20,
-    CE_WRONG_VALUE = 21
+    CE_WRONG_VALUE = 21,
+    CE_NOT_ALLOWED = 30
 };
 
 /**
