@@ -91,7 +91,7 @@ void FileWatcher::init() {
 std::unordered_map<std::string, std::string> FileWatcher::get_files() {
     std::unordered_map<std::string, std::string> map;
     for (auto it : files_) {
-        map.insert(std::make_pair(it.first, it.second.getHash()));
+        map.insert(std::make_pair(parse_path(it.first), it.second.getHash()));
     }
     return map;
 }
