@@ -4,12 +4,12 @@
 
 #include "Session.h"
 
-Session::Session(int session_id) : session_id_(session_id) {}
+Session::Session(int session_id) : session_id(session_id) {}
 
-std::string Session::get_cookie() {
-    return Utils::sign_cookie(std::to_string(this->session_id_)); // TODO: make this more secure
+std::string Session::get_cookie() const {
+    return Utils::sign_cookie(std::to_string(this->session_id)); // TODO: make this more secure
 }
 
-bool Session::is_logged_in() {
-    return this->login_status_;
+bool Session::is_logged_in() const {
+    return this->login_status;
 }

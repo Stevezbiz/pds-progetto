@@ -9,11 +9,11 @@
 #include "../comm/Utils.h"
 
 class Session {
-    int session_id_{ -1 };
-    bool login_status_{ false };
-
+    
 public:
+    int session_id{ -1 };
     std::string user;
+    bool login_status{ false };
 
     /**
      * class constructor
@@ -25,13 +25,13 @@ public:
      * genereate a cookie to identify this session
      * @return cookie
      */
-    std::string get_cookie();
+    std::string get_cookie() const;
 
     /**
      * check if login has been performed
      * @return login status
      */
-    bool is_logged_in();
+    bool is_logged_in() const;
 
 };
 
