@@ -23,7 +23,7 @@ bool Client_socket_API::receive(MESSAGE_TYPE expected_message) {
     this->cookie_ = Socket_API::get_message()->cookie;
     if(!Socket_API::close_conn())
         return false;
-    Logger::info("Client_socket_API::receive", "Receiving a message... -done", PR_VERY_LOW);
+    Logger::info("Client_socket_API::receive", "Receiving a message... - done", PR_VERY_LOW);
     return ret_val;
 }
 
