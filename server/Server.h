@@ -12,10 +12,11 @@
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
-    Server_API api_;
+    Server_API *api_;
     Database_API db_;
     std::string root_path_;
     bool stop_;
+    Session_manager *session_manager_{};
 
     /**
      * Accetta le connessioni dei client
@@ -78,6 +79,8 @@ public:
      */
     Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
            std::string root_path);
+
+    ~Server();
 };
 
 #endif //SERVER_SERVER_H

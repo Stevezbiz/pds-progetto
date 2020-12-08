@@ -7,14 +7,17 @@
 #include <utility>
 
 Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
-               std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), api_(), db_(std::move(db_path)),
+               std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), db_(std::move(db_path)),
                                         root_path_(std::move(root_path)), stop_(false) {
+    this->session_manager_ = new Session_manager{};
+    this->api_ = new Server_API{ this->session_manager_ };
+
     server_init();
     accept();
 }
 
 void Server::accept() {
-    while (!stop_) {
+    while(!stop_) {
         acceptor_.accept(socket_);
         std::thread thread([](Server_API &api, Session session) {
             api.run(session);
@@ -23,10 +26,9 @@ void Server::accept() {
     }
 }
 
-bool Server::login(Session &session, const std::string &username, const std::string &password,
-                   const Database_API &database) {
+bool Server::login(Session *session, const std::string &username, const std::string &password, const Database_API &database) {
     if (database.login_query(username, password)) {
-        session.set_user(username);
+        session->user = username;
         return true;
     }
     return false;
@@ -112,4 +114,8 @@ void Server::server_init() {
     api_.set_handle_error([](Session &session, const Comm_error *comm_error) {
         return handle_error(session, comm_error);
     });
+}
+
+Server::~Server() {
+    delete this->session_manager_;
 }
