@@ -5,9 +5,7 @@
 #include "Client_API.h"
 
 bool Client_API::get_and_save_(const std::string &path) {
-    auto req = Message::get(path);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_GET_CONTENT))
+    if(!this->api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
         return false;
     auto res = this->api_->get_message();
     if (!res->is_okay())
@@ -22,9 +20,7 @@ bool Client_API::get_and_save_(const std::string &path) {
 Client_API::Client_API(Client_socket_API *socket_api) : API(socket_api) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
-    auto req = Message::login(username, password);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    if(!this->api_->send_and_receive(Message::login(username, password), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
 
@@ -38,9 +34,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     paths.reserve(map.size());
     for (auto const &item : map)
         paths.push_back(item.first);
-    auto req = Message::probe(paths);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_PROBE_CONTENT))
+    if(!this->api_->send_and_receive(Message::probe(paths), MSG_PROBE_CONTENT))
         return false;
     auto res = this->api_->get_message();
 
@@ -79,9 +73,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
 
 bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
     Logger::info("Client_API::push", "Push started...");
-    auto req = Message::push(file, path, hash, elementStatus);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
     Logger::info("Client_API::push", "Push started... - done");
@@ -90,9 +82,7 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 }
 
 bool Client_API::restore() {
-    auto req = Message::restore();
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_RESTORE_CONTENT))
+    if(!this->api_->send_and_receive(Message::restore(), MSG_RESTORE_CONTENT))
         return false;
     auto res = this->api_->get_message();
 
@@ -106,9 +96,7 @@ bool Client_API::restore() {
 }
 
 bool Client_API::end() {
-    auto req = Message::end();
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    if(!this->api_->send_and_receive(Message::end(), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
 

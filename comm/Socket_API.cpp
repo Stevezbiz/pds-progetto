@@ -183,3 +183,9 @@ Socket_API::~Socket_API() {
     delete this->comm_error;
 }
 
+bool Socket_API::send_and_receive(Message *message, MESSAGE_TYPE expected_message) {
+    if(!this->send(message))
+        return false;
+    return this->receive(expected_message);
+}
+

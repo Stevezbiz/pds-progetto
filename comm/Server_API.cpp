@@ -69,6 +69,7 @@ void Server_API::set_handle_error(const std::function<void(Session *, const Comm
 }
 
 void Server_API::run(Socket_API *api) {
+    bool end_session = false;
 
     if(!api->receive(MSG_UNDEFINED)) {
         this->do_handle_error_(nullptr, api->get_last_error());
@@ -104,15 +105,14 @@ void Server_API::run(Socket_API *api) {
             break;
         case MSG_END:
             res = this->do_end_(session, req);
+            end_session = true;
             break;
         default:
             res = Message::error(new Comm_error{CE_UNEXPECTED_TYPE, "Server_API::run", "Message code not valid"});
     }
 
     res->cookie = session->get_cookie();
+    if(end_session)
+        this->session_manager_->remove_session(session);
     api->send(res);
-}
-
-Server_API::~Server_API() {
-    delete this->api_;
 }
