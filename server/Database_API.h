@@ -7,6 +7,7 @@
 
 #include <sqlite3.h>
 #include <string>
+#include <unordered_map>
 
 class Database_API {
     sqlite3 *db_ = nullptr;
@@ -25,6 +26,10 @@ public:
      * @return
      */
     [[nodiscard]] bool login_query(const std::string &username, const std::string &password) const;
+
+    std::unordered_map<std::string,std::string> get_paths(const std::string &username);
+
+    bool save_paths(const std::unordered_map<std::string,std::string> &map, const std::string &username);
 
     ~Database_API();
 };
