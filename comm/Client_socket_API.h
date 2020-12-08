@@ -34,6 +34,14 @@ public:
      * @return status
      */
     bool receive(MESSAGE_TYPE expected_message);
+
+    /**
+     * send a message and retrieve the response
+     * @param message
+     * @param expected_message
+     * @return status
+     */
+    bool send_and_receive(Message *message, MESSAGE_TYPE expected_message);
 };
 
 

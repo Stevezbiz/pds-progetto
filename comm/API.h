@@ -16,6 +16,9 @@
 
 namespace fs = boost::filesystem;
 
+/**
+ * @deprecated
+ */
 class API {
 
 protected:

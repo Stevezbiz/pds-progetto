@@ -17,12 +17,14 @@ bool Client_API::get_and_save_(const std::string &path) {
     return true;
 }
 
-Client_API::Client_API(Client_socket_API *socket_api) : API(socket_api) {}
+Client_API::Client_API(Client_socket_API *socket_api) : api_(socket_api) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
+    Logger::info("Client_API::login", "Trying to perform login...", PR_LOW);
     if(!this->api_->send_and_receive(Message::login(username, password), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
+    Logger::info("Client_API::login", "Trying to perform login... - done", PR_LOW);
 
     return res->is_okay();
 }
@@ -82,6 +84,7 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 }
 
 bool Client_API::restore() {
+    Logger::info("Client_API::restore", "Restore started...", PR_LOW);
     if(!this->api_->send_and_receive(Message::restore(), MSG_RESTORE_CONTENT))
         return false;
     auto res = this->api_->get_message();
@@ -89,16 +92,21 @@ bool Client_API::restore() {
     if(!res->is_okay())
         return false;
 
-    if(!(std::all_of(res->paths.begin(), res->paths.end(), [this](const std::string &path) { if (!this->get_and_save_(path)) return false; })))
-        return false;
+    for(const auto &path : res->paths) {
+        if (!this->get_and_save_(path))
+            return false;
+    }
+    Logger::info("Client_API::restore", "Restore started... - done", PR_LOW);
 
     return true;
 }
 
 bool Client_API::end() {
+    Logger::info("Client_API::end", "End started...", PR_LOW);
     if(!this->api_->send_and_receive(Message::end(), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
+    Logger::info("Client_API::end", "End started... - done", PR_LOW);
 
     return res->is_okay();
 }

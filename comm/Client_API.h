@@ -19,6 +19,8 @@ namespace fs = boost::filesystem;
  * easy class to manage client-side protocol usage
  */
 class Client_API : public API {
+    Client_socket_API *api_;
+
     /**
      * get a file from the server and save it
      * @param path

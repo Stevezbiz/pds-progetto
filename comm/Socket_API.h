@@ -116,14 +116,6 @@ public:
     bool close_conn();
 
     /**
-     * send a message and retrieve the response
-     * @param message
-     * @param expected_message
-     * @return status
-     */
-    bool send_and_receive(Message *message, MESSAGE_TYPE expected_message);
-
-    /**
      * getter
      * @return last message
      */
