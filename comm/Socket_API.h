@@ -89,9 +89,10 @@ public:
 
     /**
      * open a connection towards the specified ip and port
+     * @param force
      * @return status
      */
-    bool open_conn();
+    bool open_conn(bool force = false);
 
     /**
      * send a Message
@@ -111,9 +112,10 @@ public:
 
     /**
      * close current connection
+     * @param force
      * @return status
      */
-    bool close_conn();
+    bool close_conn(bool force = false);
 
     /**
      * getter

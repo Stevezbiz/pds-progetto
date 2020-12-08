@@ -14,22 +14,25 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, 
 
     try {
         while (!stop && retry_cont <= this->n_retry_) {
+            if(retry_cont > 0)
+                Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont), PR_NORMAL);
             perform_this(*this->socket_, ec);
 
-            if (!ec.failed()) {
+            if(!ec.failed()) {
                 stop = true;
                 status = true;
-            } else
+                ec.clear();
+            } else {
+                this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::call_", "Operation failure on socket", ec };
                 std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay_));
-
-            retry_cont++;
-            if(!stop)
-                Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont), PR_NORMAL);
+                retry_cont++;
+            }
         }
     } catch(const std::exception &ec) {
-        // this->comm_error = new Comm_error{ GENERIC, "Socket_API::call_", "Exception caught: " + std::string{ ec.what() }}; // never used
+        this->comm_error = new Comm_error{ CE_GENERIC, "Socket_API::call_", "Exception caught: " + std::string{ ec.what() }}; // never used
         return false;
     }
+
     return status;
 }
 
@@ -74,9 +77,10 @@ Socket_API::Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT err
     this->socket_ = new boost::asio::ip::tcp::socket{ std::move(socket) };
 }
 
-bool Socket_API::open_conn() {
+bool Socket_API::open_conn(bool force) {
     Logger::info("Socket_API::open_conn", "Opening a connection...", PR_VERY_LOW);
-    if(this->socket_ && this->keep_alive_ && this->socket_->is_open()) {
+
+    if(this->socket_ != nullptr && this->socket_->is_open() && this->keep_alive_ && !force) {
         Logger::info("Socket_API::open_conn", "Connection already opened", PR_VERY_LOW);
         return true;
     }
@@ -85,11 +89,13 @@ bool Socket_API::open_conn() {
         return false;
 
     try {
+        Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
         boost::asio::io_context ctx;
         boost::asio::ip::tcp::resolver resolver(ctx);
         auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
-        this->socket_ = new boost::asio::ip::tcp::socket{ ctx };
-        boost::asio::connect(*this->socket_, endpoint_iterator);
+        boost::asio::ip::tcp::socket socket{ ctx };
+        boost::asio::connect(socket, endpoint_iterator);
+        this->socket_ = new boost::asio::ip::tcp::socket{ std::move(socket) };
     } catch(const std::exception &e) {
         this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::open_conn", e.what() };
         return false;
@@ -101,8 +107,8 @@ bool Socket_API::open_conn() {
 
 bool Socket_API::send(Message *message) {
     Logger::info("Socket_API::send", "Sending a message...", PR_LOW);
-    delete this->message;
-    delete this->comm_error;
+//    delete this->message;
+//    delete this->comm_error;
 
     if(!this->call_([this, &message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::write(*this->socket_, message->send(), ec);
@@ -117,8 +123,8 @@ bool Socket_API::send(Message *message) {
 }
 
 bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
-    delete this->message;
-    delete this->comm_error;
+//    delete this->message;
+//    delete this->comm_error;
 
     bool status = true;
     this->message = new Message{};
@@ -134,10 +140,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
         return false; // it cannot do any other action here
     }
 
-    if(this->message->code == MSG_ERROR) {
-        status = false;
-    }
-    else if(expectedMessage != MSG_UNDEFINED && message->code != expectedMessage) {
+    if(expectedMessage != MSG_UNDEFINED && message->code != expectedMessage && message->code != MSG_ERROR) {
         this->comm_error = new Comm_error{CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) };
         this->message = Message::error(this->comm_error);
         status = false;
@@ -159,13 +162,14 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     return status;
 }
 
-bool Socket_API::close_conn() {
+bool Socket_API::close_conn(bool force) {
     Logger::info("Socket_API::close_conn", "Closing a connection...", PR_VERY_LOW);
 
-    if(!this->socket_)
+    if(this->socket_ == nullptr)
         return true;
-    if(this->socket_->is_open() && this->keep_alive_)
+    if(this->socket_->is_open() && this->keep_alive_ && !force)
         return true;
+    Logger::info("Socket_API::close_conn", "Force closing", PR_VERY_LOW);
 
     try {
         if(this->socket_->is_open()) {
@@ -178,6 +182,7 @@ bool Socket_API::close_conn() {
     }
 
     delete this->socket_;
+    this->socket_ = nullptr;
     Logger::info("Socket_API::close_conn", "Closing a connection... - done", PR_VERY_LOW);
     return true;
 }
