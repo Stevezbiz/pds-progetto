@@ -26,16 +26,10 @@ void Utils::write_on_file(const std::string &path, const std::vector<unsigned ch
 }
 
 void Utils::write_on_file(const fs::path &path, const std::vector<unsigned char> &file) {
-    auto os = fs::ofstream{path};
-    Utils::write_on_file(os, file);
+    auto os = fs::ofstream{path, std::ios::binary};
+    os.write(reinterpret_cast<const char *>(file.data()), file.size());
     os.close();
 }
-
-void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &file) {
-    auto file_buffer = file.data();
-    os << file_buffer;
-}
-
 
 std::string Utils::SHA256(const std::string &path) {
     return Utils::SHA256(fs::path(path));
