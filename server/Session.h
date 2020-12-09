@@ -91,12 +91,16 @@ public:
      *
      * @return
      */
-    const std::vector<std::string> *get_paths();
+    const std::vector<std::string> *get_path_schema();
 
     /**
      *
      */
-    const std::unordered_map<std::string, std::string> *get_files();
+    const std::unordered_map<std::string, std::string> *get_schema();
+
+    bool create_dir(const std::string &path, const std::string &hash);
+
+    bool remove_dir(const std::string &path);
 };
 
 #endif //SERVER_SESSION_H

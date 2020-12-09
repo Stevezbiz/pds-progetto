@@ -9,6 +9,10 @@
 #include <string>
 #include <unordered_map>
 
+enum PathType {
+    file = 0, dir = 1
+};
+
 class Database_API {
     sqlite3 *db_ = nullptr;
 
@@ -41,7 +45,7 @@ public:
      * @param username
      * @return
      */
-    [[nodiscard]] bool insert_path(const std::string &path, const std::string &hash, const std::string &username) const;
+    [[nodiscard]] bool insert_path(const std::string &path, const std::string &hash, const std::string &username, PathType type) const;
 
     /**
      *
@@ -57,6 +61,13 @@ public:
      * @return
      */
     [[nodiscard]] bool update_path(const std::string &path, const std::string &hash) const;
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    [[nodiscard]] std::unordered_map<std::string, std::string> *get_schema(const std::string &username) const;
 
     ~Database_API();
 };

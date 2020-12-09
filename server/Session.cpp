@@ -35,17 +35,29 @@ std::string Session::get_user() {
 }
 
 bool Session::create_file(const std::string &path, const std::string &hash) {
-    return database_.insert_path(path,hash,user_);
+    return database_.insert_path(path, hash, user_,PathType::file);
 }
 
 bool Session::modify_file(const std::string &path, const std::string &hash) {
-    return database_.update_path(path,hash);
+    return database_.update_path(path, hash);
 }
 
 bool Session::remove_file(const std::string &path) {
     return database_.delete_path(path);
 }
 
-const std::vector<std::string> *Session::get_paths() {
+const std::vector<std::string> *Session::get_path_schema() {
     return database_.get_path_schema(user_);
+}
+
+bool Session::create_dir(const std::string &path, const std::string &hash) {
+    return database_.insert_path(path, hash, user_, PathType::dir);
+}
+
+bool Session::remove_dir(const std::string &path) {
+    return database_.delete_path(path);
+}
+
+const std::unordered_map <std::string, std::string> *Session::get_schema() {
+    return database_.get_schema(user_);
 }

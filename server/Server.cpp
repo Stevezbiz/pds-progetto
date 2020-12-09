@@ -42,9 +42,8 @@ bool Server::login(Session &session, const std::string &username, const std::str
     return false;
 }
 
-const std::unordered_map<std::string, std::string> *
-Server::probe(Session &session, const std::vector<std::string> &paths) {
-    return session.get_files();
+const std::unordered_map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
+    return session.get_schema();
 }
 
 const std::vector<unsigned char> *Server::get(Session &session, const std::string &path, const std::string &root_path) {
@@ -99,7 +98,7 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
 }
 
 const std::vector<std::string> *Server::restore(Session &session) {
-    return session.get_paths();
+    return session.get_path_schema();
 }
 
 bool Server::end(Session &session) {
