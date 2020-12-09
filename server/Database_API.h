@@ -31,6 +31,12 @@ public:
 
     [[nodiscard]] bool save_path_schema(const std::unordered_map<std::string,std::string> &map, const std::string &username) const;
 
+    [[nodiscard]] bool insert_path(const std::string &path, const std::string &hash, const std::string &username) const;
+
+    [[nodiscard]] bool delete_path(const std::string &path) const;
+
+    [[nodiscard]] bool update_path(const std::string &path, const std::string &hash) const;
+
     ~Database_API();
 };
 

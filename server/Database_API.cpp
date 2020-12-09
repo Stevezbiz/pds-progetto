@@ -55,7 +55,8 @@ std::unordered_map<std::string, std::string> Database_API::get_path_schema(const
     return map;
 }
 
-bool Database_API::save_path_schema(const std::unordered_map<std::string, std::string> &map, const std::string &username) const {
+bool Database_API::save_path_schema(const std::unordered_map<std::string, std::string> &map,
+                                    const std::string &username) const {
     sqlite3_stmt *query;
     // delete
     if (sqlite3_prepare_v2(db_, "DELETE FROM SESSIONS WHERE user = ?", -1, &query, nullptr) !=
@@ -76,8 +77,42 @@ bool Database_API::save_path_schema(const std::unordered_map<std::string, std::s
         if (sqlite3_step(query) != SQLITE_DONE) return false;
         first = false;
     }
-    if (sqlite3_finalize(query) != SQLITE_OK) {
+    if (sqlite3_finalize(query) != SQLITE_OK) return false;
+    return true;
+}
+
+bool Database_API::insert_path(const std::string &path, const std::string &hash, const std::string &username) const {
+    sqlite3_stmt *query;
+    if (sqlite3_prepare_v2(db_, "INSERT INTO SESSIONS(path,hash,user) values(?,?,?)", -1, &query, nullptr) !=
+        SQLITE_OK)
         return false;
-    }
+    if (sqlite3_bind_text(query, 1, path.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_bind_text(query, 2, hash.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_bind_text(query, 3, username.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_step(query) != SQLITE_DONE) return false;
+    if (sqlite3_finalize(query) != SQLITE_OK) return false;
+    return true;
+}
+
+bool Database_API::delete_path(const std::string &path) const {
+    sqlite3_stmt *query;
+    if (sqlite3_prepare_v2(db_, "DELETE FROM SESSIONS WHERE path = ?", -1, &query, nullptr) !=
+        SQLITE_OK)
+        return false;
+    if (sqlite3_bind_text(query, 1, path.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_step(query) != SQLITE_DONE) return false;
+    if (sqlite3_reset(query) != SQLITE_OK) return false;
+    return true;
+}
+
+bool Database_API::update_path(const std::string &path, const std::string &hash) const {
+    sqlite3_stmt *query;
+    if (sqlite3_prepare_v2(db_, "UPDATE SESSIONS SET hash = ? WHERE path = ?", -1, &query, nullptr) !=
+        SQLITE_OK)
+        return false;
+    if (sqlite3_bind_text(query, 1, hash.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_bind_text(query, 2, path.data(), -1, nullptr) != SQLITE_OK) return false;
+    if (sqlite3_step(query) != SQLITE_DONE) return false;
+    if (sqlite3_finalize(query) != SQLITE_OK) return false;
     return true;
 }
