@@ -46,3 +46,23 @@ void Client::run() {
         }
     });
 }
+
+bool Client::pwdAttempts() {
+    std::cout << "*************** LOGIN ***************" << std::endl;
+    std::string username;
+    std::string password;
+    for (int tries = 0; tries < MAX_ATTEMPTS; ++tries)
+    {
+        std::cout << "Please insert username: ";
+        std::cin >> username;
+        std::cout << "Please insert password: ";
+        std::cin >> password;
+        if (Client::login(username, Utils::hash(password))) {
+            std::cout << "Welcome " << username << std::endl;
+            return true;
+        }
+        std::cout << "\nPlease try again.\n";
+    }
+    return false;
+}
+
