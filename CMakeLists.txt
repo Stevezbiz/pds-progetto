@@ -285,6 +285,12 @@ message(STATUS "preparing test_template...")
 
 set(test_template_SOURCE_FILES
         test/template/test_template.cpp
+        test/template/Base.cpp
+        test/template/Base.h
+        test/template/Der.cpp
+        test/template/Der.h
+        test/template/Service.cpp
+        test/template/Service.h
         )
 
 add_executable(test_template ${test_template_SOURCE_FILES})
