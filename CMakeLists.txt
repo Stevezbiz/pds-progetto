@@ -278,3 +278,16 @@ else ()
     message(WARNING "Cannot find Boost")
 endif ()
 message(STATUS "preparing test_socket... - done")
+
+# --- test_template ---
+project(test_template)
+message(STATUS "preparing test_template...")
+
+set(test_template_SOURCE_FILES
+        test/template/test_template.cpp
+        )
+
+add_executable(test_template ${test_template_SOURCE_FILES})
+
+message(STATUS "preparing test_socket... - done")
+
