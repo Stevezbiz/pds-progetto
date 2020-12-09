@@ -17,21 +17,14 @@
 class Session : public std::enable_shared_from_this<Session> {
     std::string user_;
     Socket_API api_;
-    std::unordered_map<std::string, std::string> files_;
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    bool files_contains(const std::string &key);
+    Database_API &database_;
 
 public:
     /**
      * Inizializza i campi dell'oggetto
      * @param socket: socket su cui aprire la connessione
      */
-    Session(boost::asio::ip::tcp::socket socket);
+    Session(boost::asio::ip::tcp::socket socket, Database_API &database);
 
     /**
      *
@@ -104,10 +97,6 @@ public:
      *
      */
     const std::unordered_map<std::string, std::string> *get_files();
-
-    void get_path_schema(const Database_API &database);
-
-    bool save_path_schema(const Database_API &database);
 };
 
 #endif //SERVER_SESSION_H

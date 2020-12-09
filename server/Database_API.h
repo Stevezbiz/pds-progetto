@@ -27,7 +27,7 @@ public:
      */
     [[nodiscard]] bool login_query(const std::string &username, const std::string &password) const;
 
-    [[nodiscard]] std::unordered_map<std::string,std::string> get_path_schema(const std::string &username) const;
+    [[nodiscard]] std::vector<std::string> *get_path_schema(const std::string &username) const;
 
     [[nodiscard]] bool save_path_schema(const std::unordered_map<std::string,std::string> &map, const std::string &username) const;
 

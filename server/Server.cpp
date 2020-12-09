@@ -16,9 +16,10 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
-        std::thread thread([](Server_API &api, Session session) {
+        std::thread thread([](Server_API &api, boost::asio::ip::tcp::socket socket, Database_API &db) {
+            Session session{std::move(socket),db};
             api.run(session);
-        }, std::ref(api_), std::move(socket_));
+        }, std::ref(api_), std::move(socket_), std::ref(db_));
         thread.detach();
     }
 }
@@ -99,8 +100,8 @@ const std::vector<std::string> *Server::restore(Session &session) {
     return session.get_paths();
 }
 
-bool Server::end(Session &session, const Database_API &database) {
-    return session.save_path_schema(database);
+bool Server::end(Session &session) {
+    return true;
 }
 
 void Server::handle_error(Session &session, const Comm_error *comm_error) {
@@ -113,8 +114,8 @@ void Server::server_init() {
     api_.set_login([this](Session &session, const std::string &username, const std::string &password) {
         return login(session, username, password, db_, root_path_);
     });
-    api_.set_end([this](Session &session) {
-        return end(session,db_);
+    api_.set_end([](Session &session) {
+        return end(session);
     });
     api_.set_get([this](Session &session, const std::string &path) {
         return get(session, path, root_path_);

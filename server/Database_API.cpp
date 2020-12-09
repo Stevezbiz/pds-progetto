@@ -2,6 +2,7 @@
 // Created by stevezbiz on 05/12/20.
 //
 
+#include <vector>
 #include "Database_API.h"
 
 Database_API::Database_API(std::string path) {
@@ -34,11 +35,11 @@ bool Database_API::login_query(const std::string &username, const std::string &p
     return true;
 }
 
-std::unordered_map<std::string, std::string> Database_API::get_path_schema(const std::string &username) const {
+std::vector<std::string> *Database_API::get_path_schema(const std::string &username) const {
     sqlite3_stmt *query;
     // select
-    std::unordered_map<std::string, std::string> map;
-    if (sqlite3_prepare_v2(db_, "SELECT path, hash FROM SESSIONS WHERE user = ?", -1, &query, nullptr)
+    std::vector<std::string> res;
+    if (sqlite3_prepare_v2(db_, "SELECT path FROM SESSIONS WHERE user = ?", -1, &query, nullptr)
         != SQLITE_OK) {
         // TODO: error management
     }
@@ -46,13 +47,12 @@ std::unordered_map<std::string, std::string> Database_API::get_path_schema(const
         // TODO: error management
     }
     while (sqlite3_step(query) != SQLITE_DONE) {
-        map.insert(std::make_pair(std::string(reinterpret_cast<const char *>(sqlite3_column_text(query, 0))),
-                                  std::string(reinterpret_cast<const char *>(sqlite3_column_text(query, 1)))));
+        res.emplace_back(reinterpret_cast<const char *>(sqlite3_column_text(query, 0)));
     }
     if (sqlite3_finalize(query) != SQLITE_OK) {
         // TODO: error management
     }
-    return map;
+    return new std::vector<std::string>(res);
 }
 
 bool Database_API::save_path_schema(const std::unordered_map<std::string, std::string> &map,

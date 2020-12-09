@@ -55,7 +55,7 @@ class Server {
      *
      * @return
      */
-    static bool end(Session &, const Database_API &);
+    static bool end(Session &);
 
     /**
      * @param comm_error
