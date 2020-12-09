@@ -23,7 +23,7 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
             break;
     }
     if(priority > Logger::min_priority) {
-        std::cout << "[" + log_string + "] (" + location + ") "+ message + " (PR " << priority << ")" << std::endl;
+        std::cout << std::left << std::setw(10) << "[" + log_string + "]" << std::left << std::setw(50) << "(" + location + ")" << std::left  << std::setw(100) << message << std::setw(1) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 
