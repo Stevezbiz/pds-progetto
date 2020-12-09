@@ -13,7 +13,7 @@
 #include "Socket_API.h"
 
 class Client_socket_API : public Socket_API {
-    std::string cookie_ = "";
+    std::string cookie_;
 
     /**
      * check if this is a connection error status
@@ -22,6 +22,8 @@ class Client_socket_API : public Socket_API {
     bool is_connection_error_();
 
 public:
+    Client_socket_API() = delete;
+
     /**
      * class constructor
      * @param ip

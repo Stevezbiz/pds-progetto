@@ -16,17 +16,16 @@
 
 namespace fs = boost::filesystem;
 
-template <class T>
 class API {
 
 protected:
-    T *api_;
+    Socket_API *api_;
 
     /**
      * class constructor
      * @param socket_api
      */
-    explicit API(T *socket_api = nullptr);
+    explicit API(Socket_API *socket_api = nullptr);
 
     /**
      * save a file on disk

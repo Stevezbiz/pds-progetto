@@ -191,7 +191,7 @@ Message *Socket_API::get_message() const {
     return this->message;
 }
 Comm_error *Socket_API::get_last_error() const {
-    return this->comm_error;
+    return this->comm_error ? this->comm_error : this->message->comm_error;
 }
 
 Socket_API::~Socket_API() {

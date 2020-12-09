@@ -22,11 +22,11 @@ enum ERROR_MANAGEMENT : int {
  * to manage Message type message and standard Comm_error type errors
  */
 class Socket_API {
+
+protected:
     int n_retry_;
     long retry_delay_;
     bool keep_alive_;
-
-protected:
     boost::asio::ip::tcp::socket *socket_ = nullptr;
 
     /**
