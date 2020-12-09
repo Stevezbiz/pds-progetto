@@ -88,10 +88,13 @@ void FileWatcher::init() {
     }
 }
 
-std::unordered_map<std::string, std::string> FileWatcher::get_files() {
-    std::unordered_map<std::string, std::string> map;
+std::map<std::string, std::string> FileWatcher::get_files() {
+    std::map<std::string, std::string> map;
     for (auto it : files_) {
         map.insert(std::make_pair(parse_path(it.first), it.second.getHash()));
+    }
+    for(auto it:dirs_){
+        map.insert(std::make_pair(parse_path(it), ""));
     }
     return map;
 }

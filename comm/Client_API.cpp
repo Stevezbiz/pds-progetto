@@ -31,7 +31,7 @@ bool Client_API::login(const std::string &username, const std::string &password)
     return res->is_okay();
 }
 
-bool Client_API::probe(const std::unordered_map<std::string, std::string> &map) {
+bool Client_API::probe(const std::map<std::string, std::string> &map) {
     Logger::info("Client_API::probe", "Probe check started...", PR_LOW);
 
     std::vector<std::string> paths;
@@ -53,25 +53,45 @@ bool Client_API::probe(const std::unordered_map<std::string, std::string> &map) 
         auto it = res->hashes.find(path);
         boost::filesystem::path dest_path{root_path};
         dest_path.append(path);
-        if(it == res->hashes.end()) { // if the file does not exists, the file has been created
-            Logger::info("Client_API::probe", "Created file found" + dest_path.string(), PR_LOW);
-            if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile))
-                return false;
-        }
-        else if(res->hashes.at(path) != item.second) { // if versions (hashes) are different, the file has been modified
-            Logger::info("Client_API::probe", "Modified file found " + dest_path.string(), PR_LOW);
-            if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile))
-                return false;
+        if(boost::filesystem::is_regular_file(path)){
+            if(it==res->hashes.end()){
+                // file not registered -> create
+                Logger::info("Client_API::probe", "Created file found" + path, PR_LOW);
+                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile))
+                    return false;
+            } else if(res->hashes.at(path)!=item.second){
+                // different hash -> modified
+                Logger::info("Client_API::probe", "Modified file found " + path, PR_LOW);
+                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile))
+                    return false;
+            }
+        } else if(boost::filesystem::is_directory(path)){
+            if(it==res->hashes.end()){
+                // dir not registered -> create
+                Logger::info("Client_API::probe", "Created dir found" + path, PR_LOW);
+                if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir))
+                    return false;
+            }
         }
     }
 
     for(auto const &item : res->hashes) {
         auto path = item.first;
         auto it = map.find(path);
-        if(it == map.end()) { // if the file does not exists, the file has been deleted
-            Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
-            if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
-                return false;
+        if(boost::filesystem::is_regular_file(path)){
+            if(it == map.end()) {
+                // file not found -> erase
+                Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
+                    return false;
+            }
+        } else if(boost::filesystem::is_directory(path)){
+            if(it == map.end()) {
+                // dir not found -> erase
+                Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir))
+                    return false;
+            }
         }
     }
     Logger::info("Client_API::probe", "Probe check started... - done", PR_LOW);
