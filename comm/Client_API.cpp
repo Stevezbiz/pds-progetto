@@ -2,6 +2,7 @@
 // Created by stevezbiz on 26/11/20.
 //
 
+#include <set>
 #include "Client_API.h"
 
 bool Client_API::get_and_save_(const std::string &path) {
@@ -121,7 +122,11 @@ bool Client_API::restore() {
     if(!res->is_okay())
         return false;
 
-    for(const auto &path : res->paths)
+    std::set<std::string> paths;
+    for(const auto& el : res->paths){
+        paths.insert(el);
+    }
+    for(const auto &path : paths)
         if (!this->get_and_save_(path))
             return false;
 
