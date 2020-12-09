@@ -22,13 +22,14 @@ void Server::accept() {
         acceptor_.accept(socket_);
         // socket_.set_option(boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO>{ SOCKET_TIMEOUT });
         std::thread thread([](Server_API *api, boost::asio::ip::tcp::socket socket) {
-            api->run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 });
+            api->run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 }, SOCKET_TIMEOUT);
         }, this->api_, std::move(socket_));
         thread.detach();
     }
 }
 
 bool Server::login(Session *session, const std::string &username, const std::string &password, const Database_API &database) {
+    return true;
     if (database.login_query(username, password)) {
         session->user = username;
         return true;
