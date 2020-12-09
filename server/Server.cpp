@@ -61,32 +61,32 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
     switch (status) {
         case ElementStatus::createdFile:
             Utils::write_on_file(dest_path, file);
-            if (!session.create_file(path, hash)) {
+            if (!session.create_file(dest_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot create file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(dest_path) || !session.modify_file(path, hash)) {
+            if (!boost::filesystem::remove(dest_path) || !session.modify_file(dest_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot modify file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
-            Utils::write_on_file(path, file);
+            Utils::write_on_file(dest_path, file);
             break;
         case ElementStatus::erasedFile:
-            if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
+            if (!boost::filesystem::remove(dest_path) || !session.remove_file(dest_path.string())) {
                 Logger::error("Server::push", "Cannot erase file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::createdDir:
-            if (!boost::filesystem::create_directory(dest_path) || !session.create_dir(path, hash)) {
+            if (!boost::filesystem::create_directory(dest_path) || !session.create_dir(dest_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot create directory: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::erasedDir:
-            if (!boost::filesystem::remove(dest_path) || !session.remove_dir(path)) {
+            if (!boost::filesystem::remove(dest_path) || !session.remove_dir(dest_path.string())) {
                 Logger::error("Server::push", "Cannot erase directory: " + dest_path.string(), PR_HIGH);
                 return false;
             }
