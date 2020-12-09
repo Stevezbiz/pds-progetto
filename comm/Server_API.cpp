@@ -6,6 +6,7 @@
 
 Message *Server_API::do_login_(Session *session, Message *req) {
     auto status = this->login_(session, req->username, req->password);
+    session->login_status = status;
     return status ? Message::okay() : Message::error(new Comm_error{CE_WRONG_VALUE, "Server_API::do_login", "Invalid username or password" });
 }
 
@@ -68,51 +69,67 @@ void Server_API::set_handle_error(const std::function<void(Session *, const Comm
     this->handle_error_ = handler_error_function;
 }
 
-void Server_API::run(Socket_API *api) {
+void Server_API::run(Socket_API *api, int socket_timeout) {
     bool end_session = false;
+    bool keep_alive;
 
-    if(!api->receive(MSG_UNDEFINED)) {
-        this->do_handle_error_(nullptr, api->get_last_error());
-        api->send(Message::error(new Comm_error{ CE_GENERIC, "Server_API::run", "Transmission level error" }));
-        return;
-    }
+    do {
+        auto f = std::async(std::launch::async, [api]() { return api->receive(MSG_UNDEFINED); });
+        auto status = f.wait_for(std::chrono::milliseconds(socket_timeout));
+        if(status == std::future_status::timeout) {
+            Logger::warning("Server_API::run", "Receive timeout");
+            break;
+        }
+        if(!f.get()) {
+            Logger::info("Server_API::run", "Receive error", PR_VERY_LOW);
+            this->do_handle_error_(nullptr, api->get_last_error());
+            api->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error"}));
+            break;
+        }
 
-    auto req = api->get_message();
-    auto session = this->session_manager_->retrieve_session(req);
-    if(req->code != MSG_LOGIN && !session->is_logged_in()) {
-        api->send(Message::error(new Comm_error{ CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action" }));
-        return;
-    }
+        auto req = api->get_message();
+        keep_alive = req->keep_alive;
+        Logger::info("Server_API::run", "Keep alive: " + keep_alive, PR_VERY_LOW);
+        auto session = this->session_manager_->retrieve_session(req);
+        if (req->code != MSG_LOGIN && !session->is_logged_in()) {
+            api->send(Message::error(
+                    new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
+            break;
+        }
 
-    Message *res;
+        Message *res;
 
-    // manage the request and produce a response message
-    switch (req->code) {
-        case MSG_LOGIN:
-            res = this->do_login_(session, req);
-            break;
-        case MSG_PROBE:
-            res = this->do_probe_(session, req);
-            break;
-        case MSG_GET:
-            res = this->do_get_(session, req);
-            break;
-        case MSG_PUSH:
-            res = this->do_push_(session, req);
-            break;
-        case MSG_RESTORE:
-            res = this->do_restore_(session, req);
-            break;
-        case MSG_END:
-            res = this->do_end_(session, req);
-            end_session = true;
-            break;
-        default:
-            res = Message::error(new Comm_error{CE_UNEXPECTED_TYPE, "Server_API::run", "Message code not valid"});
-    }
+        // manage the request and produce a response message
+        switch (req->code) {
+            case MSG_LOGIN:
+                res = this->do_login_(session, req);
+                break;
+            case MSG_PROBE:
+                res = this->do_probe_(session, req);
+                break;
+            case MSG_GET:
+                res = this->do_get_(session, req);
+                break;
+            case MSG_PUSH:
+                res = this->do_push_(session, req);
+                break;
+            case MSG_RESTORE:
+                res = this->do_restore_(session, req);
+                break;
+            case MSG_END:
+                res = this->do_end_(session, req);
+                end_session = true;
+                break;
+            default:
+                res = Message::error(new Comm_error{CE_UNEXPECTED_TYPE, "Server_API::run", "Invalid message code"});
+        }
 
-    res->cookie = session->get_cookie();
-    if(end_session)
-        this->session_manager_->remove_session(session);
-    api->send(res);
+        res->cookie = session->get_cookie();
+        api->send(res);
+        delete res;
+        if(end_session)
+            this->session_manager_->remove_session(session);
+    } while(keep_alive);
+
+    api->close_conn(true);
 }

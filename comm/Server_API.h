@@ -19,6 +19,8 @@
 
 namespace fs = boost::filesystem;
 
+constexpr int DEFAULT_SOCKET_TIMEOUT = 1000 * 30; // 30 seconds
+
 /**
  * easy class to manage server-side protocol usage
  */
@@ -195,8 +197,9 @@ public:
     /**
      * start handling requests
      * @param api
+     * @param socket_timeout
      */
-    void run(Socket_API *api);
+    void run(Socket_API *api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
 };
 
 #endif //SERVER_SERVER_API_H
