@@ -47,6 +47,7 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->comm_error;
     ar & this->status; // = okay
     ar & this->cookie;
+    ar & this->keep_alive;
 }
 
 std::vector<boost::asio::const_buffer> Message::send() {

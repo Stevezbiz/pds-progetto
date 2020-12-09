@@ -116,6 +116,7 @@ public:
     Comm_error *comm_error;
     bool status; // = okay
     std::string cookie;
+    bool keep_alive;
 
     /**
     * send this message
