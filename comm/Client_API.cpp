@@ -113,6 +113,8 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 }
 
 bool Client_API::restore() {
+    boost::filesystem::remove_all(root_path);
+    boost::filesystem::create_directory(root_path);
     auto req = Message::restore();
     this->api_->send(req);
     if(!this->api_->receive(MSG_RESTORE_CONTENT))
@@ -126,9 +128,12 @@ bool Client_API::restore() {
     for(const auto& el : res->paths){
         paths.insert(el);
     }
-    for(const auto &path : paths)
-        if (!this->get_and_save_(path))
+    for(const auto &path : paths){
+        boost::filesystem::path dest_path{root_path};
+        dest_path.append(path);
+        if (!this->get_and_save_(dest_path.string()))
             return false;
+    }
 
     return true;
 }
