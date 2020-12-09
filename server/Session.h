@@ -98,8 +98,19 @@ public:
      */
     const std::unordered_map<std::string, std::string> *get_schema();
 
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     */
     bool create_dir(const std::string &path, const std::string &hash);
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     bool remove_dir(const std::string &path);
 };
 
