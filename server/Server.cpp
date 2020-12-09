@@ -17,7 +17,7 @@ void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
         std::thread thread([](Server_API &api, boost::asio::ip::tcp::socket socket, Database_API &db) {
-            Session session{std::move(socket),db};
+            Session session{std::move(socket), db};
             api.run(session);
         }, std::ref(api_), std::move(socket_), std::ref(db_));
         thread.detach();
@@ -27,20 +27,23 @@ void Server::accept() {
 bool Server::login(Session &session, const std::string &username, const std::string &password,
                    const Database_API &database, const std::string &root_path) {
     if (database.login_query(username, password)) {
+        Logger::info("Server::login", "Login correct: user " + username, PR_NORMAL);
         session.set_user(username);
         boost::filesystem::path dest_path{root_path};
         dest_path.append(username);
-        if(!boost::filesystem::exists(dest_path)){
+        if (!boost::filesystem::exists(dest_path)) {
             boost::filesystem::create_directory(dest_path);
         } else {
 //            session.get_path_schema(database);
         }
         return true;
     }
+    Logger::info("Server::login", "Login failed", PR_NORMAL);
     return false;
 }
 
-const std::unordered_map<std::string, std::string> *Server::probe(Session &session, const std::vector<std::string> &paths) {
+const std::unordered_map<std::string, std::string> *
+Server::probe(Session &session, const std::vector<std::string> &paths) {
     return session.get_files();
 }
 
@@ -60,33 +63,32 @@ bool Server::push(Session &session, const std::string &path, const std::vector<u
         case ElementStatus::createdFile:
             Utils::write_on_file(dest_path, file);
             if (!session.create_file(path, hash)) {
-                // TODO: error management
+                Logger::error("Server::push", "Cannot create file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::modifiedFile:
             if (!boost::filesystem::remove(dest_path) || !session.modify_file(path, hash)) {
-                // TODO: error management
+                Logger::error("Server::push", "Cannot modify file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             Utils::write_on_file(path, file);
             break;
         case ElementStatus::erasedFile:
             if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
-                // TODO: error management
+                Logger::error("Server::push", "Cannot erase file: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::createdDir:
-            boost::filesystem::create_directory(dest_path);
-            if (!session.create_file(path, hash)) {
-                // TODO: error management
+            if (!boost::filesystem::create_directory(dest_path) || !session.create_dir(path, hash)) {
+                Logger::error("Server::push", "Cannot create directory: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::erasedDir:
-            if (!boost::filesystem::remove(dest_path) || !session.remove_file(path)) {
-                // TODO: error management
+            if (!boost::filesystem::remove(dest_path) || !session.remove_dir(path)) {
+                Logger::error("Server::push", "Cannot erase directory: " + dest_path.string(), PR_HIGH);
                 return false;
             }
             break;
