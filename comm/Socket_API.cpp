@@ -164,6 +164,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
         this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message content: " + std::string{ ec.what() }};
         return false; // it cannot do any other action here
     }
+    this->comm_error = this->message->comm_error;
     Logger::info("Socket_API::receive", "Receiving a message... - done", PR_LOW);
 
     return status;
@@ -180,8 +181,14 @@ bool Socket_API::close_conn(bool force) {
 
     try {
         if(this->socket_->is_open()) {
+            std::cerr << "0 " + std::to_string(this->socket_->is_open()) << std::endl;
             this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            std::cerr << "1 " + std::to_string(this->socket_->is_open()) << std::endl;
+            this->socket_->release();
+            std::cerr << "2 " + std::to_string(this->socket_->is_open()) << std::endl;
             this->socket_->close();
+            std::cerr << "3 " + std::to_string(this->socket_->is_open()) << std::endl;
+            this->socket_ = nullptr;
         }
     } catch(const boost::system::error_code &e) {
         this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.message(), e };
@@ -205,6 +212,7 @@ Socket_API::~Socket_API() {
     if(this->socket_ != nullptr && this->socket_->is_open()) {
         this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
         this->socket_->close();
+        this->socket_->release();
     }
     delete this->socket_;
     delete this->message;

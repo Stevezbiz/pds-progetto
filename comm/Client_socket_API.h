@@ -37,14 +37,14 @@ public:
      * @param message
      * @return status
      */
-    bool open_and_send(Message *message);
+//    bool open_and_send(Message *message);
 
     /**
      * receive a message
      * @param expected_message
      * @return status
      */
-    bool receive_and_close(MESSAGE_TYPE expected_message);
+//    bool receive_and_close(MESSAGE_TYPE expected_message);
 
     /**
      * send a message and retrieve the response
