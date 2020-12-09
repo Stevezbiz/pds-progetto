@@ -15,6 +15,12 @@
 class Client_socket_API : public Socket_API {
     std::string cookie_ = "";
 
+    /**
+     * check if this is a connection error status
+     * @return status
+     */
+    bool is_connection_error_();
+
 public:
     /**
      * class constructor
@@ -29,14 +35,14 @@ public:
      * @param message
      * @return status
      */
-    bool send(Message *message);
+    bool open_and_send(Message *message);
 
     /**
      * receive a message
      * @param expected_message
      * @return status
      */
-    bool receive(MESSAGE_TYPE expected_message);
+    bool receive_and_close(MESSAGE_TYPE expected_message);
 
     /**
      * send a message and retrieve the response

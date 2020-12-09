@@ -22,7 +22,7 @@ namespace fs = boost::filesystem;
 /**
  * easy class to manage server-side protocol usage
  */
-class Server_API : public API {
+class Server_API : public API<Socket_API> {
     Session_manager *session_manager_;
 
     // functions this class needs to manage client responses
