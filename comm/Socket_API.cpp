@@ -6,7 +6,7 @@
 
 #include <utility>
 
-bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
+bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket *, boost::system::error_code &)> &perform_this) {
     bool status = false;
     bool stop = false;
     int retry_cont = 0;
@@ -15,8 +15,14 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, 
     try {
         while (!stop && retry_cont <= this->n_retry_) {
             if(retry_cont > 0)
-                Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont), PR_NORMAL);
-            perform_this(*this->socket_, ec);
+                Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont));
+            if(!(this->socket_ && this->socket_->is_open())) {
+                Logger::warning("Socket_API::call_", "Invalid socket");
+                this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::call_", "Invalid socket" };
+                break;
+            }
+
+            perform_this(this->socket_, ec);
 
             if(!ec.failed()) {
                 stop = true;
@@ -42,8 +48,8 @@ bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size
 }
 
 bool Socket_API::receive_header_() {
-    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::read(*this->socket_, this->message->get_header_buffer(), ec);
+    if(!this->call_([this](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
+            boost::asio::read(*socket_, this->message->get_header_buffer(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_header_", "Unable to read message header" };
         return false;
@@ -53,8 +59,8 @@ bool Socket_API::receive_header_() {
 }
 
 bool Socket_API::receive_content_() {
-    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::read(*this->socket_, this->message->get_content_buffer(), ec);
+    if(!this->call_([this](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
+            boost::asio::read(*socket_, this->message->get_content_buffer(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_content_", "Unable to read message content" };
         return false;
@@ -111,8 +117,8 @@ bool Socket_API::send(Message *message) {
 //    delete this->comm_error;
 
     message->keep_alive = this->keep_alive_;
-    if(!this->call_([this, &message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
-            boost::asio::write(*this->socket_, message->send(), ec);
+    if(!this->call_([this, &message](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
+            boost::asio::write(*socket_, message->send(), ec);
         })) {
         this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::send", "Unable to write message" };
         return false;
@@ -177,8 +183,8 @@ bool Socket_API::close_conn(bool force) {
             this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
             this->socket_->close();
         }
-    } catch(const std::exception &e) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.what() };
+    } catch(const boost::system::error_code &e) {
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.message(), e };
         return false;
     }
 
@@ -196,7 +202,7 @@ Comm_error *Socket_API::get_last_error() const {
 }
 
 Socket_API::~Socket_API() {
-    if(this->socket_->is_open()) {
+    if(this->socket_ != nullptr && this->socket_->is_open()) {
         this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
         this->socket_->close();
     }

@@ -22,7 +22,8 @@ void Server::accept() {
         acceptor_.accept(socket_);
         // socket_.set_option(boost::asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO>{ SOCKET_TIMEOUT });
         std::thread thread([](Server_API *api, boost::asio::ip::tcp::socket socket) {
-            api->run(new Socket_API{ std::move(socket), RETRY_ONCE, 500 }, SOCKET_TIMEOUT);
+            if(!api->run(new Socket_API{ std::move(socket), NO_RETRY, 500 }, SOCKET_TIMEOUT))
+                Logger::error("Server::accept", "No correctly closing current socket");
         }, this->api_, std::move(socket_));
         thread.detach();
     }

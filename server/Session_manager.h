@@ -34,6 +34,8 @@ public:
     bool remove_session(Session *session);
 
     ~Session_manager();
+
+    Session *get_empty_session();
 };
 
 

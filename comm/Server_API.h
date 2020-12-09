@@ -198,8 +198,9 @@ public:
      * start handling requests
      * @param api
      * @param socket_timeout
+     * @return status
      */
-    void run(Socket_API *api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
+    bool run(Socket_API *api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
 };
 
 #endif //SERVER_SERVER_API_H

@@ -35,3 +35,7 @@ Session_manager::~Session_manager() {
         delete item.second;
     }
 }
+
+Session *Session_manager::get_empty_session() {
+    return nullptr;
+}

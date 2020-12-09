@@ -69,12 +69,14 @@ void Server_API::set_handle_error(const std::function<void(Session *, const Comm
     this->handle_error_ = handler_error_function;
 }
 
-void Server_API::run(Socket_API *api, int socket_timeout) {
+bool Server_API::run(Socket_API *api, int socket_timeout) {
     bool end_session = false;
     bool keep_alive;
+    std::future<bool> f;
 
+    Logger::info("Server_API::run", "Running...", PR_LOW);
     do {
-        auto f = std::async(std::launch::async, [api]() { return api->receive(MSG_UNDEFINED); });
+        f = std::async(std::launch::async, [](Socket_API *api) { return api->receive(MSG_UNDEFINED); }, api);
         auto status = f.wait_for(std::chrono::milliseconds(socket_timeout));
         if(status == std::future_status::timeout) {
             Logger::warning("Server_API::run", "Receive timeout");
@@ -82,14 +84,14 @@ void Server_API::run(Socket_API *api, int socket_timeout) {
         }
         if(!f.get()) {
             Logger::info("Server_API::run", "Receive error", PR_VERY_LOW);
-            this->do_handle_error_(nullptr, api->get_last_error());
+            this->do_handle_error_(this->session_manager_->get_empty_session(), api->get_last_error());
             api->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error"}));
             break;
         }
 
         auto req = api->get_message();
         keep_alive = req->keep_alive;
-        Logger::info("Server_API::run", "Keep alive: " + keep_alive, PR_VERY_LOW);
+        Logger::info("Server_API::run", "Keep alive: " + std::to_string(keep_alive), PR_VERY_LOW);
         auto session = this->session_manager_->retrieve_session(req);
         if (req->code != MSG_LOGIN && !session->is_logged_in()) {
             api->send(Message::error(
@@ -131,5 +133,12 @@ void Server_API::run(Socket_API *api, int socket_timeout) {
             this->session_manager_->remove_session(session);
     } while(keep_alive);
 
-    api->close_conn(true);
+    Logger::info("Server_API::run", "Terminating...", PR_LOW);
+    auto status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
+    f.wait(); // wait the "future" thread
+//    f.get();
+    delete api;
+    Logger::info("Server_API::run", "Running... - done", PR_LOW);
+
+    return status;
 }
