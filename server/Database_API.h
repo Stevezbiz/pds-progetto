@@ -27,14 +27,35 @@ public:
      */
     [[nodiscard]] bool login_query(const std::string &username, const std::string &password) const;
 
+    /**
+     *
+     * @param username
+     * @return
+     */
     [[nodiscard]] std::vector<std::string> *get_path_schema(const std::string &username) const;
 
-    [[nodiscard]] bool save_path_schema(const std::unordered_map<std::string,std::string> &map, const std::string &username) const;
-
+    /**
+     *
+     * @param path
+     * @param hash
+     * @param username
+     * @return
+     */
     [[nodiscard]] bool insert_path(const std::string &path, const std::string &hash, const std::string &username) const;
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     [[nodiscard]] bool delete_path(const std::string &path) const;
 
+    /**
+     *
+     * @param path
+     * @param hash
+     * @return
+     */
     [[nodiscard]] bool update_path(const std::string &path, const std::string &hash) const;
 
     ~Database_API();
