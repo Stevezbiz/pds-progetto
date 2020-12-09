@@ -110,6 +110,7 @@ bool Socket_API::send(Message *message) {
 //    delete this->message;
 //    delete this->comm_error;
 
+    message->keep_alive = this->keep_alive_;
     if(!this->call_([this, &message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::write(*this->socket_, message->send(), ec);
         })) {
