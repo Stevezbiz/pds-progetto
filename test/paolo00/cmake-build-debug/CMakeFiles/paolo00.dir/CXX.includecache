@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/paologastaldi/Documents/politecnico/PDS/pds-progetto/test/paolo00/main.cpp
+iostream
+-
+boost/array.hpp
+-
+boost/asio.hpp
+-
+

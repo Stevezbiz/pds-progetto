@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/boostasio_server.dir/main.cpp.o CMakeFiles/boostasio_server.dir/TcpConnection.cpp.o  -o boostasio_server  /usr/lib/x86_64-linux-gnu/libboost_timer.so.1.71.0 /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.71.0 /usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.71.0 /usr/lib/x86_64-linux-gnu/libboost_atomic.so.1.71.0 -lpthread 
