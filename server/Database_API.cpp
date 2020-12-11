@@ -5,6 +5,7 @@
 #include <vector>
 #include "Database_API.h"
 #include "../comm/Logger.h"
+#include <boost/filesystem.hpp>
 
 Database_API::Database_API(std::string path) {
     int rc = sqlite3_open_v2(path.data(), &db_, SQLITE_OPEN_READWRITE, nullptr);
@@ -78,7 +79,9 @@ std::vector<std::string> *Database_API::get_path_schema(const std::string &usern
     while (rc != SQLITE_DONE) {
         rc = sqlite3_step(query);
         if (rc == SQLITE_ROW) {
-            res.emplace_back(reinterpret_cast<const char *>(sqlite3_column_text(query, 0)));
+            std::string s = reinterpret_cast<const char *>(sqlite3_column_text(query, 0));
+            s = s.substr(s.find(boost::filesystem::path::preferred_separator) + 1);
+            res.emplace_back(s);
         } else if (rc != SQLITE_DONE) {
             Logger::error("Database_API::get_path_schema", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
             return new std::vector<std::string>(res);
@@ -209,11 +212,12 @@ std::unordered_map<std::string, std::string> *Database_API::get_schema(const std
     while (rc != SQLITE_DONE) {
         rc = sqlite3_step(query);
         if (rc == SQLITE_ROW) {
+            std::string s = reinterpret_cast<const char *>(sqlite3_column_text(query, 0));
+            s = s.substr(s.find(boost::filesystem::path::preferred_separator) + 1);
             if (sqlite3_column_int(query, 2) == PathType::file) {
-                res.insert(std::make_pair(reinterpret_cast<const char *>(sqlite3_column_text(query, 0)),
-                                          reinterpret_cast<const char *>(sqlite3_column_text(query, 1))));
+                res.insert(std::make_pair(s, reinterpret_cast<const char *>(sqlite3_column_text(query, 1))));
             } else {
-                res.insert(std::make_pair(reinterpret_cast<const char *>(sqlite3_column_text(query, 0)), ""));
+                res.insert(std::make_pair(s, ""));
             }
         } else if (rc != SQLITE_DONE) {
             Logger::error("Database_API::get_schema", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);

@@ -21,7 +21,7 @@ class FileWatcher {
     std::unordered_map<std::string, FSElement> files_;
     std::unordered_set<std::string> dirs_;
     bool running_;
-    int path_offset_;
+//    int path_offset_;
 
     /**
      * Verifica se la mappa contiene la chiave

@@ -12,7 +12,9 @@ bool Client_API::get_and_save_(const std::string &path) {
     auto res = this->api_->get_message();
     if (!res->is_okay())
         return false;
-
+    boost::filesystem::path dest_path{root_path_};
+    dest_path.append(path);
+    res->path = dest_path.string();
     if (!Client_API::save_file_(res))
         return false;
 
@@ -127,9 +129,7 @@ bool Client_API::restore() {
         paths.insert(el);
     }
     for(const auto &path : paths){
-        boost::filesystem::path dest_path{root_path_};
-        dest_path.append(path);
-        if (!this->get_and_save_(dest_path.string()))
+        if (!this->get_and_save_(path))
             return false;
     }
 

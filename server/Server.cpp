@@ -51,44 +51,51 @@ const std::vector<unsigned char> *Server::get(Session *session, const std::strin
     boost::filesystem::path dest_path{root_path};
     dest_path.append(session->user);
     dest_path.append(path);
-    return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
+    if(boost::filesystem::is_regular_file(dest_path)){
+        return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
+    } else {
+        return new std::vector<unsigned char>();
+    }
 }
 
 bool Server::push(Session *session, const std::string &path, const std::vector<unsigned char> &file,
                   const std::string &hash, ElementStatus status, const std::string &root_path, const Database_API &database) {
-    boost::filesystem::path dest_path{root_path};
-    dest_path.append(session->user);
-    dest_path.append(path);
+    boost::filesystem::path disk_path{root_path};
+    disk_path.append(session->user);
+    disk_path.append(path);
+    boost::filesystem::path virt_path{session->user};
+    virt_path.append(path);
+
     switch (status) {
         case ElementStatus::createdFile:
-            Utils::write_on_file(dest_path, file);
-            if (!session->create_file(database, dest_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot create file: " + dest_path.string(), PR_HIGH);
+            Utils::write_on_file(disk_path, file);
+            if (!session->create_file(database, virt_path.string(), hash)) {
+                Logger::error("Server::push", "Cannot create file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(dest_path) || !session->modify_file(database, dest_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot modify file: " + dest_path.string(), PR_HIGH);
+            if (!boost::filesystem::remove(disk_path) || !session->modify_file(database, virt_path.string(), hash)) {
+                Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
-            Utils::write_on_file(dest_path, file);
+            Utils::write_on_file(disk_path, file);
             break;
         case ElementStatus::erasedFile:
-            if (!boost::filesystem::remove(dest_path) || !session->remove_file(database, dest_path.string())) {
-                Logger::error("Server::push", "Cannot erase file: " + dest_path.string(), PR_HIGH);
+            if (!boost::filesystem::remove(disk_path) || !session->remove_file(database, virt_path.string())) {
+                Logger::error("Server::push", "Cannot erase file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::createdDir:
-            if (!boost::filesystem::create_directory(dest_path) || !session->create_dir(database, dest_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot create directory: " + dest_path.string(), PR_HIGH);
+            if (!boost::filesystem::create_directory(disk_path) || !session->create_dir(database, virt_path.string(), hash)) {
+                Logger::error("Server::push", "Cannot create directory: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             break;
         case ElementStatus::erasedDir:
-            if (!boost::filesystem::remove(dest_path) || !session->remove_dir(database, dest_path.string())) {
-                Logger::error("Server::push", "Cannot erase directory: " + dest_path.string(), PR_HIGH);
+            if (!boost::filesystem::remove(disk_path) || !session->remove_dir(database, virt_path.string())) {
+                Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             break;
