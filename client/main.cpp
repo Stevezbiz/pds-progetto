@@ -8,19 +8,10 @@ int main(int argc, char **argv) {
     try {
         ConfigSettings c;
         c.init_configuration();
-        boost::asio::io_context ctx;
-        boost::asio::ip::tcp::resolver resolver(ctx);
-        auto endpoint_iterator = resolver.resolve({c.getAddress(), c.getPort()});
-        boost::asio::ip::tcp::socket socket{ctx};
-        boost::asio::connect(socket, endpoint_iterator);
-        Client client{c.getDirPath(), std::move(socket)};
-        std::thread t([&ctx]() {
-            ctx.run();
-        });
+        Client client{c.getDirPath(), c.getAddress(),c.getPort()};
 
         if(!client.pwdAttempts()){
             Logger::info("main", "No attempts remaining... terminate the program", PR_HIGH);
-            t.join();
             client.close();
             exit(-1);
         }
@@ -44,7 +35,6 @@ int main(int argc, char **argv) {
         if(!client.close()){
             // TODO: error management
         }
-        t.join();
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }

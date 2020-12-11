@@ -19,7 +19,7 @@ class Client {
     std::string root_path_;
 
 public:
-    Client(const std::string &root_path, boost::asio::ip::tcp::socket socket);
+    Client(const std::string &root_path, std::string ip, std::string port);
 
     bool login(const std::string &username, const std::string &password);
 

@@ -3,6 +3,7 @@
 //
 
 #include <set>
+#include <utility>
 #include "Client_API.h"
 
 bool Client_API::get_and_save_(const std::string &path) {
@@ -18,7 +19,7 @@ bool Client_API::get_and_save_(const std::string &path) {
     return true;
 }
 
-Client_API::Client_API(Client_socket_API *socket_api, std::string root_path) : API(socket_api), api_(socket_api), root_path_(root_path) {}
+Client_API::Client_API(Client_socket_API *socket_api, std::string root_path) : API(socket_api), api_(socket_api), root_path_(std::move(root_path)) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
     Logger::info("Client_API::login", "Trying to perform login...", PR_LOW);
