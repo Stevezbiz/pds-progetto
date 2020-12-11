@@ -30,6 +30,7 @@ bool Server::login(Session *session, const std::string &username, const std::str
                    const Database_API &database, const std::string &root_path) {
     if (database.login_query(username, password)) {
         Logger::info("Server::login", "Login correct: user " + username, PR_NORMAL);
+        session->login_status = true;
         session->user=username;
         boost::filesystem::path dest_path{root_path};
         dest_path.append(username);
