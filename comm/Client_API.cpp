@@ -48,10 +48,12 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     // if the client has a different file than the server, the client starts a push procedure
     for(auto const &item : map) {
         auto path = item.first;
+        Logger::info("Client_API::probe", "Analyzing " + path + "...", PR_VERY_LOW);
         auto it = res->hashes.find(path);
         boost::filesystem::path dest_path{root_path_};
-        dest_path.append(path);
-        if(boost::filesystem::is_regular_file(path)){
+//        dest_path.append(path);
+        dest_path /= path ;
+        if(boost::filesystem::is_regular_file(dest_path)){
             if(it==res->hashes.end()){
                 // file not registered -> create
                 Logger::info("Client_API::probe", "Created file found" + path, PR_LOW);
@@ -63,7 +65,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                 if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile))
                     return false;
             }
-        } else if(boost::filesystem::is_directory(path)){
+        } else if(boost::filesystem::is_directory(dest_path)){
             if(it==res->hashes.end()){
                 // dir not registered -> create
                 Logger::info("Client_API::probe", "Created dir found" + path, PR_LOW);
@@ -75,15 +77,18 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
 
     for(auto const &item : res->hashes) {
         auto path = item.first;
+        Logger::info("Client_API::probe", "Analyzing " + path + " from server...", PR_VERY_LOW);
+        boost::filesystem::path dest_path{root_path_};
+        dest_path /= path ;
         auto it = map.find(path);
-        if(boost::filesystem::is_regular_file(path)){
+        if(boost::filesystem::is_regular_file(dest_path)){
             if(it == map.end()) {
                 // file not found -> erase
                 Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
                 if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
                     return false;
             }
-        } else if(boost::filesystem::is_directory(path)){
+        } else if(boost::filesystem::is_directory(dest_path)){
             if(it == map.end()) {
                 // dir not found -> erase
                 Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
