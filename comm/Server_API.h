@@ -27,7 +27,7 @@ constexpr int DEFAULT_SOCKET_TIMEOUT = 1000 * 30; // 30 seconds
  * easy class to manage server-side protocol usage
  */
 class Server_API : public API {
-    Session_manager *session_manager_;
+    std::shared_ptr<Session_manager> session_manager_;
 
     // functions this class needs to manage client responses
     std::function<bool(Session *, const std::string &, const std::string &)> login_ =
@@ -62,7 +62,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_login_(Session *session, Message *req);
+    std::shared_ptr<Message> do_login_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req);
 
     /**
      * manage probe protocol procedure
@@ -70,7 +70,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_probe_(Session *session, Message *req);
+    std::shared_ptr<Message> do_probe_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req);
 
     /**
      * manage get protocol procedure
@@ -78,7 +78,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_get_(Session *session, Message *req);
+    std::shared_ptr<Message> do_get_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req);
 
     /**
      * manage push protocol procedure
@@ -86,7 +86,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_push_(Session *session, Message *req);
+    std::shared_ptr<Message> do_push_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req);
 
     /**
      * manage restore protocol procedure
@@ -94,7 +94,7 @@ class Server_API : public API {
      * @param request message
      * @return response message
      */
-    Message *do_restore_(Session *session, Message *req);
+    std::shared_ptr<Message> do_restore_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message> &req);
 
     /**
     * manage end protocol procedure
@@ -102,7 +102,7 @@ class Server_API : public API {
     * @param request message
     * @return response message
     */
-    Message *do_end_(Session *session, Message *req);
+    std::shared_ptr<Message> do_end_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message> &req);
 
     /**
      * handle a communication error
@@ -110,14 +110,14 @@ class Server_API : public API {
      * @param comm_error
      * @return response message
      */
-    void do_handle_error_(Session *session, Comm_error *comm_error);
+    void do_handle_error_(const std::shared_ptr<Session>& session, const std::shared_ptr<Comm_error>& comm_error);
 
 public:
     /**
      * class constructor
      * @param session_manager
      */
-    explicit Server_API(Session_manager *session_manager);
+    explicit Server_API(std::shared_ptr<Session_manager> session_manager);
 
     /**
      * set how to manage a login request
@@ -202,7 +202,7 @@ public:
      * @param socket_timeout
      * @return status
      */
-    bool run(Socket_API *api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
+    bool run(std::unique_ptr<Socket_API> api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
 };
 
 #endif //SERVER_SERVER_API_H

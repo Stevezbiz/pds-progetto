@@ -42,7 +42,7 @@ public:
      * @param hash
      * @return
      */
-    bool create_file(const Database_API &database, const std::string &path, const std::string &hash);
+    bool create_file(const Database_API &database, const std::string &path, const std::string &hash) const;
 
     /**
      *
@@ -50,25 +50,25 @@ public:
      * @param hash
      * @return
      */
-    bool modify_file(const Database_API &database, const std::string &path, const std::string &hash);
+    static bool modify_file(const Database_API &database, const std::string &path, const std::string &hash);
 
     /**
      *
      * @param path
      * @return
      */
-    bool remove_file(const Database_API &database, const std::string &path);
+    static bool remove_file(const Database_API &database, const std::string &path);
 
     /**
      *
      * @return
      */
-    const std::vector<std::string> *get_path_schema(const Database_API &database);
+    [[nodiscard]] const std::vector<std::string> *get_path_schema(const Database_API &database) const;
 
     /**
      *
      */
-    const std::unordered_map<std::string, std::string> *get_schema(const Database_API &database);
+    [[nodiscard]] const std::unordered_map<std::string, std::string> *get_schema(const Database_API &database) const;
 
     /**
      *
@@ -76,14 +76,14 @@ public:
      * @param hash
      * @return
      */
-    bool create_dir(const Database_API &database, const std::string &path, const std::string &hash);
+    [[nodiscard]] bool create_dir(const Database_API &database, const std::string &path, const std::string &hash) const;
 
     /**
      *
      * @param path
      * @return
      */
-    bool remove_dir(const Database_API &database, const std::string &path);
+    static bool remove_dir(const Database_API &database, const std::string &path);
 };
 
 #endif //SERVER_SESSION_H

@@ -40,7 +40,7 @@ bool Client::close() {
 }
 
 void Client::run() {
-    fw_.start([this](std::string path, std::string hash, ElementStatus status) {
+    fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status) {
         if (!push(path, hash, status)) {
             // TODO: error management
         }

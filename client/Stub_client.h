@@ -14,8 +14,8 @@
 constexpr int FW_DELAY = 1000 * 5; // 5 seconds
 
 class Stub_client {
-    FileWatcher *fw;
-    Client_API *api;
+    std::unique_ptr<FileWatcher> fw;
+    std::unique_ptr<Client_API> api;
     bool is_logged_in = false;
     std::map<std::string, std::string> map; // stub map
 
@@ -23,7 +23,7 @@ class Stub_client {
      * manage errors
      * @param error
      */
-    static void error_handler_(Comm_error *error);
+    static void error_handler_(const std::shared_ptr<Comm_error> &error);
 
     /**
      * fill stub values
@@ -65,8 +65,6 @@ public:
      * @return is login performed
      */
     bool restore();
-
-    ~Stub_client();
 };
 
 

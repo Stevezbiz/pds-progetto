@@ -26,14 +26,14 @@ std::string Comm_error::send() const {
     return ostream.str();
 }
 
-Comm_error *Comm_error::build(const std::string &serialized) {
+std::shared_ptr<Comm_error> Comm_error::build(const std::string &serialized) {
     std::istringstream istream{ serialized };
     boost::archive::text_iarchive ia{ istream };
 
     Comm_error *comm_error;
     ia >> comm_error;
 
-    return comm_error;
+    return std::shared_ptr<Comm_error>(comm_error);
 }
 
 std::string Comm_error::to_string() const {

@@ -19,13 +19,13 @@ namespace fs = boost::filesystem;
 class API {
 
 protected:
-    Socket_API *api_;
+    std::unique_ptr<Socket_API> api_;
 
     /**
      * class constructor
      * @param socket_api
      */
-    explicit API(Socket_API *socket_api = nullptr);
+    explicit API(std::unique_ptr<Socket_API> socket_api = nullptr);
 
     /**
      * save a file on disk
@@ -33,22 +33,20 @@ protected:
      * @param message
      * @return status
      */
-    static bool save_file_(Message *message);
+    static bool save_file_(const std::shared_ptr<Message> &message);
 
 public:
     /**
      * getter
      * @return message
      */
-    Message *get_message();
+    std::shared_ptr<Message> get_message();
 
     /**
      * getter
      * @return last error
      */
-    Comm_error *get_last_error();
-
-    ~API();
+    std::shared_ptr<Comm_error>  get_last_error();
 };
 
 

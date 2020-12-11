@@ -6,7 +6,7 @@
 
 #include <utility>
 
-bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket *, boost::system::error_code &)> &perform_this) {
+bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
     bool status = false;
     bool stop = false;
     int retry_cont = 0;
@@ -18,24 +18,24 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket *, 
                 Logger::warning("Socket_API::call_", "Retry " + std::to_string(retry_cont));
             if(!(this->socket_ && this->socket_->is_open())) {
                 Logger::warning("Socket_API::call_", "Invalid socket");
-                this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::call_", "Invalid socket" };
+                this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::call_", "Invalid socket");
                 break;
             }
 
-            perform_this(this->socket_, ec);
+            perform_this(*this->socket_, ec);
 
             if(!ec.failed()) {
                 stop = true;
                 status = true;
                 ec.clear();
             } else {
-                this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::call_", "Operation failure on socket", ec };
+                this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::call_", "Operation failure on socket", ec);
                 std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay_));
                 retry_cont++;
             }
         }
     } catch(const std::exception &ec) {
-        this->comm_error = new Comm_error{ CE_GENERIC, "Socket_API::call_", "Exception caught: " + std::string{ ec.what() }}; // never used
+        this->comm_error = std::make_shared<Comm_error>(CE_GENERIC, "Socket_API::call_", "Exception caught: " + std::string{ ec.what() }); // never used
         return false;
     }
 
@@ -44,14 +44,14 @@ bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket *, 
 
 bool Socket_API::generic_handler_(const boost::system::error_code &ec, std::size_t bytes_transferred) {
     std::cout << ec << " errors, " <<bytes_transferred << " bytes as been transferred correctly" << std::endl;
-    return ec ? true : false;
+    return ec.value();
 }
 
 bool Socket_API::receive_header_() {
-    if(!this->call_([this](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
-            boost::asio::read(*socket_, this->message->get_header_buffer(), ec);
+    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+            boost::asio::read(socket, this->message->get_header_buffer(), ec);
         })) {
-        this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_header_", "Unable to read message header" };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::receive_header_", "Unable to read message header");
         return false;
     }
 
@@ -59,10 +59,10 @@ bool Socket_API::receive_header_() {
 }
 
 bool Socket_API::receive_content_() {
-    if(!this->call_([this](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
-            boost::asio::read(*socket_, this->message->get_content_buffer(), ec);
+    if(!this->call_([this](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+            boost::asio::read(socket, this->message->get_content_buffer(), ec);
         })) {
-        this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::receive_content_", "Unable to read message content" };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::receive_content_", "Unable to read message content");
         return false;
     }
 
@@ -80,7 +80,7 @@ Socket_API::Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT err
         n_retry_(error_management),
         retry_delay_(retry_delay),
         keep_alive_(keep_alive) {
-    this->socket_ = new boost::asio::ip::tcp::socket{ std::move(socket) };
+    this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
 }
 
 bool Socket_API::open_conn(bool force) {
@@ -101,9 +101,9 @@ bool Socket_API::open_conn(bool force) {
         auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
         boost::asio::ip::tcp::socket socket{ ctx };
         boost::asio::connect(socket, endpoint_iterator);
-        this->socket_ = new boost::asio::ip::tcp::socket{ std::move(socket) };
+        this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
     } catch(const std::exception &e) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::open_conn", e.what() };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
         return false;
     }
     Logger::info("Socket_API::open_conn", "Opening a connection... - done", PR_VERY_LOW);
@@ -111,20 +111,17 @@ bool Socket_API::open_conn(bool force) {
     return true;
 }
 
-bool Socket_API::send(Message *message) {
+bool Socket_API::send(std::shared_ptr<Message> message) {
     Logger::info("Socket_API::send", "Sending a message...", PR_LOW);
-//    delete this->message;
-//    delete this->comm_error;
 
     message->keep_alive = this->keep_alive_;
-    if(!this->call_([this, &message](boost::asio::ip::tcp::socket *socket, boost::system::error_code &ec) {
-            boost::asio::write(*socket_, message->send(), ec);
+    if(!this->call_([&message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
+            boost::asio::write(socket, message->send(), ec);
         })) {
-        this->comm_error = new Comm_error{CE_FAILURE, "Socket_API::send", "Unable to write message" };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::send", "Unable to write message");
         return false;
     }
     Logger::info("Socket_API::send", "Sending a message... - done", PR_LOW);
-//    delete this->message;
 
     return true;
 }
@@ -134,7 +131,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
 //    delete this->comm_error;
 
     bool status = true;
-    this->message = new Message{};
+    this->message = std::make_shared<Message>();
     Logger::info("Socket_API::receive", "Receiving a message...", PR_LOW);
 
     if(!this->receive_header_())
@@ -143,13 +140,13 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     try {
         this->message = this->message->build_header(); // build the header
     } catch(const std::exception &ec) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message header: " + std::string{ ec.what() }};
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::receive", "Cannot build the message header: " + std::string{ ec.what() });
         return false; // it cannot do any other action here
     }
 
     if(expectedMessage != MSG_UNDEFINED && message->code != expectedMessage && message->code != MSG_ERROR) {
-        this->comm_error = new Comm_error{CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) };
-        this->message = Message::error(this->comm_error);
+        this->message = Message::error(new Comm_error{ CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) });
+        this->comm_error = this->message->comm_error;
         status = false;
     }
 
@@ -161,7 +158,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
 //        delete this->message;
         this->message = new_message;
     } catch(const std::exception &ec) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::receive", "Cannot build the message content: " + std::string{ ec.what() }};
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::receive", "Cannot build the message content: " + std::string{ ec.what() });
         return false; // it cannot do any other action here
     }
     this->comm_error = this->message->comm_error;
@@ -176,7 +173,7 @@ bool Socket_API::shutdown() {
         if(this->socket_ && this->socket_->is_open())
             this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     } catch(const boost::system::error_code &e) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.message(), e };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::close_conn", e.message(), e);
         return false;
     }
     return true;
@@ -198,8 +195,6 @@ bool Socket_API::close_conn(bool force) {
 
     try {
         if(this->socket_->is_open()) {
-//            std::cerr << "0 " + std::to_string(this->socket_->is_open()) << std::endl;
-//            this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 //            std::cerr << "1 " + std::to_string(this->socket_->is_open()) << std::endl;
             this->socket_->release(ec);
 //            std::cerr << "2 " + std::to_string(this->socket_->is_open()) << std::endl;
@@ -208,34 +203,32 @@ bool Socket_API::close_conn(bool force) {
             this->socket_ = nullptr;
         }
     } catch(const boost::system::error_code &e) {
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.message(), e };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::close_conn", e.message(), e);
         return false;
     }
 
     if(ec)
-        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", ec.message(), ec };
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::close_conn", ec.message(), ec);
 
-    delete this->socket_;
-    this->socket_ = nullptr;
+    this->socket_.reset(); // delete
     Logger::info("Socket_API::close_conn", "Closing a connection... - done", PR_VERY_LOW);
     return true;
 }
 
-Message *Socket_API::get_message() const {
+std::shared_ptr<Message> Socket_API::get_message() const {
     return this->message;
 }
-Comm_error *Socket_API::get_last_error() const {
+std::shared_ptr<Comm_error> Socket_API::get_last_error() const {
     return this->comm_error ? this->comm_error : this->message->comm_error;
 }
 
 Socket_API::~Socket_API() {
+    boost::system::error_code ec;
     if(this->socket_ != nullptr && this->socket_->is_open()) {
-        this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-        this->socket_->close();
-        this->socket_->release();
+        this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        this->socket_->release(ec);
+        this->socket_->close(ec);
     }
-    delete this->socket_;
-    delete this->message;
-    delete this->comm_error;
+    this->socket_.reset();
 }
 

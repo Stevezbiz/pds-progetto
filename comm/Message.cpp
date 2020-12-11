@@ -4,34 +4,6 @@
 
 #include "Message.h"
 
-#include <utility>
-
-//Message::Message(MESSAGE_TYPE code, std::string username, std::string password, std::string path, std::string hash,
-//                 std::vector<std::string> paths, std::unordered_map<std::string, std::string> hashes,
-//                 std::vector<unsigned char> file, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
-//        code(code),
-//        username(std::move(username)),
-//        password(std::move(password)),
-//        path(std::move(path)),
-//        hash(std::move(hash)),
-//        paths(std::move(paths)),
-//        hashes(std::move(hashes)),
-//        file(std::move(file)),
-//        elementStatus(elementStatus),
-//        comm_error(comm_error),
-//        status(status),
-//        content_buffer_(nullptr) {}
-
-//Message::Message(MESSAGE_TYPE code, const std::string &username, const std::string &password, std::string path, std::string hash,
-//                 const std::vector<std::string> &paths, const std::unordered_map<std::string, std::string> &hashes,
-//                 const std::string &file_string, ElementStatus elementStatus, Comm_error *comm_error, bool status) :
-//         Message(code, username, password, std::move(path), std::move(hash), paths, hashes, std::vector<unsigned char>{ file_string.begin(), file_string.end() }, elementStatus, comm_error, status) {
-//    Logger::info("Message::Message", "file content: \"" + file_string + "\"", PR_VERY_LOW);
-//    std::vector<unsigned char> vet{ file_string.begin(), file_string.end() };
-//    Logger::info("Message::Message", "file length: " + file_string.length(), PR_VERY_LOW);
-//    Logger::info("Message::Message", "file vector length: " + vet.size(), PR_VERY_LOW);
-//}
-
 template<class Archive>
 void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->code;
@@ -42,7 +14,6 @@ void Message::serialize(Archive &ar, const unsigned int version) {
     ar & this->paths;
     ar & this->hashes;
     ar & this->file_string_;
-//    ar & this->file;
     ar & this->elementStatus;
     ar & this->comm_error;
     ar & this->status; // = okay
@@ -98,50 +69,50 @@ Message::Message(MESSAGE_TYPE code) :
         this->status = false;
 }
 
-Message *Message::okay() {
-    return new Message{MSG_OKAY };
+std::shared_ptr<Message> Message::okay() {
+    return std::make_shared<Message>(MSG_OKAY);
 }
 
-Message *Message::error(Comm_error *comm_error) {
-    auto message = new Message{MSG_ERROR };
-    message->comm_error = comm_error;
+std::shared_ptr<Message> Message::error(Comm_error *comm_error) {
+    auto message = std::make_shared<Message>(MSG_ERROR);
+    message->comm_error = std::shared_ptr<Comm_error>(comm_error);
     return message;
 }
 
-Message *Message::login(const std::string &username, const std::string &password) {
-    auto message = new Message{MSG_LOGIN };
+std::shared_ptr<Message> Message::login(const std::string &username, const std::string &password) {
+    auto message = std::make_shared<Message>(MSG_LOGIN);
     message->username = username;
     message->password = password;
     return message;
 }
 
-Message *Message::probe(const std::vector<std::string> &paths) {
-    auto message = new Message{MSG_PROBE };
+std::shared_ptr<Message> Message::probe(const std::vector<std::string> &paths) {
+    auto message = std::make_shared<Message>(MSG_PROBE);
     message->paths = paths;
     return message;
 }
 
-Message *Message::probe_content(const std::unordered_map<std::string, std::string> &hashes) {
-    auto message = new Message{MSG_PROBE_CONTENT };
+std::shared_ptr<Message> Message::probe_content(const std::unordered_map<std::string, std::string> &hashes) {
+    auto message = std::make_shared<Message>(MSG_PROBE_CONTENT);
     message->hashes = hashes;
     return message;
 }
 
-Message *Message::get(const std::string &path) {
-    auto message = new Message{MSG_GET };
+std::shared_ptr<Message> Message::get(const std::string &path) {
+    auto message = std::make_shared<Message>(MSG_GET);
     message->path = path;
     return message;
 }
 
-Message *Message::get_content(const std::vector<unsigned char> &file, const std::string &path) {
-    auto message = new Message{MSG_GET_CONTENT };
+std::shared_ptr<Message> Message::get_content(const std::vector<unsigned char> &file, const std::string &path) {
+    auto message = std::make_shared<Message>(MSG_GET_CONTENT);
     message->file = file;
     message->path = path;
     return message;
 }
 
-Message *Message::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
-    auto message = new Message{MSG_PUSH };
+std::shared_ptr<Message> Message::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
+    auto message = std::make_shared<Message>(MSG_PUSH);
     message->file = file;
     message->path = path;
     message->hash = hash;
@@ -149,22 +120,21 @@ Message *Message::push(const std::vector<unsigned char> &file, const std::string
     return message;
 }
 
-Message *Message::restore() {
-    auto message = new Message{MSG_RESTORE };
-    return message;
+std::shared_ptr<Message> Message::restore() {
+    return std::make_shared<Message>(MSG_RESTORE);
 }
 
-Message *Message::restore_content(const std::vector<std::string> &paths) {
-    auto message = new Message{MSG_RESTORE_CONTENT };
+std::shared_ptr<Message> Message::restore_content(const std::vector<std::string> &paths) {
+    auto message = std::make_shared<Message>(MSG_RESTORE_CONTENT);
     message->paths = paths;
     return message;
 }
 
-Message *Message::end() {
-    return new Message{MSG_END };
+std::shared_ptr<Message> Message::end() {
+    return std::make_shared<Message>(MSG_END);
 }
 
-Message *Message::build_header() {
+std::shared_ptr<Message> Message::build_header() {
     Logger::info("Message::build_header", "Building message header...", PR_LOW);
     Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{this->header_buffer_, code_length + length_length } + "\"", PR_LOW);
     // auto buffer = reinterpret_cast<char *>(this->header_buffer);
@@ -178,31 +148,18 @@ Message *Message::build_header() {
     this->code = static_cast<MESSAGE_TYPE>(msg_code);
     this->content_buffer_length_ = content_length;
     this->content_buffer_ = new char[content_length]();
-//    this->content_buffer->resize(content_length);
-
-    /*
-    this->code = this->header_buffer->type;
-    this->content_buffer->resize(this->header_buffer->length);
-     */
-    /*
-    delete this->content_buffer;
-    this->content_buffer = new char[this->header_buffer->length]; // prepare the content buffer
-    delete this->header_buffer; // not necessary anymore
-    */
     Logger::info("Message::build_header", "Content code " + std::to_string(msg_code), PR_VERY_LOW);
     Logger::info("Message::build_header", "Content length " + std::to_string(content_length), PR_VERY_LOW);
     Logger::info("Message::build_header", "Building message header... - done", PR_LOW);
 
-    return this;
+    return shared_from_this();
 }
 
-Message *Message::build_content() const {
+std::shared_ptr<Message> Message::build_content() const {
     Logger::info("Message::build_content", "Building message content...", PR_LOW);
     Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{ this->content_buffer_, this->content_buffer_length_ } + "\"", PR_LOW);
-//    auto vet = reinterpret_cast<char *>(&this->content_buffer[0]);
     std::string archive_data{ this->content_buffer_, this->content_buffer_length_ };
     std::istringstream archive_stream{ archive_data };
-    // std::istringstream ss{ std::string{ this->content_buffer, this->header_buffer->length }};
     boost::archive::text_iarchive ia{ archive_stream };
     Message *new_message;
     ia >> new_message; // de-serialization
@@ -211,10 +168,9 @@ Message *Message::build_content() const {
     new_message->file.clear();
     new_message->file = file_vet;
     new_message->file_string_.clear();
-    // delete this->content_buffer; // not necessary anymore
     Logger::info("Message::build_content", "Building message content... - done", PR_LOW);
 
-    return new_message;
+    return std::shared_ptr<Message>(new_message);
 }
 
 [[nodiscard]] boost::asio::mutable_buffer Message::get_header_buffer() const { // generic pointer, sorry
@@ -226,7 +182,6 @@ Message *Message::build_content() const {
 }
 
 Message::~Message() {
-    delete this->comm_error;
     delete[] this->header_buffer_;
     delete[] this->content_buffer_;
 }

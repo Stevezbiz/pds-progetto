@@ -63,13 +63,13 @@ public:
      * @param serialize
      * @return error
      */
-    static Comm_error *build(const std::string &serialized);
+    static std::shared_ptr<Comm_error> build(const std::string &serialized);
 
     /**
      * transform this error to a string
      * @return string
      */
-    std::string to_string() const;
+    [[nodiscard]] std::string to_string() const;
 };
 
 

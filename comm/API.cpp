@@ -4,21 +4,19 @@
 
 #include "API.h"
 
-API::API(Socket_API *socket_api) : api_(socket_api) {}
+#include <utility>
 
-bool API::save_file_(Message *message) {
+API::API(std::unique_ptr<Socket_API> socket_api) : api_(std::move(socket_api)) {}
+
+bool API::save_file_(const std::shared_ptr<Message> &message) {
     Utils::write_on_file(fs::path{ message->path }, message->file);
     return true;
 }
 
-Message *API::get_message() {
+std::shared_ptr<Message> API::get_message() {
     return this->api_->get_message();
 }
 
-Comm_error *API::get_last_error() {
+std::shared_ptr<Comm_error> API::get_last_error() {
     return this->api_->get_last_error();
-}
-
-API::~API() {
-    delete this->api_;
 }

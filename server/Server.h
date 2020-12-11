@@ -15,11 +15,11 @@ constexpr int SOCKET_TIMEOUT = 1000 * 10; // 10 sec
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
-    Server_API *api_;
+    std::unique_ptr<Server_API> api_;
     Database_API db_;
     std::string root_path_;
     bool stop_;
-    Session_manager *session_manager_{};
+    std::shared_ptr<Session_manager> session_manager_;
 
     /**
      * Accetta le connessioni dei client

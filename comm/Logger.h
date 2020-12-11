@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 #include "Comm_error.h"
 
 enum LOG_CODE : int {

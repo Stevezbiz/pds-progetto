@@ -4,42 +4,44 @@
 
 #include "Server_API.h"
 
-Message *Server_API::do_login_(Session *session, Message *req) {
-    auto status = this->login_(session, req->username, req->password);
+#include <utility>
+
+std::shared_ptr<Message> Server_API::do_login_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto status = this->login_(session.get(), req->username, req->password);
     session->login_status = status;
     return status ? Message::okay() : Message::error(new Comm_error{CE_WRONG_VALUE, "Server_API::do_login", "Invalid username or password" });
 }
 
-Message *Server_API::do_probe_(Session *session, Message *req) {
-    auto hashes = this->probe_(session, req->paths);
+std::shared_ptr<Message> Server_API::do_probe_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto hashes = this->probe_(session.get(), req->paths);
     return Message::probe_content(*hashes);
 }
 
-Message *Server_API::do_get_(Session *session, Message *req) {
-    auto file = this->get_(session, req->path);
+std::shared_ptr<Message> Server_API::do_get_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto file = this->get_(session.get(), req->path);
     return Message::get_content(*file, req->path);
 }
 
-Message *Server_API::do_push_(Session *session, Message *req) {
-    auto status = this->push_(session, req->path, req->file, req->hash, req->elementStatus);
+std::shared_ptr<Message> Server_API::do_push_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto status = this->push_(session.get(), req->path, req->file, req->hash, req->elementStatus);
     return status ? Message::okay() : Message::error(new Comm_error{CE_FAILURE, "Server_API::do_push", "Unable to push the file" });
 }
 
-Message *Server_API::do_restore_(Session *session, Message *req) {
-    auto paths = this->restore_(session);
+std::shared_ptr<Message> Server_API::do_restore_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto paths = this->restore_(session.get());
     return Message::restore_content(*paths);
 }
 
-Message *Server_API::do_end_(Session *session, Message *req) {
-    auto status = this->end_(session);
+std::shared_ptr<Message> Server_API::do_end_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
+    auto status = this->end_(session.get());
     return status ? Message::okay() : Message::error(new Comm_error{CE_FAILURE, "Server_API::do_end", "The server doesn't approved your request" });
 }
 
-void Server_API::do_handle_error_(Session *session, Comm_error *comm_error) {
-    this->handle_error_(session, comm_error);
+void Server_API::do_handle_error_(const std::shared_ptr<Session>& session, const std::shared_ptr<Comm_error>& comm_error) {
+    this->handle_error_(session.get(), comm_error.get());
 }
 
-Server_API::Server_API(Session_manager *session_manager) : session_manager_(session_manager) {}
+Server_API::Server_API(std::shared_ptr<Session_manager> session_manager) : session_manager_(std::move(session_manager)) {}
 
 void Server_API::set_login(const std::function<bool(Session *, const std::string &, const std::string &)> &login_function) {
     this->login_ = login_function;
@@ -69,41 +71,41 @@ void Server_API::set_handle_error(const std::function<void(Session *, const Comm
     this->handle_error_ = handler_error_function;
 }
 
-bool Server_API::run(Socket_API *api, int socket_timeout) {
+bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
     bool end_session = false;
     bool keep_alive;
     std::future<bool> f;
     bool status;
+    std::shared_ptr<Socket_API> api_ = std::move(api);
 
     Logger::info("Server_API::run", "Running...", PR_LOW);
     do {
-        f = std::async(std::launch::async, [](Socket_API *api) { return api->receive(MSG_UNDEFINED); }, api);
+        f = std::async(std::launch::async, [](std::shared_ptr<Socket_API> api_) { return api_->receive(MSG_UNDEFINED); }, api_);
         auto future_status = f.wait_for(std::chrono::milliseconds(socket_timeout));
         if(future_status == std::future_status::timeout) {
             Logger::warning("Server_API::run", "Receive timeout");
-            status = api->shutdown();
+            status = api_->shutdown();
             f.wait();
 //            status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
             break;
         }
         if(!f.get()) {
             Logger::info("Server_API::run", "Receive error", PR_VERY_LOW);
-            this->do_handle_error_(this->session_manager_->get_empty_session(), api->get_last_error());
+            this->do_handle_error_(this->session_manager_->get_empty_session(), api_->get_last_error());
             api->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error"}));
             break;
         }
 
-        auto req = api->get_message();
+        auto req = api_->get_message();
         keep_alive = req->keep_alive;
         Logger::info("Server_API::run", "Keep alive: " + std::to_string(keep_alive), PR_VERY_LOW);
         auto session = this->session_manager_->retrieve_session(req);
         if (req->code != MSG_LOGIN && !session->is_logged_in()) {
-            api->send(Message::error(
-                    new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
+            api->send(Message::error(new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
             break;
         }
 
-        Message *res;
+        std::shared_ptr<Message> res;
 
         // manage the request and produce a response message
         switch (req->code) {
@@ -131,15 +133,15 @@ bool Server_API::run(Socket_API *api, int socket_timeout) {
         }
 
         res->cookie = session->get_cookie();
-        api->send(res);
-        delete res;
+        api_->send(res);
+        res.reset();
         if(end_session)
             this->session_manager_->remove_session(session);
     } while(keep_alive);
 
     Logger::info("Server_API::run", "Terminating...", PR_LOW);
-    status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
-    delete api;
+    status = api_->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
+    api_.reset();
     Logger::info("Server_API::run", "Running... - done", PR_LOW);
 
     return status;

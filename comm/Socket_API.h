@@ -24,10 +24,10 @@ enum ERROR_MANAGEMENT : int {
 class Socket_API {
 
 protected:
-    int n_retry_;
-    long retry_delay_;
-    bool keep_alive_;
-    boost::asio::ip::tcp::socket *socket_ = nullptr;
+    int n_retry_ = NO_RETRY;
+    long retry_delay_ = 0;
+    bool keep_alive_ = false;
+    std::unique_ptr<boost::asio::ip::tcp::socket> socket_{ nullptr };
 
     /**
      * class constructor
@@ -39,7 +39,7 @@ protected:
      * @param perform_this
      * @return status
      */
-    bool call_(const std::function<void(boost::asio::ip::tcp::socket *, boost::system::error_code &)> &perform_this);
+    bool call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this);
 
     /**
      * testing handler
@@ -65,8 +65,8 @@ protected:
 public:
     std::string ip;
     std::string port;
-    Message *message = nullptr;
-    Comm_error *comm_error = nullptr;
+    std::shared_ptr<Message>(message);
+    std::shared_ptr<Comm_error>(comm_error);
 
     /**
      * class constructor
@@ -101,7 +101,7 @@ public:
      * @param message
      * @return status
      */
-    bool send(Message *message = new Message{MSG_ERROR });
+    bool send(std::shared_ptr<Message> message = std::make_shared<Message>(MSG_ERROR));
 
     /**
      * receive a message
@@ -127,13 +127,13 @@ public:
      * getter
      * @return last message
      */
-    Message *get_message() const;
+    [[nodiscard]] std::shared_ptr<Message> get_message() const;
 
     /**
      * getter
      * @return last error
      */
-    Comm_error *get_last_error() const;
+    [[nodiscard]] std::shared_ptr<Comm_error> get_last_error() const;
 
     ~Socket_API();
 };

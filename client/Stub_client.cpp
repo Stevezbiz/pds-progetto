@@ -4,7 +4,7 @@
 
 #include "Stub_client.h"
 
-void Stub_client::error_handler_(Comm_error *error) {
+void Stub_client::error_handler_(const std::shared_ptr<Comm_error> &error) {
     std::cout << error->to_string() << std::endl;
 }
 
@@ -25,7 +25,7 @@ void Stub_client::open_conn_(const std::string &ip, const std::string &port) {
         boost::asio::connect(socket, endpoint_iterator);
 
         auto socket_api = new Client_socket_API{ip,port };
-        this->api = new Client_API{ socket_api,"." };
+        this->api = std::make_unique<Client_API>(socket_api,".");
     } catch(const std::exception &e) {
         std::cerr << "(Stub_client::open_conn_) " << e.what() << std::endl;
         exit(-1);
@@ -35,7 +35,7 @@ void Stub_client::open_conn_(const std::string &ip, const std::string &port) {
 
 Stub_client::Stub_client(const std::string &root_path, const std::string &ip, const std::string &port) {
     this->open_conn_(ip, port);
-    this->fw = new FileWatcher{ root_path, std::chrono::milliseconds(FW_DELAY) };
+    this->fw = std::make_unique<FileWatcher>(root_path, std::chrono::milliseconds(FW_DELAY));
     this->prepare_stub();
 }
 
@@ -76,9 +76,4 @@ bool Stub_client::restore() {
     this->normal();
 
     return true;
-}
-
-Stub_client::~Stub_client() {
-    delete this->api;
-    delete this->fw;
 }

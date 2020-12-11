@@ -9,8 +9,8 @@
 Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
                std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), db_(std::move(db_path)),
                                         root_path_(std::move(root_path)), stop_(false) {
-    this->session_manager_ = new Session_manager{};
-    this->api_ = new Server_API{ this->session_manager_ };
+    this->session_manager_ = std::make_shared<Session_manager>();
+    this->api_ = std::make_unique<Server_API>(this->session_manager_);
     server_init();
     accept();
 }
@@ -18,10 +18,10 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
-        std::thread thread([](Server_API *api, boost::asio::ip::tcp::socket socket) {
-            if(!api->run(new Socket_API{ std::move(socket), NO_RETRY, 500 }, SOCKET_TIMEOUT))
+        std::thread thread([this](boost::asio::ip::tcp::socket socket) {
+            if(!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
                 Logger::error("Server::accept", "No correctly closing current socket");
-        }, this->api_, std::move(socket_));
+        }, std::move(socket_));
         thread.detach();
     }
 }
@@ -75,14 +75,14 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(disk_path) || !session->modify_file(database, virt_path.string(), hash)) {
+            if (!boost::filesystem::remove(disk_path) || !Session::modify_file(database, virt_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             Utils::write_on_file(disk_path, file);
             break;
         case ElementStatus::erasedFile:
-            if (!boost::filesystem::remove(disk_path) || !session->remove_file(database, virt_path.string())) {
+            if (!boost::filesystem::remove(disk_path) || !Session::remove_file(database, virt_path.string())) {
                 Logger::error("Server::push", "Cannot erase file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
@@ -94,7 +94,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::erasedDir:
-            if (!boost::filesystem::remove(disk_path) || !session->remove_dir(database, virt_path.string())) {
+            if (!boost::filesystem::remove(disk_path) || !Session::remove_dir(database, virt_path.string())) {
                 Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
                 return false;
             }

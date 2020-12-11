@@ -18,12 +18,8 @@ bool Client_socket_API::is_connection_error_() {
 Client_socket_API::Client_socket_API(std::string ip, std::string port, bool keep_alive) :
         Socket_API(std::move(ip), std::move(port), RETRY_ONCE, 500, keep_alive) {}
 
-bool Client_socket_API::send_and_receive(Message *message, MESSAGE_TYPE expected_message) {
+bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message) {
     Logger::info("Client_socket_API::send_and_receive", "Sending a message...", PR_VERY_LOW);
-//    if(!this->open_and_send(message))
-//        return false;
-//    if(!this->receive_and_close(expected_message))
-//        return false;
 
     if(!this->open_conn())
         return false;

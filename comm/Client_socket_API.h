@@ -52,7 +52,7 @@ public:
      * @param expected_message
      * @return status
      */
-    bool send_and_receive(Message *message, MESSAGE_TYPE expected_message);
+    bool send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message);
 };
 
 
