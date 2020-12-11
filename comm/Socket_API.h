@@ -111,6 +111,12 @@ public:
     bool receive(MESSAGE_TYPE expectedMessage = MSG_UNDEFINED);
 
     /**
+     * shutdown current connection
+     * @return status
+     */
+    bool shutdown();
+
+    /**
      * close current connection
      * @param force
      * @return status

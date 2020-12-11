@@ -81,7 +81,9 @@ bool Server_API::run(Socket_API *api, int socket_timeout) {
         auto future_status = f.wait_for(std::chrono::milliseconds(socket_timeout));
         if(future_status == std::future_status::timeout) {
             Logger::warning("Server_API::run", "Receive timeout");
-             status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
+            status = api->shutdown();
+            f.wait();
+//            status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
             break;
         }
         if(!f.get()) {
