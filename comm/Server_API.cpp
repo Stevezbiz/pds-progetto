@@ -73,13 +73,15 @@ bool Server_API::run(Socket_API *api, int socket_timeout) {
     bool end_session = false;
     bool keep_alive;
     std::future<bool> f;
+    bool status;
 
     Logger::info("Server_API::run", "Running...", PR_LOW);
     do {
         f = std::async(std::launch::async, [](Socket_API *api) { return api->receive(MSG_UNDEFINED); }, api);
-        auto status = f.wait_for(std::chrono::milliseconds(socket_timeout));
-        if(status == std::future_status::timeout) {
+        auto future_status = f.wait_for(std::chrono::milliseconds(socket_timeout));
+        if(future_status == std::future_status::timeout) {
             Logger::warning("Server_API::run", "Receive timeout");
+             status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
             break;
         }
         if(!f.get()) {
@@ -134,9 +136,7 @@ bool Server_API::run(Socket_API *api, int socket_timeout) {
     } while(keep_alive);
 
     Logger::info("Server_API::run", "Terminating...", PR_LOW);
-    auto status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
-    f.wait(); // wait the "future" thread
-//    f.get();
+    status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
     delete api;
     Logger::info("Server_API::run", "Running... - done", PR_LOW);
 

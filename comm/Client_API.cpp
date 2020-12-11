@@ -99,9 +99,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
 
 bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
     Logger::info("Client_API::push", "Push started...");
-    auto req = Message::push(file, path, hash, elementStatus);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
     Logger::info("Client_API::push", "Push started... - done");
@@ -112,9 +110,7 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 bool Client_API::restore() {
     boost::filesystem::remove_all(root_path_);
     boost::filesystem::create_directory(root_path_);
-    auto req = Message::restore();
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_RESTORE_CONTENT))
+    if(!this->api_->send_and_receive(Message::restore(),MSG_RESTORE_CONTENT))
         return false;
     auto res = this->api_->get_message();
 

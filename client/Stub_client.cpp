@@ -24,8 +24,8 @@ void Stub_client::open_conn_(const std::string &ip, const std::string &port) {
         boost::asio::ip::tcp::socket socket{ ctx };
         boost::asio::connect(socket, endpoint_iterator);
 
-        auto socket_api = new Client_socket_API{ std::move(socket) };
-        this->api = new Client_API{ socket_api };
+        auto socket_api = new Client_socket_API{ip,port };
+        this->api = new Client_API{ socket_api,"." };
     } catch(const std::exception &e) {
         std::cerr << "(Stub_client::open_conn_) " << e.what() << std::endl;
         exit(-1);

@@ -171,6 +171,8 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
 }
 
 bool Socket_API::close_conn(bool force) {
+    boost::system::error_code ec;
+
     Logger::info("Socket_API::close_conn", "Closing a connection...", PR_VERY_LOW);
 
     if(this->socket_ == nullptr)
@@ -182,11 +184,11 @@ bool Socket_API::close_conn(bool force) {
     try {
         if(this->socket_->is_open()) {
             std::cerr << "0 " + std::to_string(this->socket_->is_open()) << std::endl;
-            this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
             std::cerr << "1 " + std::to_string(this->socket_->is_open()) << std::endl;
-            this->socket_->release();
+            this->socket_->release(ec);
             std::cerr << "2 " + std::to_string(this->socket_->is_open()) << std::endl;
-            this->socket_->close();
+            this->socket_->close(ec);
             std::cerr << "3 " + std::to_string(this->socket_->is_open()) << std::endl;
             this->socket_ = nullptr;
         }
@@ -194,6 +196,9 @@ bool Socket_API::close_conn(bool force) {
         this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", e.message(), e };
         return false;
     }
+
+    if(ec)
+        this->comm_error = new Comm_error{ CE_FAILURE, "Socket_API::close_conn", ec.message(), ec };
 
     delete this->socket_;
     this->socket_ = nullptr;
