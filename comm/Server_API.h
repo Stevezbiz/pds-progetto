@@ -10,6 +10,8 @@
 #include <vector>
 #include <functional>
 #include <boost/filesystem.hpp>
+#include <future>
+#include <chrono>
 #include "API.h"
 #include "Socket_API.h"
 #include "Message.h"
