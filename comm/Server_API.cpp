@@ -76,11 +76,11 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
     bool keep_alive;
     std::future<bool> f;
     bool status;
-    std::shared_ptr<Socket_API> api_ = std::move(api);
+    std::shared_ptr<Socket_API> api_ = std::move(api); // unique_ptr to shared_ptr, as it is used in more threads
 
     Logger::info("Server_API::run", "Running...", PR_LOW);
     do {
-        f = std::async(std::launch::async, [](std::shared_ptr<Socket_API> api_) { return api_->receive(MSG_UNDEFINED); }, api_);
+        f = std::async(std::launch::async, [](const std::shared_ptr<Socket_API> &api_) { return api_->receive(MSG_UNDEFINED); }, api_);
         auto future_status = f.wait_for(std::chrono::milliseconds(socket_timeout));
         if(future_status == std::future_status::timeout) {
             Logger::warning("Server_API::run", "Receive timeout");
@@ -92,7 +92,7 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
         if(!f.get()) {
             Logger::info("Server_API::run", "Receive error", PR_VERY_LOW);
             this->do_handle_error_(this->session_manager_->get_empty_session(), api_->get_last_error());
-            api->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error"}));
+            api_->send(Message::error(new Comm_error{CE_GENERIC, "Server_API::run", "Transmission level error"}));
             break;
         }
 
@@ -101,7 +101,7 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
         Logger::info("Server_API::run", "Keep alive: " + std::to_string(keep_alive), PR_VERY_LOW);
         auto session = this->session_manager_->retrieve_session(req);
         if (req->code != MSG_LOGIN && !session->is_logged_in()) {
-            api->send(Message::error(new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
+            api_->send(Message::error(new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
             break;
         }
 
