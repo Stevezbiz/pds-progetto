@@ -8,14 +8,18 @@
 #include "Session.h"
 #include "../comm/Server_API.h"
 #include "Database_API.h"
+#include "Session_manager.h"
+
+constexpr int SOCKET_TIMEOUT = 1000 * 10; // 10 sec
 
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
-    Server_API api_;
+    Server_API *api_;
     Database_API db_;
     std::string root_path_;
     bool stop_;
+    Session_manager *session_manager_{};
 
     /**
      * Accetta le connessioni dei client
@@ -26,41 +30,41 @@ class Server {
      *
      * @return
      */
-    static bool login(Session &, const std::string &, const std::string &, const Database_API &, const std::string &);
+    static bool login(Session *, const std::string &, const std::string &, const Database_API &, const std::string &);
 
     /**
      *
      * @return
      */
-    static const std::unordered_map<std::string, std::string> *probe(Session &, const std::vector<std::string> &);
+    static const std::unordered_map<std::string, std::string> *probe(Session *, const std::vector<std::string> &, const Database_API &);
 
     /**
      *
      * @return
      */
-    static const std::vector<unsigned char> *get(Session &, const std::string &, const std::string &);
+    static const std::vector<unsigned char> *get(Session *, const std::string &, const std::string &);
 
     /**
      *
      */
-    static bool push(Session &, const std::string &, const std::vector<unsigned char> &, const std::string &,
-                     ElementStatus, const std::string &);
+    static bool push(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &,
+                     ElementStatus, const std::string &, const Database_API &);
 
     /**
      *
      */
-    static const std::vector<std::string> *restore(Session &);
+    static const std::vector<std::string> *restore(Session *, const Database_API &);
 
     /**
      *
      * @return
      */
-    static bool end(Session &);
+    static bool end(Session *);
 
     /**
      * @param comm_error
      */
-    static void handle_error(Session &, const Comm_error *);
+    static void handle_error(Session *, const Comm_error *);
 
     /**
      *

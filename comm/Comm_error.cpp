@@ -11,7 +11,11 @@ void Comm_error::serialize(Archive &ar, const unsigned int version) {
     ar & this->location;
 }
 
-Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message) : comm_errno(comm_errno), location(std::move(location)), message(std::move(message)) {}
+Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message, boost::system::error_code original_ec) :
+        comm_errno(comm_errno),
+        location(std::move(location)),
+        message(std::move(message)),
+        original_ec(original_ec) {}
 
 std::string Comm_error::send() const {
     std::ostringstream ostream{};

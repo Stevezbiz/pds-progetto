@@ -24,18 +24,22 @@ enum ERROR_MANAGEMENT : int {
 class Socket_API {
 
 protected:
-    boost::asio::ip::tcp::socket socket_;
-    Message *message;
-    Comm_error *comm_error;
-    int n_retry;
-    long retry_delay;
+    int n_retry_;
+    long retry_delay_;
+    bool keep_alive_;
+    boost::asio::ip::tcp::socket *socket_ = nullptr;
+
+    /**
+     * class constructor
+     */
+    Socket_API() = default;
 
     /**
      * (sync) call read/write functions and manage errors
      * @param perform_this
      * @return status
      */
-    bool call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this);
+    bool call_(const std::function<void(boost::asio::ip::tcp::socket *, boost::system::error_code &)> &perform_this);
 
     /**
      * testing handler
@@ -44,7 +48,7 @@ protected:
      * @param bytes_transferred
      * @return status
      */
-    static bool generic_handler_(const boost::system::error_code& ec, std::size_t bytes_transferred);
+    static bool generic_handler_(const boost::system::error_code &ec, std::size_t bytes_transferred);
 
     /**
      * receive the packet header
@@ -59,25 +63,36 @@ protected:
     bool receive_content_();
 
 public:
+    std::string ip;
+    std::string port;
+    Message *message = nullptr;
+    Comm_error *comm_error = nullptr;
+
+    /**
+     * class constructor
+     * @param ip
+     * @param port
+     * @param error_management
+     * @param retry_delay
+     * @param keep_alive
+     */
+    explicit Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
+
     /**
      * class constructor
      * @param socket
      * @param error_management
      * @param retry_delay
+     * @param keep_alive
      */
-    explicit Socket_API(boost::asio::ip::tcp::socket &&socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000);
+    explicit Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
 
     /**
-     * socket setter
-     * @param socket
+     * open a connection towards the specified ip and port
+     * @param force
+     * @return status
      */
-    void set_socket(boost::asio::ip::tcp::socket &&socket);
-
-    /**
-     * socket getter
-     * @return socket
-     */
-    boost::asio::ip::tcp::socket &&get_socket();
+    bool open_conn(bool force = false);
 
     /**
      * send a Message
@@ -96,16 +111,23 @@ public:
     bool receive(MESSAGE_TYPE expectedMessage = MSG_UNDEFINED);
 
     /**
+     * close current connection
+     * @param force
+     * @return status
+     */
+    bool close_conn(bool force = false);
+
+    /**
      * getter
      * @return last message
      */
-    Message *get_message();
+    Message *get_message() const;
 
     /**
      * getter
      * @return last error
      */
-    Comm_error *get_last_error();
+    Comm_error *get_last_error() const;
 
     ~Socket_API();
 };

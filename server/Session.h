@@ -6,63 +6,35 @@
 #define SERVER_SESSION_H
 
 #include <boost/asio.hpp>
-#include <deque>
-#include <utility>
 #include <iostream>
-#include <sqlite3.h>
 #include <unordered_map>
 #include "../comm/Socket_API.h"
 #include "Database_API.h"
 
-class Session : public std::enable_shared_from_this<Session> {
-    std::string user_;
-    Socket_API api_;
-    Database_API &database_;
+class Session {
 
 public:
+    int session_id{ -1 };
+    std::string user;
+    bool login_status{ false };
+
     /**
      * Inizializza i campi dell'oggetto
      * @param socket: socket su cui aprire la connessione
      */
-    Session(boost::asio::ip::tcp::socket socket, Database_API &database);
+    Session(int session_id);
 
     /**
-     *
-     * @param user
+     * genereate a cookie to identify this session
+     * @return cookie
      */
-    void set_user(std::string user);
+    std::string get_cookie() const;
 
     /**
-     *
-     * @param expectedMessage
-     * @return
+     * check if login has been performed
+     * @return login status
      */
-    bool receive(MESSAGE_TYPE expectedMessage);
-
-    /**
-     *
-     * @return
-     */
-    Comm_error *get_last_error();
-
-    /**
-     *
-     * @param message
-     * @return
-     */
-    bool send(Message *message);
-
-    /**
-     *
-     * @return
-     */
-    Message *get_message();
-
-    /**
-     *
-     * @return
-     */
-    std::string get_user();
+    bool is_logged_in() const;
 
     /**
      *
@@ -70,7 +42,7 @@ public:
      * @param hash
      * @return
      */
-    bool create_file(const std::string &path, const std::string &hash);
+    bool create_file(const Database_API &database, const std::string &path, const std::string &hash);
 
     /**
      *
@@ -78,25 +50,25 @@ public:
      * @param hash
      * @return
      */
-    bool modify_file(const std::string &path, const std::string &hash);
+    bool modify_file(const Database_API &database, const std::string &path, const std::string &hash);
 
     /**
      *
      * @param path
      * @return
      */
-    bool remove_file(const std::string &path);
+    bool remove_file(const Database_API &database, const std::string &path);
 
     /**
      *
      * @return
      */
-    const std::vector<std::string> *get_path_schema();
+    const std::vector<std::string> *get_path_schema(const Database_API &database);
 
     /**
      *
      */
-    const std::unordered_map<std::string, std::string> *get_schema();
+    const std::unordered_map<std::string, std::string> *get_schema(const Database_API &database);
 
     /**
      *
@@ -104,14 +76,14 @@ public:
      * @param hash
      * @return
      */
-    bool create_dir(const std::string &path, const std::string &hash);
+    bool create_dir(const Database_API &database, const std::string &path, const std::string &hash);
 
     /**
      *
      * @param path
      * @return
      */
-    bool remove_dir(const std::string &path);
+    bool remove_dir(const Database_API &database, const std::string &path);
 };
 
 #endif //SERVER_SESSION_H

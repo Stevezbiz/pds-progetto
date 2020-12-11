@@ -10,8 +10,8 @@
 #include <functional>
 #include <boost/filesystem.hpp>
 #include "API.h"
-#include "Socket_API.h"
 #include "Utils.h"
+#include "Client_socket_API.h"
 
 namespace fs = boost::filesystem;
 
@@ -19,6 +19,8 @@ namespace fs = boost::filesystem;
  * easy class to manage client-side protocol usage
  */
 class Client_API : public API {
+    Client_socket_API *api_{};
+    std::string root_path_;
     /**
      * get a file from the server and save it
      * @param path
@@ -33,7 +35,7 @@ public:
      * @param socket_api
      * @param root_path
      */
-    explicit Client_API(Socket_API *socket_api, const std::string &root_path = ".");
+    explicit Client_API(Client_socket_API *socket_api, std::string root_path);
 
     /**
      * do the login complete procedure:
@@ -55,7 +57,7 @@ public:
      * @param map - <path, hash> mapping
      * @return status
      */
-    bool probe(const std::map<std::string, std::string> &map);
+    bool probe(const std::map <std::string, std::string> &map);
 
     /**
      * do the complete push procedure:

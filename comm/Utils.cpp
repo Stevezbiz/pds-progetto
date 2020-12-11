@@ -11,7 +11,7 @@ std::vector<unsigned char> Utils::read_from_file(const std::string &path) {
 }
 
 std::vector<unsigned char> Utils::read_from_file(const fs::path &path) {
-    auto is = fs::ifstream{path};
+    auto is = fs::ifstream{path, std::ios::binary};
     auto file = Utils::read_from_file(is);
     is.close();
     return file;
@@ -27,8 +27,12 @@ void Utils::write_on_file(const std::string &path, const std::vector<unsigned ch
 
 void Utils::write_on_file(const fs::path &path, const std::vector<unsigned char> &file) {
     auto os = fs::ofstream{path, std::ios::binary};
-    os.write(reinterpret_cast<const char *>(file.data()), file.size());
+    Utils::write_on_file(os, file);
     os.close();
+}
+
+void Utils::write_on_file(std::ostream &os, const std::vector<unsigned char> &file) {
+    os.write(reinterpret_cast<const char *>(file.data()), file.size());
 }
 
 std::string Utils::SHA256(const std::string &path) {
@@ -81,4 +85,12 @@ std::string Utils::hash(const std::string &input) {
         os << std::setfill('0') << std::setw(2) << int(i);
     }
     return os.str();
+}
+
+std::string Utils::sign_cookie(std::string plain_cookie) { // TODO: make this more secure
+    return plain_cookie;
+}
+
+std::string Utils::verify_cookie(std::string cipher_cookie) { // TODO: make this more secure
+    return cipher_cookie;
 }

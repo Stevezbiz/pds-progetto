@@ -78,6 +78,19 @@ public:
      */
     static std::string hash(const std::string &input);
 
+    /**
+     * create a signed cookie
+     * @param plain_cookie
+     * @return cypher cookie
+     */
+    static std::string sign_cookie(std::string plain_cookie);
+
+    /**
+     * extract cookie content
+     * @param chiper_cookie
+     * @return plain cookie
+     */
+    static std::string verify_cookie(std::string cipher_cookie);
 };
 
 

@@ -6,28 +6,26 @@
 #include "Client_API.h"
 
 bool Client_API::get_and_save_(const std::string &path) {
-    auto req = Message::get(path);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_GET_CONTENT))
+    if(!this->api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
         return false;
     auto res = this->api_->get_message();
     if (!res->is_okay())
         return false;
 
-    if (!this->save_file_(res))
+    if (!Client_API::save_file_(res))
         return false;
 
     return true;
 }
 
-Client_API::Client_API(Socket_API *socket_api, const std::string &root_path) : API(socket_api, root_path) {}
+Client_API::Client_API(Client_socket_API *socket_api, std::string root_path) : API(socket_api), api_(socket_api), root_path_(root_path) {}
 
 bool Client_API::login(const std::string &username, const std::string &password) {
-    auto req = Message::login(username, password);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    Logger::info("Client_API::login", "Trying to perform login...", PR_LOW);
+    if(!this->api_->send_and_receive(Message::login(username, password), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
+    Logger::info("Client_API::login", "Trying to perform login... - done", PR_LOW);
 
     return res->is_okay();
 }
@@ -39,9 +37,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     paths.reserve(map.size());
     for (auto const &item : map)
         paths.push_back(item.first);
-    auto req = Message::probe(paths);
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_PROBE_CONTENT))
+    if(!this->api_->send_and_receive(Message::probe(paths), MSG_PROBE_CONTENT))
         return false;
     auto res = this->api_->get_message();
 
@@ -52,7 +48,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     for(auto const &item : map) {
         auto path = item.first;
         auto it = res->hashes.find(path);
-        boost::filesystem::path dest_path{root_path};
+        boost::filesystem::path dest_path{root_path_};
         dest_path.append(path);
         if(boost::filesystem::is_regular_file(path)){
             if(it==res->hashes.end()){
@@ -113,8 +109,8 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 }
 
 bool Client_API::restore() {
-    boost::filesystem::remove_all(root_path);
-    boost::filesystem::create_directory(root_path);
+    boost::filesystem::remove_all(root_path_);
+    boost::filesystem::create_directory(root_path_);
     auto req = Message::restore();
     this->api_->send(req);
     if(!this->api_->receive(MSG_RESTORE_CONTENT))
@@ -129,7 +125,7 @@ bool Client_API::restore() {
         paths.insert(el);
     }
     for(const auto &path : paths){
-        boost::filesystem::path dest_path{root_path};
+        boost::filesystem::path dest_path{root_path_};
         dest_path.append(path);
         if (!this->get_and_save_(dest_path.string()))
             return false;
@@ -139,11 +135,10 @@ bool Client_API::restore() {
 }
 
 bool Client_API::end() {
-    auto req = Message::end();
-    this->api_->send(req);
-    if(!this->api_->receive(MSG_OKAY))
+    Logger::info("Client_API::end", "End started...", PR_LOW);
+    if(!this->api_->send_and_receive(Message::end(), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
-
+    Logger::info("Client_API::end", "End started... - done", PR_LOW);
     return res->is_okay();
 }
