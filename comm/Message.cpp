@@ -104,10 +104,11 @@ std::shared_ptr<Message> Message::get(const std::string &path) {
     return message;
 }
 
-std::shared_ptr<Message> Message::get_content(const std::vector<unsigned char> &file, const std::string &path) {
+std::shared_ptr<Message> Message::get_content(const std::vector<unsigned char> &file, const std::string &path, ElementStatus status) {
     auto message = std::make_shared<Message>(MSG_GET_CONTENT);
     message->file = file;
     message->path = path;
+    message->elementStatus = status;
     return message;
 }
 

@@ -18,8 +18,9 @@ std::shared_ptr<Message> Server_API::do_probe_(const std::shared_ptr<Session>& s
 }
 
 std::shared_ptr<Message> Server_API::do_get_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
-    auto file = this->get_(session.get(), req->path);
-    return Message::get_content(*file, req->path);
+    ElementStatus status;
+    auto file = this->get_(session.get(), req->path, status);
+    return Message::get_content(*file, req->path, status);
 }
 
 std::shared_ptr<Message> Server_API::do_push_(const std::shared_ptr<Session>& session, const std::shared_ptr<Message>& req) {
@@ -51,7 +52,7 @@ void Server_API::set_probe(const std::function<const std::unordered_map<std::str
     this->probe_ = probe_function;
 }
 
-void Server_API::set_get(const std::function<const std::vector<unsigned char> *(Session *, const std::string &)> &get_function) {
+void Server_API::set_get(const std::function<const std::vector<unsigned char> *(Session *, const std::string &, ElementStatus &)> &get_function) {
     this->get_ = get_function;
 }
 

@@ -42,7 +42,7 @@ class Server {
      *
      * @return
      */
-    static const std::vector<unsigned char> *get(Session *, const std::string &, const std::string &);
+    static const std::vector<unsigned char> *get(Session *, const std::string &, const std::string &, ElementStatus &);
 
     /**
      *

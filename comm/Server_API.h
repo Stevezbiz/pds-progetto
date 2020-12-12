@@ -38,8 +38,8 @@ class Server_API : public API {
             [](Session *, const std::vector<std::string> &) {
                 return new std::unordered_map<std::string, std::string>{};
             };
-    std::function<const std::vector<unsigned char> *(Session *, const std::string &)> get_ =
-            [](Session *, const std::string &) {
+    std::function<const std::vector<unsigned char> *(Session *, const std::string &, ElementStatus &)> get_ =
+            [](Session *, const std::string &, ElementStatus &) {
                 return new std::vector<unsigned char>{};
             };
     std::function<bool(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &, ElementStatus)> push_ =
@@ -150,7 +150,7 @@ public:
      * - output:
      *      - const std::vector<unsigned char> &file, a vector of bytes
      */
-    void set_get(const std::function<const std::vector<unsigned char> *(Session *, const std::string &)> &get_function);
+    void set_get(const std::function<const std::vector<unsigned char> *(Session *, const std::string &, ElementStatus &)> &get_function);
 
     /**
      * set how to manage a push request

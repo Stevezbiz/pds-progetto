@@ -153,7 +153,7 @@ public:
      * @param path
      * @return new message
      */
-    static std::shared_ptr<Message> get_content(const std::vector<unsigned char> &file, const std::string &path);
+    static std::shared_ptr<Message> get_content(const std::vector<unsigned char> &file, const std::string &path, ElementStatus status);
 
     /**
      * create a message to upload a file on the server

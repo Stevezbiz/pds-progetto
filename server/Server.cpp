@@ -47,13 +47,15 @@ const std::unordered_map<std::string, std::string> *Server::probe(Session *sessi
     return session->get_schema(database);
 }
 
-const std::vector<unsigned char> *Server::get(Session *session, const std::string &path, const std::string &root_path) {
+const std::vector<unsigned char> *Server::get(Session *session, const std::string &path, const std::string &root_path, ElementStatus &status) {
     boost::filesystem::path dest_path{root_path};
     dest_path.append(session->user);
     dest_path.append(path);
     if(boost::filesystem::is_regular_file(dest_path)){
+        status=ElementStatus::createdFile;
         return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
     } else {
+        status=ElementStatus::createdDir;
         return new std::vector<unsigned char>();
     }
 }
@@ -124,8 +126,8 @@ void Server::server_init() {
     api_->set_end([](Session *session) {
         return end(session);
     });
-    api_->set_get([this](Session *session, const std::string &path) {
-        return get(session, path, root_path_);
+    api_->set_get([this](Session *session, const std::string &path, ElementStatus &status) {
+        return get(session, path, root_path_, status);
     });
     api_->set_probe([this](Session *session, const std::vector<std::string> &paths) {
         return probe(session, paths, db_);

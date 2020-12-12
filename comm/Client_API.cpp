@@ -15,8 +15,12 @@ bool Client_API::get_and_save_(const std::string &path) {
     boost::filesystem::path dest_path{root_path_};
     dest_path.append(path);
     res->path = dest_path.string();
-    if (!Client_API::save_file_(res))
-        return false;
+    if(res->elementStatus==ElementStatus::createdFile){
+        if (!Client_API::save_file_(res))
+            return false;
+    } else {
+        boost::filesystem::create_directory(dest_path);
+    }
 
     return true;
 }
