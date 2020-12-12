@@ -24,6 +24,10 @@ enum ERROR_MANAGEMENT : int {
  * to manage Message type message and standard Comm_error type errors
  */
 class Socket_API {
+    boost::asio::io_context ctx_{};
+    boost::asio::ip::tcp::resolver::iterator endpoint_iterator_;
+
+    void init_config_();
 
 protected:
     int n_retry_ = NO_RETRY;

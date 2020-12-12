@@ -6,6 +6,12 @@
 
 #include <utility>
 
+void Socket_API::init_config_() {
+    boost::asio::ip::tcp::resolver resolver(this->ctx_);
+    Logger::info("Socket_API::init_config_", "Resolving to " + this->ip + ":" + this->port, PR_VERY_LOW);
+    this->endpoint_iterator_ = resolver.resolve({ this->ip, this->port });
+}
+
 bool Socket_API::call_(const std::function<void(boost::asio::ip::tcp::socket &, boost::system::error_code &)> &perform_this) {
     bool status = false;
     bool stop = false;
@@ -74,7 +80,9 @@ Socket_API::Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_
         port(std::move(port)),
         n_retry_(error_management),
         retry_delay_(retry_delay),
-        keep_alive_(keep_alive) {}
+        keep_alive_(keep_alive) {
+    this->init_config_();
+}
 
 Socket_API::Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management, long retry_delay, bool keep_alive) :
         n_retry_(error_management),
@@ -97,16 +105,15 @@ bool Socket_API::open_conn(bool force) {
     auto f = std::async(std::launch::async, [this]() {
             try {
                 Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
-                boost::asio::io_context ctx;
-                boost::asio::ip::tcp::resolver resolver(ctx);
-                Logger::info("Socket_API::open_conn", "Resolving to " + this->ip + ":" + this->port, PR_VERY_LOW);
-                auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
                 Logger::info("Socket_API::open_conn", "Opening socket", PR_VERY_LOW);
-                boost::asio::ip::tcp::socket socket{ ctx };
+//                auto socket = new boost::asio::ip::tcp::socket{ this->ctx_ };
+                boost::asio::ip::tcp::socket socket{ this->ctx_ };
                 Logger::info("Socket_API::open_conn", "Connecting", PR_VERY_LOW);
-                boost::asio::connect(socket, endpoint_iterator);
+                boost::asio::connect(socket, this->endpoint_iterator_);
                 Logger::info("Socket_API::open_conn", "Moving the socket", PR_VERY_LOW);
+//                this->socket_ = std::unique_ptr<boost::asio::ip::tcp::socket>(socket);
                 this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
+                Logger::info("Socket_API::open_conn", "Everything is done", PR_VERY_LOW);
             } catch(const std::exception &e) {
                 this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
                 return false;
@@ -139,9 +146,6 @@ bool Socket_API::send(std::shared_ptr<Message> message) {
 }
 
 bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
-//    delete this->message;
-//    delete this->comm_error;
-
     bool status = true;
     this->message = std::make_shared<Message>();
     Logger::info("Socket_API::receive", "Receiving a message...", PR_LOW);
@@ -167,7 +171,6 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
 
     try {
         auto new_message = message->build_content(); // build the whole message
-//        delete this->message;
         this->message = new_message;
     } catch(const std::exception &ec) {
         this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::receive", "Cannot build the message content: " + std::string{ ec.what() });
