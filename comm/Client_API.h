@@ -19,7 +19,7 @@ namespace fs = boost::filesystem;
  * easy class to manage client-side protocol usage
  */
 class Client_API : public API {
-    std::unique_ptr<Client_socket_API>api_;
+    std::shared_ptr<Client_socket_API>api_;
     std::string root_path_;
     /**
      * get a file from the server and save it

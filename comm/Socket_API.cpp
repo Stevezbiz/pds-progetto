@@ -99,9 +99,13 @@ bool Socket_API::open_conn(bool force) {
                 Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
                 boost::asio::io_context ctx;
                 boost::asio::ip::tcp::resolver resolver(ctx);
+                Logger::info("Socket_API::open_conn", "Resolving to " + this->ip + ":" + this->port, PR_VERY_LOW);
                 auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
+                Logger::info("Socket_API::open_conn", "Opening socket", PR_VERY_LOW);
                 boost::asio::ip::tcp::socket socket{ ctx };
+                Logger::info("Socket_API::open_conn", "Connecting", PR_VERY_LOW);
                 boost::asio::connect(socket, endpoint_iterator);
+                Logger::info("Socket_API::open_conn", "Moving the socket", PR_VERY_LOW);
                 this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
             } catch(const std::exception &e) {
                 this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
@@ -218,7 +222,7 @@ bool Socket_API::close_conn(bool force) {
     if(ec)
         this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::close_conn", ec.message(), ec);
 
-    this->socket_.reset(); // delete
+    this->socket_.reset(nullptr); // delete
     Logger::info("Socket_API::close_conn", "Closing a connection... - done", PR_VERY_LOW);
     return true;
 }
@@ -237,6 +241,6 @@ Socket_API::~Socket_API() {
         this->socket_->release(ec);
         this->socket_->close(ec);
     }
-    this->socket_.reset();
+    this->socket_.reset(nullptr);
 }
 
