@@ -5,6 +5,7 @@
 #ifndef COMM_ERROR_H
 #define COMM_ERROR_H
 
+#include <iostream>
 #include <sstream>
 #include <boost/tuple/tuple.hpp>
 #include <boost/archive/text_oarchive.hpp>

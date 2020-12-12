@@ -8,6 +8,8 @@
 #include "Message.h"
 #include "Comm_error.h"
 
+constexpr int CONN_TIMEOUT = 1000 * 10; // 10 seconds
+
 /**
  * list of ways to manage error in communication
  */

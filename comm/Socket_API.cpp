@@ -94,21 +94,29 @@ bool Socket_API::open_conn(bool force) {
     if(!this->close_conn()) // close current socket in a safe way
         return false;
 
-    try {
-        Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
-        boost::asio::io_context ctx;
-        boost::asio::ip::tcp::resolver resolver(ctx);
-        auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
-        boost::asio::ip::tcp::socket socket{ ctx };
-        boost::asio::connect(socket, endpoint_iterator);
-        this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
-    } catch(const std::exception &e) {
-        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
+    auto f = std::async(std::launch::async, [this]() {
+            try {
+                Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
+                boost::asio::io_context ctx;
+                boost::asio::ip::tcp::resolver resolver(ctx);
+                auto endpoint_iterator = resolver.resolve({ this->ip, this->port });
+                boost::asio::ip::tcp::socket socket{ ctx };
+                boost::asio::connect(socket, endpoint_iterator);
+                this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
+            } catch(const std::exception &e) {
+                this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
+                return false;
+            }
+            return true;
+        });
+    auto future_status = f.wait_for(std::chrono::milliseconds(CONN_TIMEOUT));
+    if(future_status == std::future_status::timeout) {
+        this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", "Unable to connect, timeout");
         return false;
     }
     Logger::info("Socket_API::open_conn", "Opening a connection... - done", PR_VERY_LOW);
 
-    return true;
+    return f.get();
 }
 
 bool Socket_API::send(std::shared_ptr<Message> message) {

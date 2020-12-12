@@ -15,7 +15,9 @@ Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string 
         comm_errno(comm_errno),
         location(std::move(location)),
         message(std::move(message)),
-        original_ec(original_ec) {}
+        original_ec(original_ec) {
+    std::cerr << "ERROR: " + this->location + " " + this->message << std::endl;
+}
 
 std::string Comm_error::send() const {
     std::ostringstream ostream{};

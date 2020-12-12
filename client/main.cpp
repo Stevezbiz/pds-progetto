@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
         Client client{c.getDirPath(), c.getAddress(),c.getPort()};
 
         if(!client.pwdAttempts()){
-            Logger::info("main", "No attempts remaining... terminate the program", PR_HIGH);
+            Logger::error("main", "No attempts remaining... terminate the program", PR_HIGH);
             client.close();
             exit(-1);
         }
@@ -21,11 +21,17 @@ int main(int argc, char **argv) {
             case normal:
                 if(!client.probe()){
                     // TODO: error management
+                    Logger::error("main", "Probe failed", PR_HIGH);
+                    client.close();
+                    exit(-1);
                 }
                 break;
             case restore:
-                if(!client.restore()){
+                if(!client.restore()) {
                     // TODO: error management
+                    Logger::error("main", "Restore failed", PR_HIGH);
+                    client.close();
+                    exit(-1);
                 }
                 break;
             case end:
@@ -34,6 +40,9 @@ int main(int argc, char **argv) {
         client.run();
         if(!client.close()){
             // TODO: error management
+            Logger::error("main", "client cannot be closed", PR_HIGH);
+            client.close();
+            exit(-1);
         }
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
