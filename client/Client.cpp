@@ -58,7 +58,7 @@ bool Client::pwdAttempts() {
         std::cout << "Please insert password: ";
         std::cin >> password;
         if (Client::login(username, Utils::hash(password))) {
-            std::cout << "Welcome " << username << std::endl;
+            std::cout << "\n| Welcome " << username << " |" <<std::endl;
             return true;
         }
         std::cout << "\nPlease try again.\n";

@@ -194,11 +194,11 @@ void ConfigSettings::showConfig() {
 }
 
 void ConfigSettings::showChoice() {
-    std::cout << "What action would you like to take?\n"
-              << " 1) Normal mode (keeps the remote backup server updated of any changes)\n"
-              << " 2) Restore all (recover all files and folders from Remote Backup Server)\n"
-              << " q) Exit\n"
-              << ": ";
+    std::cout << "-------------------------------------\nWhat action would you like to take?\n-------------------------------------\n"
+              << "  1) Normal mode (keeps the remote backup server updated of any changes)\n"
+              << "  2) Restore all (recover all files and folders from Remote Backup Server)\n"
+              << "  q) Exit\n"
+              << ">> : ";
 }
 
 int ConfigSettings::question_menu() {
