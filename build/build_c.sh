@@ -1,4 +1,5 @@
 #!/bin/sh
 cmake --install ..
 cmake ..
-cmake --build .
+cmake --build . --target client
+

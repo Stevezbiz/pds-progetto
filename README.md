@@ -51,12 +51,17 @@ brew install openssl
   - Run Win32OpenSSL-1_0_2h.exe and Win64OpenSSL-1_0_2h.exe and install to openssl directory(ex. C\lib\openssl)
   
 ## Build Instructions
-
 ```
 $ cd build
-$ ./build.sh
 ```
-
+#### build server 
+```
+$ ./build_s.sh
+```
+#### build client 
+```
+$ ./build_c.sh
+```
 ## Usage 
 
 - Server
@@ -65,9 +70,8 @@ $ ./build.sh
   ./server <Port>
   ```
 
-  - Backup directory
-    backup folders for each user
-    /server/???
+  - Backup directory folders for each user
+    __/server/???__
     
 
 - Client 
@@ -79,8 +83,71 @@ $ ./build.sh
 ## Description
 
 ### Client
-It is not necessary to pass arguments, it is possible to insert the configuration parameter at the first start on the command line.
+  - It is not necessary to pass arguments, it is possible to insert the configuration parameters(_server ip_, _port_, _path_ ) at the first start.
+  - A socket has been created and there is an attempt to connect with the server at the given port.
+  - After the login phase, if it is successful, a user can decide if **_recover all_** files and folders from the Remote Backup Server or decide to keeps the remote backup server updated of any changes (**_normal mode_**), the normal mode is anticipated from a **_probe phase_** where the client can verify if the server already has every folder and file of users updated.
+  - After initial settings is actived a system watcher that notices all the changes (Erased / Created or Modified) in the path provided by the user. Each element (file or folder) is represented by SHA256 hash + path name.
+
+### Server
+  - the argument is just the port on which the server will start listening
+  - the endpoint is connected to the port.
+  - The system can accept multiple clients, for each is created a thread where is created a class session (that expires in case of inactivity).
+  - server manages the login, a user provides their own username and password and the server checks the database and queries it if users are saved in the system.
+### Comm
+- Server and client APIs shared all methods of the Message class that is the basis of the communication, it provides all communication functionality as send, probe, get, push, restore, build_content, build_header, get_header_buffer ...
+
+- Both the server and the user have a dedicated APIs that they can use to contact each other.
+    - e.g. the user just calls (login, push, restore..) and all operations are done correctly, the complexity is hidden in the APIs.
+    #### Logger
+    Logger is the instrumect that provide a complete document that contains all of the logs that are needed to record all events, happenings, and occurrences relative to the activity.
+    There are 3 types of logs:
+    - INFO
+    - WARNING
+    - ERROR
+
+    They are organized in priority level from very-low to very-high so it is easier to check the importance of problems or general information of what is happening.
 
 
+---
 
- 
+## Transfer protocol
+
+##### Message
+The Message is composed using a TLV format (type, length, value):
+the message types are: 
+  - MSG_ERROR
+  - MSG_UNDEFINED
+  - MSG_OKAY
+  - MSG_LOGIN
+  - MSG_PROBE
+  - MSG_PROBE_CONTENT
+  - MSG_GET
+  - MSG_GET_CONTENT
+  - MSG_PUSH
+  - MSG_RESTORE
+  - MSG_RESTORE_CONTENT
+  - MSG_END = 100
+
+  All the information are serialized and are emplaced in the socket: type and length are pushed in the header and all the file value are positioned in the content of the socket.
+ Each message exchanged from a client maintains cookies that identify the session.
+##### Socket
+Here are used the boost asio sockets, they need ip of the server and port to be created.
+Content usage is anticipated by function "call_" that allows identifying socket invalidity or failure operations, in that case, the function retries every 500 ms the connection until a preset number of repetitions.
+At the reception, the socket is decomposed and the Message is reconstructed.
+The sending phase is composed of the writing of the Message in the socket using asio writing.
+The socket has a Timeout that when it expires the session is closed.
+##### Session
+Each client is identified by a server-generated __cookie__.
+The session doesn't allow any operation if the login is not completed successfully.
+
+- From the server-side is managed the creation and the expiration of the session, if a client doesn't send anything for a given time, the session is pulled down and the socket closed, if the client tries to send something it is recreated a session with a given client's cookie.
+Sessions are managed by the Session manager who takes care of the verify of the cookies, retrieves a session in case a session expires after the timeout and it creates new sessions.
+
+- From the client-side check if there are a connection error status -> in this case probably the session was session dropped from the server, it retries and opens the connection trying a recontact the server from a new session created from the other side (server).
+
+
+ ## Contributors
+ The application has been developed by:
+- Paolo Gastaldi
+- Stefano Gennero
+- Carlo Borsarelli

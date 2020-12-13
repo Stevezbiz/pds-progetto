@@ -9,7 +9,7 @@
 #include "../comm/Message.h"
 #include "../comm/Client_API.h"
 #include "FileWatcher.h"
-#define MAX_ATTEMPTS 2
+#define MAX_ATTEMPTS 5
 
 constexpr int FW_DELAY = 1000 * 5;
 
