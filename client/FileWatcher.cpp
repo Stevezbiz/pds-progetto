@@ -9,8 +9,8 @@ namespace fs = boost::filesystem;
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
         path_to_watch_(std::move(path_to_watch)), delay_(delay), running(true) {
 //    path_offset_ = path_to_watch_.size();
-//    if (path_to_watch_[path_offset_ - 1] != '/') {
-//        path_to_watch_ += '/';
+//    if (path_to_watch_[path_offset_ - 1] != boost::filesystem::path::preferred_separator) {
+//        path_to_watch_ += boost::filesystem::path::preferred_separator;
 //        path_offset_++;
 //    }
     init();
@@ -100,5 +100,5 @@ std::map<std::string, std::string> FileWatcher::get_files() {
 }
 
 std::string FileWatcher::parse_path(const boost::filesystem::path &path) const {
-    return path.string().substr(path.string().find(boost::filesystem::path::preferred_separator) + 1);
+    return boost::filesystem::relative(path, path_to_watch_).string();
 }
