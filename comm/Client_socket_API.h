@@ -12,14 +12,28 @@
 #include <utility>
 #include "Socket_API.h"
 
+constexpr int MAX_THREADS = 4;
+
 class Client_socket_API : public Socket_API {
-    std::string cookie_;
+    int thread_id_{ 0 };
+    std::map<int, std::future<bool>> threads_;
+    std::mutex m_threads_;
+    std::condition_variable cv_;
 
     /**
      * check if this is a connection error status
      * @return status
      */
     bool is_connection_error_();
+
+    /**
+     * create a new API based on the current one
+     * @return new client socket API
+     */
+    std::shared_ptr<Client_socket_API> create_new_API_();
+
+protected:
+    std::string cookie_;
 
 public:
     Client_socket_API() = delete;
@@ -33,26 +47,28 @@ public:
     Client_socket_API(std::string ip, std::string port, bool keep_alive = true);
 
     /**
-     * send a message
-     * @param message
-     * @return status
-     */
-//    bool open_and_send(Message *message);
-
-    /**
-     * receive a message
-     * @param expected_message
-     * @return status
-     */
-//    bool receive_and_close(MESSAGE_TYPE expected_message);
-
-    /**
-     * send a message and retrieve the response
+     * (sync) send a message and retrieve the response
      * @param message
      * @param expected_message
      * @return status
      */
     bool send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message);
+
+    /**
+     * async send a message and retrieve the response
+     * this function will block you only if no more threads are available
+     * @param message
+     * @param expected_message
+     * @param cb
+     * @return status
+     */
+    bool async_send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message, const std::function<bool(bool, const std::shared_ptr<Message> &, const std::shared_ptr<Comm_error> &)> &);
+
+    /**
+     * wait all async functions previously called
+     * @return true if all async functions returned true, false otherwise
+     */
+    bool wait_all_async();
 };
 
 

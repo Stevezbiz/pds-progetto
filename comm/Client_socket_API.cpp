@@ -15,6 +15,13 @@ bool Client_socket_API::is_connection_error_() {
     return std::any_of(errors.begin(), errors.end(), [this](auto error) { return this->get_last_error()->original_ec == error; });
 }
 
+std::shared_ptr<Client_socket_API> Client_socket_API::create_new_API_() {
+    auto new_API = std::make_unique<Client_socket_API>(this->ip, this->port, false);
+    new_API->keep_alive_ = false;
+    new_API->cookie_ = this->cookie_;
+    return new_API;
+}
+
 Client_socket_API::Client_socket_API(std::string ip, std::string port, bool keep_alive) :
         Socket_API(std::move(ip), std::move(port), RETRY_ONCE, 500, keep_alive) {}
 
@@ -56,4 +63,46 @@ bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message
         return false;
     Logger::info("Client_socket_API::send_and_receive", "Receiving a message... - done", PR_VERY_LOW);
     return ret_val;
+}
+
+bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message, const std::function<bool(bool, const std::shared_ptr<Message> &, const std::shared_ptr<Comm_error> &)> &cb) {
+    Logger::info("Client_socket_API::async_send_and_receive", "Creating new thread...", PR_VERY_LOW);
+
+    std::unique_lock<std::mutex> lock(this->m_threads_);
+    this->cv_.wait(lock, [this]() {
+            return std::count_if(this->threads_.begin(), this->threads_.end(), [](const auto &item) { return !item.second.valid(); }) < MAX_THREADS; // count active threads
+        });
+
+    auto thread_id = this->thread_id_++;
+    this->threads_.emplace(thread_id, std::async(std::launch::async,
+          [message, expected_message, cb](int thread_id, std::shared_ptr<Client_socket_API> api) {
+                Logger::info("Client_socket_API::async_send_and_receive", "Thread started, id " + std::to_string(thread_id), PR_VERY_LOW);
+                auto ret_val = api->send_and_receive(message, expected_message);
+                Logger::info("Client_socket_API::async_send_and_receive", "Thread connection done, id " + std::to_string(thread_id), PR_VERY_LOW);
+                ret_val = cb(ret_val, api->get_message(), api->get_last_error());
+                Logger::info("Client_socket_API::async_send_and_receive", "Thread callback done, id " + std::to_string(thread_id), PR_VERY_LOW);
+                return ret_val;
+            }, thread_id, this->create_new_API_()));
+
+    lock.unlock();
+    this->cv_.notify_one();
+    Logger::info("Client_socket_API::async_send_and_receive", "Creating new thread... - done", PR_VERY_LOW);
+
+    return true;
+}
+
+bool Client_socket_API::wait_all_async() {
+    bool status = true;
+
+    Logger::info("Client_socket_API::wait_all_async", "Waiting all threads...", PR_VERY_LOW);
+    for(auto &item : this->threads_) {
+        auto id = item.first;
+        auto f = std::move(item.second);
+        if(!f.get())
+            status = false;
+        this->threads_.erase(id);
+    }
+
+    Logger::info("Client_socket_API::wait_all_async", "Waiting all threads... - done", PR_VERY_LOW);
+    return status;
 }

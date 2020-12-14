@@ -7,20 +7,41 @@
 #include "Client_API.h"
 
 bool Client_API::get_and_save_(const std::string &path) {
-    if(!this->api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
-        return false;
-    auto res = this->api_->get_message();
-    if (!res->is_okay())
-        return false;
-    boost::filesystem::path dest_path{root_path_};
-    dest_path.append(path);
-    res->path = dest_path.string();
-    if(res->elementStatus==ElementStatus::createdFile){
-        if (!Client_API::save_file_(res))
-            return false;
-    } else {
-        boost::filesystem::create_directory(dest_path);
-    }
+    this->api_->async_send_and_receive(Message::get(path),MSG_GET_CONTENT,
+       [this, path](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
+           Logger::info("Client_API::get_and_save_", "Analyzing new file...", PR_VERY_LOW);
+           if (!res->is_okay()) {
+               Logger::error(comm_error.get());
+               return false;
+           }
+           boost::filesystem::path dest_path{root_path_};
+           dest_path.append(path);
+           res->path = dest_path.string();
+           if(res->elementStatus==ElementStatus::createdFile){
+               if (!Client_API::save_file_(res))
+                   return false;
+           } else {
+               boost::filesystem::create_directory(dest_path);
+           }
+           Logger::info("Client_API::get_and_save_", "Analyzing new file... - done", PR_VERY_LOW);
+
+           return true;
+       });
+
+//    if(!this->api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
+//        return false;
+//    auto res = this->api_->get_message();
+//    if (!res->is_okay())
+//        return false;
+//    boost::filesystem::path dest_path{root_path_};
+//    dest_path.append(path);
+//    res->path = dest_path.string();
+//    if(res->elementStatus==ElementStatus::createdFile){
+//        if (!Client_API::save_file_(res))
+//            return false;
+//    } else {
+//        boost::filesystem::create_directory(dest_path);
+//    }
 
     return true;
 }
@@ -63,19 +84,19 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
             if(it==res->hashes.end()){
                 // file not registered -> create
                 Logger::info("Client_API::probe", "Created file found " + path, PR_LOW);
-                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile))
+                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile, -1))
                     return false;
             } else if(res->hashes.at(path)!=item.second){
                 // different hash -> modified
                 Logger::info("Client_API::probe", "Modified file found " + path, PR_LOW);
-                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile))
+                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile, -1))
                     return false;
             }
         } else if(boost::filesystem::is_directory(dest_path)){
             if(it==res->hashes.end()){
                 // dir not registered -> create
                 Logger::info("Client_API::probe", "Created dir found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir))
+                if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir, -1))
                     return false;
             }
         }
@@ -93,30 +114,51 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
             if(hash != "") { // file
                 // file not found -> erase
                 Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile, -1))
                     return false;
             }
             else { // dir
                 // dir not found -> erase
                 Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir))
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
                     return false;
             }
         }
     }
+    this->api_->wait_all_async();
     Logger::info("Client_API::probe", "Probe check started... - done", PR_LOW);
 
     return true;
 }
 
-bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus) {
-    Logger::info("Client_API::push", "Push started...");
-    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
-        return false;
-    auto res = this->api_->get_message();
+bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus, int fw_cycle) {
+    Logger::info("Client_API::push", "Push started...", PR_LOW);
+
+    if(this->fw_cycle_ != fw_cycle) {
+        Logger::info("Client_API::push", "New filewatcher cycle, waiting all threads...", PR_VERY_LOW);
+        if (!this->api_->wait_all_async()) // all files from the previous filewatcher analysy must be pushed before proceding
+            return false;
+        this->fw_cycle_ = fw_cycle;
+        Logger::info("Client_API::push", "New filewatcher cycle, waiting all threads... - done", PR_VERY_LOW);
+    }
+
+    this->api_->async_send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY,
+       [](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
+           Logger::info("Client_API::push", "Analyzing new file...", PR_VERY_LOW);
+           if (status)
+               return false;
+           Logger::info("Client_API::push", "Analyzing new file... - done", PR_VERY_LOW);
+
+           return res->is_okay();
+       });
+
+//    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
+//        return false;
+//    auto res = this->api_->get_message();
     Logger::info("Client_API::push", "Push started... - done");
 
-    return res->is_okay();
+//    return res->is_okay();
+    return true;
 }
 
 bool Client_API::restore() {
@@ -138,7 +180,7 @@ bool Client_API::restore() {
             return false;
     }
 
-    return true;
+    return this->api_->wait_all_async();;
 }
 
 bool Client_API::end() {

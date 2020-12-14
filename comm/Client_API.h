@@ -21,6 +21,8 @@ namespace fs = boost::filesystem;
 class Client_API : public API {
     Client_socket_API *api_;
     std::string root_path_;
+    int fw_cycle_ = -1; // first cycle for probe or restore
+
     /**
      * get a file from the server and save it
      * @param path
@@ -67,9 +69,10 @@ public:
      * @param file
      * @param path
      * @param hash
+     * @param fw_cycle
      * @return status
      */
-    bool push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus);
+    bool push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus, int fw_cycle = 0);
 
     /**
      * do the complete restore procedure:
