@@ -38,6 +38,10 @@ int main(int argc, char **argv) {
                 return 0;
         }
         client.run();
+        std::string fine;
+        do{
+            std::cin>>fine;
+        } while(fine!="q");
         if(!client.close()){
             // TODO: error management
             Logger::error("main", "client cannot be closed", PR_HIGH);

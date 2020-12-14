@@ -43,13 +43,14 @@ bool Client::close() {
 }
 
 void Client::run() {
-    f_ = std::async(std::launch::async, [this]() {
+    f_ = std::async(std::launch::async, [this](){
         this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status) {
             if (!push(path, hash, status)) {
                 // TODO: error management
             }
         });
     });
+
 }
 
 bool Client::pwdAttempts() {

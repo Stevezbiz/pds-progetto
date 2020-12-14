@@ -39,13 +39,14 @@ void FileWatcher::findErased(const std::function<void(std::string, std::string, 
             it++;
         }
     }
-    auto it2 = dirs_.end();
-    while (it2 != dirs_.begin()) {
+    auto it2 = dirs_.rbegin();
+    while (it2 != dirs_.rend()) {
         if (!fs::exists(it2->data())) {
             action(parse_path(it2->data()), "", ElementStatus::erasedDir);
-            it2 = dirs_.erase(it2);
-        } else {
-            it2--;
+            auto it3 = dirs_.erase(--it2.base());
+            it2 = std::reverse_iterator(it3);
+        } else{
+            it2++;
         }
     }
 }
