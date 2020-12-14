@@ -27,6 +27,7 @@ enum PRIORITY : int {
 };
 
 class Logger {
+    static std::mutex m_write_;
 
 public:
     static PRIORITY min_priority;
