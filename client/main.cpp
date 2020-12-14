@@ -38,15 +38,15 @@ int main(int argc, char **argv) {
                 return 0;
         }
         client.run();
-        std::string fine;
-        do{
-            std::cin>>fine;
-        } while(fine!="q");
-        if(!client.close()){
-            // TODO: error management
-            Logger::error("main", "client cannot be closed", PR_HIGH);
-            client.close();
-            exit(-1);
+        while(c.question_menu() != 2){//If it triggered the third operation -> Quit
+            if (question_yesno("Are you sure you want to exit?")) {
+                std::cout << "Exit....\n";
+                if(!client.close()){
+                    Logger::error("main", "client cannot be closed", PR_HIGH);
+                    exit(-1);
+                }
+                exit(0);
+            }
         }
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
