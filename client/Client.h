@@ -17,6 +17,7 @@ class Client {
     FileWatcher fw_;
     Client_API api_;
     std::string root_path_;
+    std::future<void> f_;
 
 public:
     Client(const std::string &root_path, std::string ip, std::string port);

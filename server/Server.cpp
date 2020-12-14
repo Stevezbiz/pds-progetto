@@ -96,7 +96,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::erasedDir:
-            if (!boost::filesystem::remove(disk_path) || !Session::remove_dir(database, virt_path.string())) {
+            if (!boost::filesystem::remove_all(disk_path) || !Session::remove_dir(database, virt_path.string())) {
                 Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
                 return false;
             }

@@ -7,7 +7,8 @@
 
 #include <string>
 #include <chrono>
-#include <unordered_map>
+#include <map>
+#include <set>
 #include <functional>
 #include <thread>
 #include <boost/filesystem.hpp>
@@ -18,9 +19,8 @@
 class FileWatcher {
     std::string path_to_watch_;
     std::chrono::duration<int, std::milli> delay_;
-    std::unordered_map<std::string, FSElement> files_;
-    std::unordered_set<std::string> dirs_;
-    bool running_;
+    std::map<std::string, FSElement> files_;
+    std::set<std::string> dirs_;
 //    int path_offset_;
 
     /**
@@ -44,6 +44,8 @@ class FileWatcher {
     void findCreatedOrModified(const std::function<void(std::string, std::string hash, ElementStatus)> &action);
 
 public:
+    std::atomic<bool> running;
+
     /**
      * Inizializza i campi dell'oggetto e acquisisce la struttura iniziale della directory
      * @param path_to_watch: la directory che il file watcher deve monitorare

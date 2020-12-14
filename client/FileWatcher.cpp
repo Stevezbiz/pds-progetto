@@ -7,7 +7,7 @@
 namespace fs = boost::filesystem;
 
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
-        path_to_watch_(std::move(path_to_watch)), delay_(delay), running_(true) {
+        path_to_watch_(std::move(path_to_watch)), delay_(delay), running(true) {
 //    path_offset_ = path_to_watch_.size();
 //    if (path_to_watch_[path_offset_ - 1] != '/') {
 //        path_to_watch_ += '/';
@@ -17,7 +17,7 @@ FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, s
 }
 
 void FileWatcher::start(const std::function<void(std::string, std::string, ElementStatus)> &action) {
-    while (running_) {
+    while (running) {
         std::this_thread::sleep_for(delay_);
         findErased(action);
         findCreatedOrModified(action);
@@ -39,13 +39,13 @@ void FileWatcher::findErased(const std::function<void(std::string, std::string, 
             it++;
         }
     }
-    auto it2 = dirs_.begin();
-    while (it2 != dirs_.end()) {
+    auto it2 = dirs_.end();
+    while (it2 != dirs_.begin()) {
         if (!fs::exists(it2->data())) {
             action(parse_path(it2->data()), "", ElementStatus::erasedDir);
             it2 = dirs_.erase(it2);
         } else {
-            it2++;
+            it2--;
         }
     }
 }

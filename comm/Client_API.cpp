@@ -87,15 +87,16 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
         boost::filesystem::path dest_path{root_path_};
         dest_path /= path ;
         auto it = map.find(path);
-        if(boost::filesystem::is_regular_file(dest_path)){
-            if(it == map.end()) {
+
+        auto hash = item.second;
+        if(it == map.end()) {
+            if(hash != "") { // file
                 // file not found -> erase
                 Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
                 if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile))
                     return false;
             }
-        } else if(boost::filesystem::is_directory(dest_path)){
-            if(it == map.end()) {
+            else { // dir
                 // dir not found -> erase
                 Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
                 if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir))

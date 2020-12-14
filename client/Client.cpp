@@ -36,14 +36,19 @@ bool Client::restore() {
 }
 
 bool Client::close() {
-    return api_.end();
+    auto ret_val = api_.end();
+    fw_.running.store(false);
+    f_.get();
+    return ret_val;
 }
 
 void Client::run() {
-    fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status) {
-        if (!push(path, hash, status)) {
-            // TODO: error management
-        }
+    f_ = std::async(std::launch::async, [this]() {
+        this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status) {
+            if (!push(path, hash, status)) {
+                // TODO: error management
+            }
+        });
     });
 }
 
