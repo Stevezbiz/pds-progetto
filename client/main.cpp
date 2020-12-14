@@ -38,8 +38,9 @@ int main(int argc, char **argv) {
                 return 0;
         }
         client.run();
-        while(c.question_menu() != 2){//If it triggered the third operation -> Quit
-            if (question_yesno("Are you sure you want to exit?")) {
+        while(true){//If it triggered the third operation -> Quit
+           if (c.question_menu() == 0) {
+            if (c.question_yesno("Are you sure you want to exit?")) {
                 std::cout << "Exit....\n";
                 if(!client.close()){
                     Logger::error("main", "client cannot be closed", PR_HIGH);
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
                 }
                 exit(0);
             }
+           }
         }
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
