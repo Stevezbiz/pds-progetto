@@ -185,6 +185,7 @@ bool Client_API::restore() {
 
 bool Client_API::end() {
     Logger::info("Client_API::end", "End started...", PR_LOW);
+    this->api_->wait_all_async(); // thread safe
     if(!this->api_->send_and_receive(Message::end(), MSG_OKAY))
         return false;
     auto res = this->api_->get_message();
