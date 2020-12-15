@@ -95,12 +95,11 @@ bool Client_socket_API::wait_all_async() {
     bool status = true;
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads...", PR_VERY_LOW);
-    for(auto &item : this->threads_) {
-        auto id = item.first;
-        auto f = std::move(item.second);
-        if(!f.get())
+    auto it = this->threads_.begin();
+    while(it != this->threads_.end()) {
+        if(!it->second.get())
             status = false;
-        this->threads_.erase(id);
+        it = this->threads_.erase(it);
     }
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads... - done", PR_VERY_LOW);
