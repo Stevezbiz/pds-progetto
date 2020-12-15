@@ -26,7 +26,7 @@ public:
 
     bool probe();
 
-    bool push(const std::string &path, const std::string &hash, ElementStatus status);
+    bool push(const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle);
 
     bool restore();
 

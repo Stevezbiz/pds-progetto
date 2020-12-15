@@ -19,14 +19,14 @@ bool Client::probe() {
     return api_.probe(fw_.get_files());
 }
 
-bool Client::push(const std::string &path, const std::string &hash, ElementStatus status) {
+bool Client::push(const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
     std::vector<unsigned char> file;
     boost::filesystem::path dest_path{root_path_};
     dest_path.append(path);
     if (status == ElementStatus::createdFile || status == ElementStatus::modifiedFile) {
         file = Utils::read_from_file(dest_path);
     }
-    return api_.push(file, path, hash, status);
+    return api_.push(file, path, hash, status, fw_cycle);
 }
 
 bool Client::restore() {
@@ -44,8 +44,8 @@ bool Client::close() {
 
 void Client::run() {
     f_ = std::async(std::launch::async, [this](){
-        this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status) {
-            if (!push(path, hash, status)) {
+        this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
+            if (!push(path, hash, status, fw_cycle)) {
                 // TODO: error management
             }
         });
