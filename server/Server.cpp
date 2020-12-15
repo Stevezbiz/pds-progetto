@@ -18,11 +18,20 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
+
+        std::unique_lock<std::mutex> lock(this->m_threads_);
+        this->cv_.wait(lock, [this]() { return this->n_active_threads_ < MAX_THREADS; });
+
+        this->n_active_threads_++;
         std::thread thread([this](boost::asio::ip::tcp::socket socket) {
             if(!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
                 Logger::error("Server::accept", "No correctly closing current socket");
+            this->n_active_threads_--;
         }, std::move(socket_));
         thread.detach();
+
+        lock.unlock();
+        this->cv_.notify_one();
     }
 }
 

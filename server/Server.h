@@ -11,6 +11,7 @@
 #include "Session_manager.h"
 
 constexpr int SOCKET_TIMEOUT = 1000 * 10; // 10 sec
+constexpr int MAX_THREADS = 4;
 
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
@@ -20,6 +21,9 @@ class Server {
     std::string root_path_;
     bool stop_;
     std::shared_ptr<Session_manager> session_manager_;
+    std::mutex m_threads_;
+    std::condition_variable cv_;
+    std::atomic<int> n_active_threads_{ 0 };
 
     /**
      * Accetta le connessioni dei client
