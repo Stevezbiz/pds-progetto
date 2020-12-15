@@ -30,7 +30,7 @@ class Logger {
     static std::mutex m_write_;
 
 public:
-    static PRIORITY min_priority;
+    static PRIORITY logger_filter;
 
     /**
      * create a new log

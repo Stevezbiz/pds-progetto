@@ -4,13 +4,13 @@
 
 #include "Logger.h"
 
-PRIORITY Logger::min_priority = PR_NULL;
+PRIORITY Logger::logger_filter = PR_NULL;
 std::mutex Logger::m_write_;
 
 enum LOG_LENGTHS : int {
     log_length = 10,
-    location_length = 50,
-    message_length = 100,
+    location_length = 35,
+    message_length = 110,
     priority_length = 1
 };
 
@@ -32,10 +32,14 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
             log_string = "UNDEFINED";
             break;
     }
-    auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-6) + " (...)";
 
-    if(priority > Logger::min_priority) {
-        std::cout << std::left << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length) << "(" + location + ")" << std::left  << std::setw(message_length) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
+    if(priority > Logger::logger_filter) {
+        auto curr_location = location.length() <= location_length-2 ? location : location.substr(0, location_length-2-3) + "..."; // -2 (two brackets)
+        curr_location.erase(std::remove(curr_location.begin(), curr_location.end(), '\n'), curr_location.end()-1);
+        auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
+        curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
+
+        std::cout << std::left << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 

@@ -2,6 +2,8 @@
 #include "Server.h"
 
 int main(int argc, char **argv) {
+    Logger::logger_filter = PR_NULL;
+
     if (argc != 4) {
         std::cerr << "Usage: " << argv[0] << " <port> <root directory> <database directory>" << std::endl;
         exit(-1);

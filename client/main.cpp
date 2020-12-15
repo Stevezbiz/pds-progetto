@@ -3,8 +3,11 @@
 #include <utility>
 #include "Client.h"
 #include "ConfigSetting.h"
+#include "../comm/Logger.h"
 
 int main(int argc, char **argv) {
+    Logger::logger_filter = PR_NULL;
+
     try {
         ConfigSettings c;
         c.init_configuration();
