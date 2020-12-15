@@ -20,6 +20,7 @@ bool Client::probe() {
 }
 
 bool Client::push(const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
+    Logger::info("Client::push", "push started for file " + path, PR_VERY_LOW);
     std::vector<unsigned char> file;
     boost::filesystem::path dest_path{root_path_};
     dest_path.append(path);
@@ -46,7 +47,7 @@ void Client::run() {
     f_ = std::async(std::launch::async, [this](){
         this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
             if (!push(path, hash, status, fw_cycle)) {
-                // TODO: error management
+                this->close();
             }
         });
     });

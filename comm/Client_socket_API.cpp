@@ -69,18 +69,18 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
     Logger::info("Client_socket_API::async_send_and_receive", "Creating new thread...", PR_VERY_LOW);
 
     std::unique_lock<std::mutex> lock(this->m_threads_);
-    this->cv_.wait(lock, [this]() {
-            return std::count_if(this->threads_.begin(), this->threads_.end(), [](const auto &item) { return !item.second.valid(); }) < MAX_THREADS; // count active threads
-        });
+    this->cv_.wait(lock, [this]() { return this->n_active_threads_ < MAX_THREADS; });
 
     auto thread_id = this->thread_id_++;
+    this->n_active_threads_++;
     this->threads_.emplace(thread_id, std::async(std::launch::async,
-          [message, expected_message, cb](int thread_id, std::shared_ptr<Client_socket_API> api) {
+          [this, message, expected_message, cb](int thread_id, std::shared_ptr<Client_socket_API> api) {
                 Logger::info("Client_socket_API::async_send_and_receive", "Thread started, id " + std::to_string(thread_id), PR_VERY_LOW);
                 auto ret_val = api->send_and_receive(message, expected_message);
                 Logger::info("Client_socket_API::async_send_and_receive", "Thread connection done, id " + std::to_string(thread_id), PR_VERY_LOW);
                 ret_val = cb(ret_val, api->get_message(), api->get_last_error());
                 Logger::info("Client_socket_API::async_send_and_receive", "Thread callback done, id " + std::to_string(thread_id), PR_VERY_LOW);
+                this->n_active_threads_--;
                 return ret_val;
             }, thread_id, this->create_new_API_()));
 
@@ -93,6 +93,7 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
 
 bool Client_socket_API::wait_all_async() {
     bool status = true;
+    std::lock_guard<std::mutex> lg(this->m_threads_);
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads...", PR_VERY_LOW);
     auto it = this->threads_.begin();
@@ -101,6 +102,7 @@ bool Client_socket_API::wait_all_async() {
             status = false;
         it = this->threads_.erase(it);
     }
+    this->thread_id_ = 0;
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads... - done", PR_VERY_LOW);
     return status;

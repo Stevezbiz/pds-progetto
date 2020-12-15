@@ -19,6 +19,7 @@ class Client_socket_API : public Socket_API {
     std::map<int, std::future<bool>> threads_;
     std::mutex m_threads_;
     std::condition_variable cv_;
+    std::atomic<int> n_active_threads_{ 0 };
 
     /**
      * check if this is a connection error status
