@@ -6,6 +6,7 @@
 #include "Database_API.h"
 #include "../comm/Logger.h"
 #include <boost/filesystem.hpp>
+#include "../comm/Utils.h"
 
 Database_API::Database_API(std::string path) {
     int rc = sqlite3_open_v2(path.data(), &db_, SQLITE_OPEN_READWRITE, nullptr);
@@ -37,7 +38,8 @@ bool Database_API::login_query(const std::string &username, const std::string &p
         Logger::error("Database_API::login_query", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
         return false;
     }
-    rc = sqlite3_bind_text(query, 2, password.data(), -1, nullptr);
+    std::string hash = Utils::hash(password);
+    rc = sqlite3_bind_text(query, 2, hash.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::login_query", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
         return false;
