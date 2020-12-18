@@ -72,6 +72,30 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     if(!res->is_okay())
         return false;
 
+    for(auto const &item : res->hashes) {
+        auto path = item.first;
+        Logger::info("Client_API::probe", "Analyzing " + path + " from server...", PR_VERY_LOW);
+        boost::filesystem::path dest_path{root_path_};
+        dest_path /= path ;
+        auto it = map.find(path);
+
+        auto hash = item.second;
+        if(it == map.end()) {
+            if(!hash.empty()) { // file
+                // file not found -> erase
+                Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile, -1))
+                    return false;
+            }
+            else { // dir
+                // dir not found -> erase
+                Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
+                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
+                    return false;
+            }
+        }
+    }
+
     // if the client has a different file than the server, the client starts a push procedure
     for(auto const &item : map) {
         auto path = item.first;
@@ -97,30 +121,6 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                 // dir not registered -> create
                 Logger::info("Client_API::probe", "Created dir found " + path, PR_LOW);
                 if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir, -1))
-                    return false;
-            }
-        }
-    }
-
-    for(auto const &item : res->hashes) {
-        auto path = item.first;
-        Logger::info("Client_API::probe", "Analyzing " + path + " from server...", PR_VERY_LOW);
-        boost::filesystem::path dest_path{root_path_};
-        dest_path /= path ;
-        auto it = map.find(path);
-
-        auto hash = item.second;
-        if(it == map.end()) {
-            if(hash != "") { // file
-                // file not found -> erase
-                Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile, -1))
-                    return false;
-            }
-            else { // dir
-                // dir not found -> erase
-                Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
                     return false;
             }
         }
