@@ -107,8 +107,10 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::createdDir:
-            if (!boost::filesystem::create_directory(disk_path) ||
-                !session->create_dir(database, virt_path.string(), hash)) {
+            if(!boost::filesystem::exists(disk_path)){
+                boost::filesystem::create_directory(disk_path);
+            }
+            if (!session->create_dir(database, virt_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot create directory: " + disk_path.string(), PR_HIGH);
                 return false;
             }
@@ -125,7 +127,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
         default:
             return false;
     }
-    Logger::info("Server::push", "Success", PR_LOW);
+    Logger::info("Server::push", "Success: " + disk_path.string(), PR_LOW);
     return true;
 }
 
