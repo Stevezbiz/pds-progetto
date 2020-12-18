@@ -23,7 +23,7 @@ class Server {
     std::shared_ptr<Session_manager> session_manager_;
     std::mutex m_threads_;
     std::condition_variable cv_;
-    std::atomic<int> n_active_threads_{ 0 };
+    std::atomic<int> n_active_threads_{0};
 
     /**
      * Accetta le connessioni dei client
@@ -40,7 +40,8 @@ class Server {
      *
      * @return
      */
-    static const std::unordered_map<std::string, std::string> *probe(Session *, const std::vector<std::string> &, const Database_API &);
+    static const std::unordered_map<std::string, std::string> *
+    probe(Session *, const std::vector<std::string> &, const Database_API &);
 
     /**
      *
@@ -74,6 +75,13 @@ class Server {
      *
      */
     void server_init();
+
+    /**
+     *
+     * @param base
+     * @param path
+     */
+    static void create_dirs(boost::filesystem::path base, const std::string &path);
 
 public:
 
