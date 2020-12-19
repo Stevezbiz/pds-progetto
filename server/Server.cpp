@@ -6,6 +6,8 @@
 
 #include <utility>
 
+namespace fs = boost::filesystem; 
+
 Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
                std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), db_(std::move(db_path)),
                                         root_path_(std::move(root_path)), stop_(false) {
@@ -41,10 +43,10 @@ bool Server::login(Session *session, const std::string &username, const std::str
         Logger::info("Server::login", "Login correct: user " + username, PR_NORMAL);
         session->login_status = true;
         session->user = username;
-        boost::filesystem::path dest_path{root_path};
+        fs::path dest_path{root_path};
         dest_path.append(username);
-        if (!boost::filesystem::exists(dest_path)) {
-            boost::filesystem::create_directory(dest_path);
+        if (!fs::exists(dest_path)) {
+            fs::create_directory(dest_path);
         }
         return true;
     }
@@ -60,10 +62,10 @@ const std::unordered_map<std::string, std::string> *Server::probe(Session *sessi
 
 const std::vector<unsigned char> *Server::get(Session *session, const std::string &path, const std::string &root_path,
                                               ElementStatus &status) {
-    boost::filesystem::path dest_path{root_path};
+    fs::path dest_path{root_path};
     dest_path.append(session->user);
     dest_path.append(path);
-    if (boost::filesystem::is_regular_file(dest_path)) {
+    if (fs::is_regular_file(dest_path)) {
         status = ElementStatus::createdFile;
         return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
     } else {
@@ -75,12 +77,12 @@ const std::vector<unsigned char> *Server::get(Session *session, const std::strin
 bool Server::push(Session *session, const std::string &path, const std::vector<unsigned char> &file,
                   const std::string &hash, ElementStatus status, const std::string &root_path,
                   const Database_API &database) {
-    boost::filesystem::path disk_path{root_path};
+    fs::path disk_path{root_path};
     disk_path.append(session->user);
     if (status == ElementStatus::createdFile || status == ElementStatus::createdDir)
         create_dirs(disk_path, path);
     disk_path.append(path);
-    boost::filesystem::path virt_path{session->user};
+    fs::path virt_path{session->user};
     virt_path.append(path);
     switch (status) {
         case ElementStatus::createdFile:
@@ -91,15 +93,15 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!boost::filesystem::remove(disk_path) || !Session::modify_file(database, virt_path.string(), hash)) {
+            if (!fs::remove(disk_path) || !Session::modify_file(database, virt_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             Utils::write_on_file(disk_path, file);
             break;
         case ElementStatus::erasedFile:
-            if(boost::filesystem::exists(disk_path)){
-                boost::filesystem::remove(disk_path);
+            if(fs::exists(disk_path)){
+                fs::remove(disk_path);
             }
             if (!Session::remove_file(database, virt_path.string())) {
                 Logger::error("Server::push", "Cannot erase file: " + disk_path.string(), PR_HIGH);
@@ -107,8 +109,8 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::createdDir:
-            if(!boost::filesystem::exists(disk_path)){
-                boost::filesystem::create_directory(disk_path);
+            if(!fs::exists(disk_path)){
+                fs::create_directory(disk_path);
             }
             if (!session->create_dir(database, virt_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot create directory: " + disk_path.string(), PR_HIGH);
@@ -116,8 +118,8 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::erasedDir:
-            if(boost::filesystem::exists(disk_path)){
-                boost::filesystem::remove_all(disk_path);
+            if(fs::exists(disk_path)){
+                fs::remove_all(disk_path);
             }
             if (!Session::remove_dir(database, virt_path.string())) {
                 Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
@@ -168,13 +170,13 @@ void Server::server_init() {
     });
 }
 
-void Server::create_dirs(boost::filesystem::path base, const std::string &path) {
-    boost::filesystem::path dirs(path);
+void Server::create_dirs(fs::path base, const std::string &path) {
+    fs::path dirs(path);
     dirs.remove_leaf();
-    boost::filesystem::path dir(std::move(base));
+    fs::path dir(std::move(base));
     for(const auto& p : dirs){
         dir.append(p.string());
-        if(!boost::filesystem::exists(dir))
-            boost::filesystem::create_directory(dir);
+        if(!fs::exists(dir))
+            fs::create_directory(dir);
     }
 }

@@ -10,7 +10,7 @@
 #include "Database_API.h"
 #include "Session_manager.h"
 
-constexpr int SOCKET_TIMEOUT = 1000 * 10; // 10 sec
+constexpr int SOCKET_TIMEOUT = 1000 * 1000; // 10 sec
 constexpr int MAX_THREADS = 32;
 
 class Server {

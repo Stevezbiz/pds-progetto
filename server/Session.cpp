@@ -5,8 +5,6 @@
 #include "Session.h"
 #include "../comm/Utils.h"
 
-using namespace boost::asio;
-
 Session::Session(int session_id) : session_id(session_id) {}
 
 std::string Session::get_cookie() const {
