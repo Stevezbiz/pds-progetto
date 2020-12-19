@@ -8,22 +8,17 @@
 namespace fs = boost::filesystem;
 
 FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, std::milli> delay) :
-        path_to_watch_(std::move(path_to_watch)), delay_(delay), running(true) {
-//    path_offset_ = path_to_watch_.size();
-//    if (path_to_watch_[path_offset_ - 1] != fs::path::preferred_separator) {
-//        path_to_watch_ += fs::path::preferred_separator;
-//        path_offset_++;
-//    }
+        path_to_watch_(std::move(path_to_watch)), delay_(delay), running_(true) {
     init();
 }
 
 void FileWatcher::start(const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
     Logger::info("FileWatcher::start", "Started", PR_LOW);
-    while (running) {
-        std::this_thread::sleep_for(delay_);
+    while (running_) {
         find_erased(action);
         find_created_or_modified(action);
         fw_cycle_++;
+        std::this_thread::sleep_for(delay_);
     }
     Logger::info("FileWatcher::start", "Stopped", PR_LOW);
 }
@@ -104,7 +99,7 @@ void FileWatcher::init() {
     Logger::info("FileWatcher::init", "Initialization done", PR_LOW);
 }
 
-std::map<std::string, std::string> FileWatcher::get_files() {
+std::map<std::string, std::string> FileWatcher::get_elements() {
     std::map<std::string, std::string> map;
     for (auto it : files_) {
         map.insert(std::make_pair(parse_path(it.first), it.second.getHash()));
@@ -117,4 +112,8 @@ std::map<std::string, std::string> FileWatcher::get_files() {
 
 std::string FileWatcher::parse_path(const fs::path &path) const {
     return fs::relative(path, path_to_watch_).string();
+}
+
+void FileWatcher::stop() {
+    running_ = false;
 }

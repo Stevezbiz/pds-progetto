@@ -16,7 +16,7 @@ bool Client::login(const std::string &username, const std::string &password) {
 
 bool Client::probe() {
     fw_.init();
-    return api_.probe(fw_.get_files());
+    return api_.probe(fw_.get_elements());
 }
 
 bool Client::push(const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
@@ -38,7 +38,7 @@ bool Client::restore() {
 
 bool Client::close() {
     auto ret_val = api_.end();
-    fw_.running.store(false);
+    fw_.stop();
     f_.get();
     return ret_val;
 }

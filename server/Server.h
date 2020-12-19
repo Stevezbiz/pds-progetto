@@ -26,58 +26,61 @@ class Server {
     std::atomic<int> n_active_threads_{0};
 
     /**
-     * Accetta le connessioni dei client
+     * Accepts incoming connections
      */
     void accept();
 
     /**
-     *
-     * @return
+     * Performs the login of a user
+     * @return true if login procedure seccessed, false otherwise
      */
     static bool login(Session *, const std::string &, const std::string &, const Database_API &, const std::string &);
 
     /**
-     *
-     * @return
+     * Performs the probe requested by a client session
+     * @return a map containing the paths and the hashes of the elements already stored on server
      */
     static const std::unordered_map<std::string, std::string> *
     probe(Session *, const std::vector<std::string> &, const Database_API &);
 
     /**
-     *
-     * @return
+     * Performs the get requested by a client session
+     * @return the content of the file requested by the user
      */
     static const std::vector<unsigned char> *get(Session *, const std::string &, const std::string &, ElementStatus &);
 
     /**
-     *
+     * Performs the push requested by a client session
+     * @return true if push has been successful, false otherwise
      */
     static bool push(Session *, const std::string &, const std::vector<unsigned char> &, const std::string &,
                      ElementStatus, const std::string &, const Database_API &);
 
     /**
-     *
+     * Performs the restore requested by a client session
+     * @return a vector containing all the elements stored on server
      */
     static const std::vector<std::string> *restore(Session *, const Database_API &);
 
     /**
-     *
-     * @return
+     * Closes a session
+     * @return true if the session has been closed correctly, false otherwise
      */
     static bool end(Session *);
 
     /**
+     * Error handler
      * @param comm_error
      */
     static void handle_error(Session *, const Comm_error *);
 
     /**
-     *
+     * Initializes the server's API
      */
     void server_init();
 
     /**
-     *
+     * Creates all the directories of a path if they do not exist already
      * @param base
      * @param path
      */
@@ -86,11 +89,11 @@ class Server {
 public:
 
     /**
-     * Inizializza i campi dell'oggetto e pone il server in attesa di accettare connessioni
-     * @param ctx: i servizi di I/O forniti
-     * @param endpoint: l'indirizzo e la porta a cui lanciare il server
+     * Initializes the object's structures and let the server wait for incoming connections
+     * @param ctx
+     * @param endpoint: address and port where the server is listening
      * @param db: database path
-     * @param root_path: root directory for saving bakup
+     * @param root_path: root directory for saving data
      */
     Server(boost::asio::io_context &io_service, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
            std::string root_path);

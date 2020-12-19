@@ -21,34 +21,32 @@ class FileWatcher {
     std::chrono::duration<int, std::milli> delay_;
     std::map<std::string, FSElement> files_;
     std::set<std::string> dirs_;
-//    int path_offset_;
+    std::atomic_bool running_;
     int fw_cycle_ = -1;
 
     /**
-     * Verifica se la mappa contiene la chiave
-     * @param key: chiave da cercare
-     * @return True se la chiave è presente
+     * Verifies if the files' map contains a certain key
+     * @param key
+     * @return true if the files' map contains the key
      */
     bool contains(const std::string &key);
 
     /**
-     * Verifica se gli elementi presenti al precedente check sono stati cancellati
-     * @param action: una funzione di handler per gestire le eventuali cancellazioni
+     * Checks for any element that has been removed since the previous check
+     * @param action: handler funtion to manage the modifications
      */
     void find_erased(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
     /**
-     * Verifica se gli elementi ora presenti non esistevano ancora al precedente check
-     * e verifica se gli elementi sono stati modificati
-     * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
+     * Checks for any element that has been created or modified since the previous check
+     * @param action: handler funtion to manage the modifications
      */
-    void find_created_or_modified(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    void find_created_or_modified(
+            const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
 public:
-    std::atomic<bool> running;
-
     /**
-     * Inizializza i campi dell'oggetto e acquisisce la struttura iniziale della directory
+     * Object constructor that initializes all the structures of the FileWatcher
      * @param path_to_watch: la directory che il file watcher deve monitorare
      * @param delay: il tempo di polling tra un check e il successivo
      */
@@ -59,28 +57,33 @@ public:
     FileWatcher &operator=(const FileWatcher &) = delete;
 
     /**
-     * Opera il polling sul thread del file watcher e chiama le funzioni per il check delle modifiche alla directory
-     * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
+     * Starts the FileWatcher, that will be able to recognize and signal modifications to the home directory content
+     * @param action: handler funtion to manage the modifications
      */
     void start(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
     /**
-     *
+     * Clears all the collected data and get the initial image of the home directory
      */
     void init();
 
     /**
-     *
-     * @return
+     * Getter for the files' map and the dirs' set
+     * @return a map containing all the files and the directories associated with their hashes. Directories have an empty string as hash
      */
-    std::map<std::string, std::string> get_files();
+    std::map<std::string, std::string> get_elements();
 
     /**
-     *
+     * Makes a path relative to the home directory of the FileWatcher
      * @param path
      * @return
      */
-    std::string parse_path(const boost::filesystem::path &path) const;
+    [[nodiscard]] std::string parse_path(const boost::filesystem::path &path) const;
+
+    /**
+     * Stops the execution of the FileWatcher
+     */
+    void stop();
 };
 
 

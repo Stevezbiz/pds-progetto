@@ -14,74 +14,82 @@
 class Session {
 
 public:
-    int session_id{ -1 };
+    int session_id{-1};
     std::string user;
-    bool login_status{ false };
+    bool login_status{false};
 
     /**
-     * Inizializza i campi dell'oggetto
-     * @param socket: socket su cui aprire la connessione
+     * Initializesthe object's structures
+     * @param session_id
      */
-    Session(int session_id);
+    explicit Session(int session_id);
 
     /**
-     * genereate a cookie to identify this session
+     * Genereates a cookie to identify this session
      * @return cookie
      */
-    std::string get_cookie() const;
+    [[nodiscard]] std::string get_cookie() const;
 
     /**
-     * check if login has been performed
+     * Checks if login has been performed
      * @return login status
      */
-    bool is_logged_in() const;
+    [[nodiscard]] bool is_logged_in() const;
 
     /**
-     *
-     * @param path
-     * @param hash
-     * @return
+     * Inserts a file in the database
+     * @param database: the database
+     * @param path: the path of the file
+     * @param hash: the hash of the file
+     * @return the result of the action on the database
      */
-    bool create_file(const Database_API &database, const std::string &path, const std::string &hash) const;
+    [[nodiscard]] bool create_file(const Database_API &database, const std::string &path, const std::string &hash) const;
 
     /**
-     *
-     * @param path
-     * @param hash
-     * @return
+     * Updates a file already in the database
+     * @param database: the database
+     * @param path: the path of the file
+     * @param hash: the hash of the file
+     * @return the result of the action on the database
      */
     static bool modify_file(const Database_API &database, const std::string &path, const std::string &hash);
 
     /**
-     *
-     * @param path
-     * @return
+     * Removes a file from the database
+     * @param database: the database
+     * @param path: the path of the file
+     * @return the result of the action on the database
      */
     static bool remove_file(const Database_API &database, const std::string &path);
 
     /**
-     *
-     * @return
+     * Retrieves the elements from the database
+     * @param database: the database
+     * @return a vector containing the paths of the retrieved elements
      */
     [[nodiscard]] const std::vector<std::string> *get_path_schema(const Database_API &database) const;
 
     /**
-     *
+     * Retrieves the elements from the database
+     * @param database: the database
+     * @return a map containing the paths and the hashes of the retrieved elements
      */
     [[nodiscard]] const std::unordered_map<std::string, std::string> *get_schema(const Database_API &database) const;
 
     /**
-     *
-     * @param path
-     * @param hash
-     * @return
+     * Insert a directory in the database
+     * @param database: the database
+     * @param path: the path of the directory
+     * @param hash: an empty string
+     * @return the result of the action on the database
      */
     [[nodiscard]] bool create_dir(const Database_API &database, const std::string &path, const std::string &hash) const;
 
     /**
-     *
-     * @param path
-     * @return
+     * Removes a directory from the database
+     * @param database: the database
+     * @param path: the path of the directory
+     * @return the result of the action on the database
      */
     static bool remove_dir(const Database_API &database, const std::string &path);
 };

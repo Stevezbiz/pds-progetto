@@ -91,7 +91,6 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
                            }, thread_id, this->create_new_API_()));
 
     lock.unlock();
-    this->cv_.notify_one();
     Logger::info("Client_socket_API::async_send_and_receive", "Creating new thread... - done", PR_VERY_LOW);
 
     return true;
