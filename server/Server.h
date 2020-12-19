@@ -11,7 +11,7 @@
 #include "Session_manager.h"
 
 constexpr int SOCKET_TIMEOUT = 1000 * 1000; // 10 sec
-constexpr int MAX_THREADS = 32;
+constexpr int MAX_THREADS = 4;
 
 class Server {
     boost::asio::ip::tcp::acceptor acceptor_;
