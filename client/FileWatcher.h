@@ -35,14 +35,14 @@ class FileWatcher {
      * Verifica se gli elementi presenti al precedente check sono stati cancellati
      * @param action: una funzione di handler per gestire le eventuali cancellazioni
      */
-    void findErased(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    void find_erased(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
     /**
      * Verifica se gli elementi ora presenti non esistevano ancora al precedente check
      * e verifica se gli elementi sono stati modificati
      * @param action: una funzione di handler per gestire le eventuali modifiche riscontrate
      */
-    void findCreatedOrModified(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    void find_created_or_modified(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
 public:
     std::atomic<bool> running;

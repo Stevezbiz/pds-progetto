@@ -6,7 +6,7 @@
 
 #include <utility>
 
-namespace fs = boost::filesystem; 
+namespace fs = boost::filesystem;
 
 Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
                std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), db_(std::move(db_path)),
@@ -57,6 +57,7 @@ bool Server::login(Session *session, const std::string &username, const std::str
 const std::unordered_map<std::string, std::string> *Server::probe(Session *session,
                                                                   const std::vector<std::string> &paths,
                                                                   const Database_API &database) {
+    Logger::info("Server::probe", "Probing server content", PR_LOW);
     return session->get_schema(database);
 }
 
@@ -67,9 +68,11 @@ const std::vector<unsigned char> *Server::get(Session *session, const std::strin
     dest_path.append(path);
     if (fs::is_regular_file(dest_path)) {
         status = ElementStatus::createdFile;
+        Logger::info("Server::get", "File " + dest_path.string(), PR_LOW);
         return new std::vector<unsigned char>(Utils::read_from_file(dest_path));
     } else {
         status = ElementStatus::createdDir;
+        Logger::info("Server::get", "Directory " + dest_path.string(), PR_LOW);
         return new std::vector<unsigned char>();
     }
 }
@@ -93,14 +96,14 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::modifiedFile:
-            if (!fs::remove(disk_path) || !Session::modify_file(database, virt_path.string(), hash)) {
+            if (!Session::modify_file(database, virt_path.string(), hash)) {
                 Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
                 return false;
             }
             Utils::write_on_file(disk_path, file);
             break;
         case ElementStatus::erasedFile:
-            if(fs::exists(disk_path)){
+            if (fs::exists(disk_path)) {
                 fs::remove(disk_path);
             }
             if (!Session::remove_file(database, virt_path.string())) {
@@ -109,7 +112,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::createdDir:
-            if(!fs::exists(disk_path)){
+            if (!fs::exists(disk_path)) {
                 fs::create_directory(disk_path);
             }
             if (!session->create_dir(database, virt_path.string(), hash)) {
@@ -118,7 +121,7 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
             }
             break;
         case ElementStatus::erasedDir:
-            if(fs::exists(disk_path)){
+            if (fs::exists(disk_path)) {
                 fs::remove_all(disk_path);
             }
             if (!Session::remove_dir(database, virt_path.string())) {
@@ -134,10 +137,12 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
 }
 
 const std::vector<std::string> *Server::restore(Session *session, const Database_API &database) {
+    Logger::info("Server::probe", "Getting server content", PR_LOW);
     return session->get_path_schema(database);
 }
 
 bool Server::end(Session *session) {
+    Logger::info("Server::end", "Closing session", PR_LOW);
     return true;
 }
 
@@ -174,9 +179,9 @@ void Server::create_dirs(fs::path base, const std::string &path) {
     fs::path dirs(path);
     dirs.remove_leaf();
     fs::path dir(std::move(base));
-    for(const auto& p : dirs){
+    for (const auto &p : dirs) {
         dir.append(p.string());
-        if(!fs::exists(dir))
+        if (!fs::exists(dir))
             fs::create_directory(dir);
     }
 }

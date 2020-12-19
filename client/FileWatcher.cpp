@@ -3,6 +3,7 @@
 //
 
 #include "FileWatcher.h"
+#include "../comm/Logger.h"
 
 namespace fs = boost::filesystem;
 
@@ -17,12 +18,14 @@ FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, s
 }
 
 void FileWatcher::start(const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
+    Logger::info("FileWatcher::start", "Started", PR_LOW);
     while (running) {
         std::this_thread::sleep_for(delay_);
-        findErased(action);
-        findCreatedOrModified(action);
+        find_erased(action);
+        find_created_or_modified(action);
         fw_cycle_++;
     }
+    Logger::info("FileWatcher::start", "Stopped", PR_LOW);
 }
 
 bool FileWatcher::contains(const std::string &key) {
@@ -30,10 +33,11 @@ bool FileWatcher::contains(const std::string &key) {
     return el != files_.end();
 }
 
-void FileWatcher::findErased(const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
+void FileWatcher::find_erased(const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
     auto it = files_.begin();
     while (it != files_.end()) {
         if (!fs::exists(it->first)) {
+            Logger::info("FileWatcher::find_erased", "Found erased file " + it->first, PR_VERY_LOW);
             action(parse_path(it->first), it->second.getHash(), ElementStatus::erasedFile, fw_cycle_);
             it = files_.erase(it);
         } else {
@@ -42,27 +46,33 @@ void FileWatcher::findErased(const std::function<void(std::string, std::string, 
     }
     auto it2 = dirs_.rbegin();
     while (it2 != dirs_.rend()) {
-        if (!fs::exists(it2->data())) {
-            action(parse_path(it2->data()), "", ElementStatus::erasedDir, fw_cycle_);
+        if (!fs::exists(*it2)) {
+            Logger::info("FileWatcher::find_erased", "Found erased directory " + *it2, PR_VERY_LOW);
+            action(parse_path(*it2), "", ElementStatus::erasedDir, fw_cycle_);
             auto it3 = dirs_.erase(--it2.base());
             it2 = std::reverse_iterator(it3);
-        } else{
+        } else {
             it2++;
         }
     }
 }
 
-void FileWatcher::findCreatedOrModified(const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
+void FileWatcher::find_created_or_modified(
+        const std::function<void(std::string, std::string, ElementStatus, int)> &action) {
     for (const auto &el : fs::recursive_directory_iterator(path_to_watch_)) {
         if (fs::is_regular_file(el.path())) {
             time_t lwt = fs::last_write_time(el);
             if (!contains(el.path().string())) {
                 FSElement new_file{el.path(), lwt};
                 files_.insert(std::make_pair(el.path().string(), new_file));
+                Logger::info("FileWatcher::find_created_or_modified", "Found created file " + el.path().string(),
+                             PR_VERY_LOW);
                 action(parse_path(el.path().string()), new_file.getHash(), ElementStatus::createdFile, fw_cycle_);
             } else {
                 if (files_.find(el.path().string())->second.isOld(lwt)) {
                     if (files_.find(el.path().string())->second.needUpdate()) {
+                        Logger::info("FileWatcher::find_created_or_modified",
+                                     "Found modified file " + el.path().string(), PR_VERY_LOW);
                         action(parse_path(el.path().string()), files_.find(el.path().string())->second.getHash(),
                                ElementStatus::modifiedFile, fw_cycle_);
                     }
@@ -71,6 +81,8 @@ void FileWatcher::findCreatedOrModified(const std::function<void(std::string, st
         } else if (fs::is_directory(el.path())) {
             if (dirs_.find(el.path().string()) == dirs_.end()) {
                 dirs_.insert(el.path().string());
+                Logger::info("FileWatcher::find_created_or_modified", "Found created directory " + el.path().string(),
+                             PR_VERY_LOW);
                 action(parse_path(el.path().string()), "", ElementStatus::createdDir, fw_cycle_);
             }
         }
@@ -88,7 +100,8 @@ void FileWatcher::init() {
             dirs_.insert(el.path().string());
         }
     }
-    fw_cycle_=0;
+    fw_cycle_ = 0;
+    Logger::info("FileWatcher::init", "Initialization done", PR_LOW);
 }
 
 std::map<std::string, std::string> FileWatcher::get_files() {
