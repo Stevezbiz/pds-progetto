@@ -82,12 +82,12 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
                                auto ret_val = api->send_and_receive(message, expected_message);
                                Logger::info("Client_socket_API::async_send_and_receive",
                                             "Thread connection done, id " + std::to_string(thread_id), PR_VERY_LOW);
-//                               ret_val = cb(ret_val, api->get_message(), api->get_last_error());
-//                               Logger::info("Client_socket_API::async_send_and_receive",
-//                                            "Thread callback done, id " + std::to_string(thread_id), PR_VERY_LOW);
+                               ret_val = cb(ret_val, api->get_message(), api->get_last_error());
+                               Logger::info("Client_socket_API::async_send_and_receive",
+                                            "Thread callback done, id " + std::to_string(thread_id), PR_VERY_LOW);
                                this->n_active_threads_--;
                                this->cv_.notify_one();
-                               return ret_val && api->get_message()->is_okay();
+                               return ret_val;
                            }, thread_id, this->create_new_API_()));
 
     lock.unlock();
