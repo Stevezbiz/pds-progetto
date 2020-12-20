@@ -54,6 +54,9 @@ int main(int argc, char **argv) {
             }
            }
         }
+    } catch (std::runtime_error &re) {
+        std::cerr << "Exception: " << re.what() << std::endl;
+        client->close();
     } catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         client->close();

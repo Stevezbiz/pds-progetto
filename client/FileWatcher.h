@@ -35,14 +35,14 @@ class FileWatcher {
      * Checks for any element that has been removed since the previous check
      * @param action: handler funtion to manage the modifications
      */
-    void find_erased(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    bool find_erased(const std::function<bool(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
     /**
      * Checks for any element that has been created or modified since the previous check
      * @param action: handler funtion to manage the modifications
      */
-    void find_created_or_modified(
-            const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    bool find_created_or_modified(
+            const std::function<bool(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
 public:
     /**
@@ -60,7 +60,7 @@ public:
      * Starts the FileWatcher, that will be able to recognize and signal modifications to the home directory content
      * @param action: handler funtion to manage the modifications
      */
-    void start(const std::function<void(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
+    bool start(const std::function<bool(std::string, std::string hash, ElementStatus, int fw_cycle)> &action);
 
     /**
      * Clears all the collected data and get the initial image of the home directory

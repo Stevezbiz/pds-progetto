@@ -45,10 +45,17 @@ bool Client::close() {
 
 void Client::run() {
     f_ = std::async(std::launch::async, [this](){
-        this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
-            if (!push(path, hash, status, fw_cycle))
-                throw std::runtime_error(api_.get_last_error()->to_string());
-        });
+        if(!this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
+            if (!push(path, hash, status, fw_cycle)){
+                Logger::error("Client::run","Cannot do push");
+                return false;
+            }
+            return true;
+        })) {
+            auto ret_val = api_.end();
+            fw_.stop();
+            exit(-1);
+        }
     });
 
 }

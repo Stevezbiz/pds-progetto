@@ -1,13 +1,13 @@
 #include <iostream>
 #include "Server.h"
 
-constexpr std::string_view LOG_FILE = "./logs.txt";
+#define LOG_FILE "./logs.txt"
 
 int main(int argc, char **argv) {
     Logger::logger_filter = PR_LOW;
     std::ofstream log_stream;
 //    log_stream.open(LOG_FILE, std::ios_base::app); // append
-    log_stream.open(LOG_FILE, std::ofstream::out | std::ofstream::trunc); // erase previous content
+    log_stream.open(LOG_FILE, std::ios::out | std::ios::trunc); // erase previous content
     Logger::redirect(log_stream);
 
     if (argc != 4) {
