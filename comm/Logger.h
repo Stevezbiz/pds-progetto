@@ -31,6 +31,7 @@ class Logger {
 
 public:
     static PRIORITY logger_filter;
+    static std::ostream output_;
 
     /**
      * create a new log
@@ -70,6 +71,12 @@ public:
      * @param priority
      */
     static void error(const Comm_error *comm_error, PRIORITY priority = PR_HIGH);
+
+    /**
+     * redirect logs to a new output stream
+     * @param new_stream
+     */
+    static void redirect(std::ostream &new_stream);
 };
 
 

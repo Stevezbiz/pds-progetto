@@ -1,8 +1,14 @@
 #include <iostream>
 #include "Server.h"
 
+constexpr std::string_view LOG_FILE = "./logs.txt";
+
 int main(int argc, char **argv) {
-    Logger::logger_filter = PR_NULL;
+    Logger::logger_filter = PR_LOW;
+    std::ofstream log_stream;
+//    log_stream.open(LOG_FILE, std::ios_base::app); // append
+    log_stream.open(LOG_FILE, std::ofstream::out | std::ofstream::trunc); // erase previous content
+    Logger::redirect(log_stream);
 
     if (argc != 4) {
         std::cerr << "Usage: " << argv[0] << " <port> <root directory> <database directory>" << std::endl;
@@ -16,5 +22,7 @@ int main(int argc, char **argv) {
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
     }
+
+    log_stream.close();
     return 0;
 }

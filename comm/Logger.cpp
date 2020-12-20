@@ -6,6 +6,7 @@
 
 PRIORITY Logger::logger_filter = PR_NULL;
 std::mutex Logger::m_write_;
+std::ostream Logger::output_{ std::cout.rdbuf() };
 
 enum LOG_LENGTHS : int {
     log_length = 10,
@@ -39,7 +40,7 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
         auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
         curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
 
-        std::cout << std::left << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
+        Logger::output_ << std::left << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 
@@ -57,4 +58,8 @@ void Logger::error(const std::string &location, const std::string &message, PRIO
 
 void Logger::error(const Comm_error *comm_error, PRIORITY priority) {
     Logger::error(comm_error->location, comm_error->to_string(), priority);
+}
+
+void Logger::redirect(std::ostream &new_stream) {
+    Logger::output_.rdbuf(new_stream.rdbuf());
 }
