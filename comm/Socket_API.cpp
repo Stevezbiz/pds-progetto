@@ -99,27 +99,27 @@ bool Socket_API::open_conn(bool force) {
         return true;
     }
 
-    if(!this->close_conn()) // close current socket in a safe way
+    if(!this->close_conn() || this->ctx_.stopped()) // close current socket in a safe way
         return false;
 
     auto f = std::async(std::launch::async, [this]() {
-            try {
-                Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
-                Logger::info("Socket_API::open_conn", "Opening socket", PR_VERY_LOW);
+        try {
+            Logger::info("Socket_API::open_conn", "Creating the socket...", PR_VERY_LOW);
+            Logger::info("Socket_API::open_conn", "Opening socket", PR_VERY_LOW);
 //                auto socket = new boost::asio::ip::tcp::socket{ this->ctx_ };
-                boost::asio::ip::tcp::socket socket{ this->ctx_ };
-                Logger::info("Socket_API::open_conn", "Connecting", PR_VERY_LOW);
-                boost::asio::connect(socket, this->endpoint_iterator_);
-                Logger::info("Socket_API::open_conn", "Moving the socket", PR_VERY_LOW);
+            boost::asio::ip::tcp::socket socket{ this->ctx_ };
+            Logger::info("Socket_API::open_conn", "Connecting", PR_VERY_LOW);
+            boost::asio::connect(socket, this->endpoint_iterator_);
+            Logger::info("Socket_API::open_conn", "Moving the socket", PR_VERY_LOW);
 //                this->socket_ = std::unique_ptr<boost::asio::ip::tcp::socket>(socket);
-                this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
-                Logger::info("Socket_API::open_conn", "Everything is done", PR_VERY_LOW);
-            } catch(const std::exception &e) {
-                this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
-                return false;
-            }
-            return true;
-        });
+            this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
+            Logger::info("Socket_API::open_conn", "Everything is done", PR_VERY_LOW);
+        } catch(const std::exception &e) {
+            this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", e.what());
+            return false;
+        }
+        return true;
+    });
     auto future_status = f.wait_for(std::chrono::milliseconds(CONN_TIMEOUT));
     if(future_status == std::future_status::timeout) {
         this->comm_error = std::make_shared<Comm_error>(CE_FAILURE, "Socket_API::open_conn", "Unable to connect, timeout");
