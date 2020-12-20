@@ -145,8 +145,10 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
     this->api_->async_send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY,
        [](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
            Logger::info("Client_API::push", "Analyzing new file...", PR_VERY_LOW);
-           if (!status)
+           if (!status || !res->is_okay()){
+               Logger::error(comm_error.get());
                return false;
+           }
            Logger::info("Client_API::push", "Analyzing new file... - done", PR_VERY_LOW);
 
            return res->is_okay();
