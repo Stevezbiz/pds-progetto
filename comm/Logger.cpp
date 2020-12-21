@@ -36,7 +36,7 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
 
     if(priority > Logger::logger_filter) {
         auto curr_location = location.length() <= location_length-2 ? location : location.substr(0, location_length-2-3) + "..."; // -2 (two brackets)
-        curr_location.erase(std::remove(curr_location.begin(), curr_location.end(), '\n'), curr_location.end()-1);
+        curr_location.erase(std::remove(curr_location.begin(), curr_location.end(), '\n'), curr_location.end());
         auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
         curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
 
