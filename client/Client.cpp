@@ -32,12 +32,16 @@ bool Client::push(const std::string &path, const std::string &hash, ElementStatu
 
 bool Client::restore() {
     bool ret = api_.restore();
-    fw_.init();
+    if(ret){
+        fw_.init();
+        Logger::info("Client::restore", "Restore completed", PR_NORMAL);
+    }
     return ret;
 }
 
 bool Client::close() {
     auto ret_val = api_.end();
+    Logger::info("Client::close", "Closing", PR_NORMAL);
     fw_.stop();
     f_.get();
     return ret_val;
@@ -47,8 +51,25 @@ void Client::run() {
     f_ = std::async(std::launch::async, [this](){
         if(!this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
             if (!push(path, hash, status, fw_cycle)){
-                Logger::error("Client::run","Cannot do push");
+                Logger::error("Client::run","Cannot push changes of '" + path + "' on server");
                 return false;
+            }
+            switch(status){
+                case ElementStatus::createdDir:
+                    Logger::info("Client::run","Created directory '" + path + "' on server", PR_NORMAL);
+                    break;
+                case ElementStatus::createdFile:
+                    Logger::info("Client::run","Created file '" + path + "' on server", PR_NORMAL);
+                    break;
+                case ElementStatus::erasedDir:
+                    Logger::info("Client::run","Erased directory '" + path + "' from server", PR_NORMAL);
+                    break;
+                case ElementStatus::erasedFile:
+                    Logger::info("Client::run","Erased file '" + path + "' from server", PR_NORMAL);
+                    break;
+                case ElementStatus::modifiedFile:
+                    Logger::info("Client::run","Modified file '" + path + "' on server", PR_NORMAL);
+                    break;
             }
             return true;
         })) {

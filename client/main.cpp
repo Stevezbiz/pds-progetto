@@ -42,16 +42,15 @@ int main(int argc, char **argv) {
         }
         client->run();
         while(true){//If it triggered the third operation -> Quit
-           if (c.question_menu() == 0) {
-            if (c.question_yesno("Are you sure you want to exit?")) {
-                std::cout << "Exit....\n";
-                if(!client->close()){
-                    Logger::error("main", "client cannot be closed", PR_HIGH);
-                    exit(-1);
+            if (c.question_menu() == 0) {
+                if (c.question_yesno("Are you sure you want to exit?")) {
+                    if(!client->close()){
+                        Logger::error("main", "client cannot be closed", PR_HIGH);
+                        exit(-1);
+                    }
+                    break;
                 }
-                break;
             }
-           }
         }
     } catch (std::runtime_error &re) {
         std::cerr << "Exception: " << re.what() << std::endl;
