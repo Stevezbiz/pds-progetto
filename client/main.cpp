@@ -16,7 +16,6 @@ int main(int argc, char **argv) {
 
         if(!client->pwdAttempts()){
             Logger::error("main", "No attempts remaining... terminate the program", PR_HIGH);
-            client->close();
             exit(-1);
         }
 

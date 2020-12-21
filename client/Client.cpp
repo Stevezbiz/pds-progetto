@@ -76,6 +76,7 @@ bool Client::pwdAttempts() {
         }
         std::cout << "\nPlease try again.\n";
     }
+    auto ret_val = api_.end();
     return false;
 }
 
