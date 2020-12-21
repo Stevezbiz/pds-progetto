@@ -13,7 +13,7 @@ FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, s
 }
 
 bool FileWatcher::start(const std::function<bool(std::string, std::string, ElementStatus, int)> &action) {
-    Logger::info("FileWatcher::start", "Started", PR_LOW);
+    Logger::info("FileWatcher::start", "Started monitoring", PR_NORMAL);
     while (running_) {
         if(!find_erased(action))
             return false;
@@ -22,7 +22,7 @@ bool FileWatcher::start(const std::function<bool(std::string, std::string, Eleme
         fw_cycle_++;
         std::this_thread::sleep_for(delay_);
     }
-    Logger::info("FileWatcher::start", "Stopped", PR_LOW);
+    Logger::info("FileWatcher::start", "Stopped monitoring", PR_NORMAL);
     return true;
 }
 
