@@ -4,64 +4,94 @@
 #include <boost/filesystem.hpp>
 #include <utility>
 
-enum Command{
+enum Command {
     end, normal, restore
 };
 
-class ConfigSettings
-{
-    std::string address;
-    boost::filesystem::path dir_path;
-    int port=0;
+class ConfigSettings {
+    std::string address_ = "127.0.0.1";
+    boost::filesystem::path dir_path_ = ".";
+    int port_ = 8080;
+    std::string logs_path_ = ".client_logs";
 
 public:
     ConfigSettings() = default;
-    ConfigSettings(std::string address,boost::filesystem::path dir_path,int port):address(std::move(address)),dir_path(std::move(dir_path)),port(port){};
+
+    /**
+     *
+     * @param address
+     * @param dir_path
+     * @param port
+     * @param logs_path
+     */
+    ConfigSettings(std::string address, boost::filesystem::path dir_path, int port, std::string logs_path);
+
     /**
      * Function to used to initialize the application
      */
     void init_configuration();
+
     /**
      * If a init_config file already exist -> read the initial configuration from it
      */
     void read_config();
+
     /**
      * If an init_config file doesn't exist or the user wants to overwrite -> initialize initial variables and create the file
      */
     void write_config();
+
     /**
      * Check if a file already exists
      */
-    static inline bool exist_file (const std::string& name);
+    static inline bool exist_file(const std::string &name);
+
     /**
      * Manage the creation of yes and no questions
      */
-    static bool question_yesno(std::string const& message);
+    static bool question_yesno(std::string const &message);
+
     /**
      * Convert every answer into a boolean
      */
-    static bool checkAnswerOK(std::string& answer, bool& result);
+    static bool checkAnswerOK(std::string &answer, bool &result);
+
     /**
      * Show the configuration of the server
      */
     void showConfig();
+
     /**
      * Manage the menu and all the possible answers
      */
-    Command menu();
+    static Command menu();
+
     /**
      * Manage the answers of the menu
      */
-    int question_menu();
+    static int question_menu();
+
     /**
      * Show the the choices from menu
      */
-    void showChoice();
+    static void showChoice();
 
+    /**
+     *
+     * @return
+     */
     std::string getAddress();
 
-    std::string getPort();
+    /**
+     *
+     * @return
+     */
+    [[nodiscard]] std::string getPort() const;
 
+    /**
+     *
+     * @return
+     */
     std::string getDirPath();
 };
 

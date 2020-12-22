@@ -4,17 +4,23 @@
 
 #include "ConfigSetting.h"
 
+ConfigSettings::ConfigSettings(std::string address, boost::filesystem::path dir_path, int port, std::string logs_path)
+        : address_(std::move(address)), dir_path_(std::move(dir_path)), port_(port), logs_path_(std::move(logs_path)) {}
+
+
 void ConfigSettings::read_config() {
-    std::ifstream config("init_config.txt");
+    std::ifstream config(".client_config.txt");
     std::string line;
     while (getline(config, line)) {
         std::istringstream sin(line.substr(line.find('=') + 1));
         if (line.find("address") != -1)
-            sin >> address;
+            sin >> address_;
         else if (line.find("port") != -1)
-            sin >> port;
+            sin >> port_;
         else if (line.find("path") != -1)
-            sin >> dir_path;
+            sin >> dir_path_;
+        else if (line.find("logs") != -1)
+            sin >> logs_path_;
     }
     showConfig();
 }
@@ -30,57 +36,98 @@ bool ConfigSettings::exist_file(const std::string &name) {
 
 void ConfigSettings::write_config() {
     boost::system::error_code ec;
-    std::string work_directory;
+    std::string address;
+    std::string port;
+    std::string dir_path;
+    std::string logs_path;
+
+    // get the address
     do {
-        std::cout << "Server address: " << std::flush;
+        std::cout << "Server address (default '" + address_ + "'): " << std::flush;
         std::getline(std::cin, address);
-        boost::asio::ip::address::from_string(address, ec);
-        if (ec) {
-            std::cout << "The ip address is invalid!" << std::endl;
-            std::cin.clear();
+        if (!address.empty()) {
+            boost::asio::ip::address::from_string(address, ec);
+            if (ec) {
+                std::cout << "The ip address is invalid!" << std::endl;
+                std::cin.clear();
+            } else {
+                address_ = address;
+            }
+            //std::this_thread::sleep_for (std::chrono::milliseconds(40));
         }
-        //std::this_thread::sleep_for (std::chrono::milliseconds(40));
     } while (ec);
-    // Get the port.
+
+    // get the port
     for (;;) {
-        std::cout << "Port: ";
-        if (std::cin >> port && ((port > 0 ? (int) log10((double) port) + 1 : 1) == 4)) {
+        std::cout << "Port (default '" + std::to_string(port_) + "'): ";
+        std::getline(std::cin, port);
+        if (!port.empty()) {
+            if ((std::stoi(port) > 0 ? (int) log10((double) std::stoi(port)) + 1 : 1) == 4) {
+                port_ = std::stoi(port);
+                break;
+            } else {
+                std::cout << "Please enter a valid port." << std::endl;
+                std::cin.clear();
+                std::cin.ignore(1);
+            }
+        } else
             break;
+    }
+    // get the directory to bakup
+    while (true) {
+        std::cout << "Folder to bakup (default '" + dir_path_.string() + "'): ";
+        std::cin >> dir_path;
+        if (!dir_path.empty()) {
+            if (boost::filesystem::exists(dir_path)) {
+                if (boost::filesystem::is_directory(dir_path)) {
+                    // the directory already exists
+                    dir_path_ = boost::filesystem::path(dir_path);
+                    break;
+                } else {
+                    // a file with directory's name already exists
+                    std::cout << "Cannot name the folder: file '" + dir_path + "' already exists" << std::endl;
+                }
+            } else {
+                // the directory does not exists
+                std::cout << "The folder doesn't not exist" << std::endl;
+                if (question_yesno("Would you like to create the folder")) {
+                    boost::filesystem::create_directory(dir_path); // create src folder
+                    dir_path_ = boost::filesystem::path(dir_path);
+                    std::cout << "The " << dir_path << " folder has been created." << std::endl;
+                    break;
+                }
+            }
         } else {
-            std::cout << "Please enter a valid port." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(1);
+            break;
         }
     }
-    //insert working directory
+
+    // get the logs path
     while (true) {
-        std::cout << "Insert the folder path to perform the remote backup: ";
-        std::cin >> work_directory;
-
-        dir_path = boost::filesystem::path(work_directory);
-
-        if (!boost::filesystem::is_directory(dir_path) ||
-            !boost::filesystem::exists(dir_path)) { // Check if src folder exists
-            std::cout << "The folder doesn't not exist" << std::endl;
-
-            if (question_yesno("Would you like to create the folder")) {
-                std::cout << "The " << work_directory << " folder is created." << std::endl;
-                boost::filesystem::create_directory(dir_path); // create src folder
+        std::cout << "Insert the path to save logs (default '" + logs_path_ + "'): ";
+        std::cin >> logs_path;
+        if (!logs_path.empty()) {
+            if (boost::filesystem::is_directory(dir_path_)) {
+                // a directory with file's name already exists
+                std::cout << "Cannot name the file: folder '" + dir_path + "' already exists" << std::endl;
+            } else {
+                logs_path_ = logs_path;
                 break;
             }
-
         } else {
             break;
         }
     }
 
     // Create and open a text file
-    std::ofstream conf("init_config.txt");
+    std::ofstream conf(".client_config.txt");
 
     // Write to the file
-    conf << "address = " << address << std::endl;
-    conf << "port = " << port << std::endl;
-    conf << "path = " << dir_path << std::endl;
+    conf << "address = " << address_ << std::endl;
+    conf << "port = " << port_ << std::endl;
+    conf << "path = " << dir_path_ << std::endl;
+    conf << "logs = " << logs_path_ << std::endl;
+
     // Close the file
     conf.close();
     showConfig();
@@ -119,7 +166,7 @@ bool ConfigSettings::checkAnswerOK(std::string &answer, bool &result) {
 }
 
 void ConfigSettings::init_configuration() {
-    bool exist_config = ConfigSettings::exist_file("init_config.txt");
+    bool exist_config = ConfigSettings::exist_file(".client_config.txt");
     std::cout << R"(
          ___ ___ __  __  ___ _____ ___   ___   _   ___ _  ___   _ ___
         | _ \ __|  \/  |/ _ \_   _| __| | _ ) /_\ / __| |/ / | | | _ \
@@ -144,15 +191,15 @@ void ConfigSettings::init_configuration() {
 }
 
 std::string ConfigSettings::getAddress() {
-    return this->address;
+    return this->address_;
 }
 
-std::string ConfigSettings::getPort() {
-    return std::to_string(port);
+std::string ConfigSettings::getPort() const {
+    return std::to_string(port_);
 }
 
 std::string ConfigSettings::getDirPath() {
-    return this->dir_path.string();
+    return this->dir_path_.string();
 }
 
 Command ConfigSettings::menu() {
@@ -186,19 +233,20 @@ Command ConfigSettings::menu() {
 void ConfigSettings::showConfig() {
     std::cout << R"(
     +---------------------------------------+
-    |  Address = )" << address << R"(
-    |  Port = )" << port << R"(
-    |  Path = )" << dir_path << R"(
+    |  Address = )" << address_ << R"(
+    |  Port = )" << port_ << R"(
+    |  Path = )" << dir_path_ << R"(
     +---------------------------------------+
         )" << '\n';
 }
 
 void ConfigSettings::showChoice() {
-    std::cout << "-------------------------------------\nWhat action would you like to take?\n-------------------------------------\n"
-              << "  1) Normal mode (keeps the remote backup server updated of any changes)\n"
-              << "  2) Restore all (recover all files and folders from Remote Backup Server)\n"
-              << "  q) Exit\n"
-              << ">> : ";
+    std::cout
+            << "-------------------------------------\nWhat action would you like to take?\n-------------------------------------\n"
+            << "  1) Normal mode (keeps the remote backup server updated of any changes)\n"
+            << "  2) Restore all (recover all files and folders from Remote Backup Server)\n"
+            << "  q) Exit\n"
+            << ">> : ";
 }
 
 int ConfigSettings::question_menu() {
