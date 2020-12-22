@@ -76,7 +76,7 @@ void ConfigSettings::write_config() {
     // get the directory to bakup
     while (true) {
         std::cout << "Folder to bakup (default '" + dir_path_.string() + "'): ";
-        std::cin >> dir_path;
+        std::getline(std::cin, dir_path);
         if (!dir_path.empty()) {
             if (boost::filesystem::exists(dir_path)) {
                 if (boost::filesystem::is_directory(dir_path)) {
@@ -105,7 +105,7 @@ void ConfigSettings::write_config() {
     // get the logs path
     while (true) {
         std::cout << "Insert the path to save logs (default '" + logs_path_ + "'): ";
-        std::cin >> logs_path;
+        std::getline(std::cin, logs_path);
         if (!logs_path.empty()) {
             if (boost::filesystem::is_directory(dir_path_)) {
                 // a directory with file's name already exists
@@ -236,6 +236,7 @@ void ConfigSettings::show_config() {
     |  Address = )" << address_ << R"(
     |  Port = )" << port_ << R"(
     |  Path = )" << dir_path_ << R"(
+    |  Logs = )" << logs_path_ << R"(
     +---------------------------------------+
         )" << '\n';
 }

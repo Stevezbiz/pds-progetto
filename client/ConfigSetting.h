@@ -12,7 +12,7 @@ class ConfigSettings {
     std::string address_ = "127.0.0.1";
     boost::filesystem::path dir_path_ = ".";
     int port_ = 8080;
-    std::string logs_path_ = ".client_logs";
+    std::string logs_path_ = ".client_logs.txt";
 
 public:
     ConfigSettings() = default;
