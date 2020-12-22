@@ -211,20 +211,21 @@ Command ConfigSettings::menu() {
         switch (response) {
             case 0:
                 if (question_yesno("Are you sure you want to exit?")) {
-                    std::cout << "Exiting....\n";
+                    std::cout << "Closing...\n";
                     return Command::end;
                 }
                 break;
             case 1:
-                std::cout << "server synchronization ...\n";
+                std::cout << "Synchronizing with server...\n";
                 return Command::normal;
             case 2:
                 if (question_yesno("Are you sure to recover all files and folders from the Server")) {
+                    std::cout << "Restoring..." << std::endl;
                     return Command::restore;
                 }
                 break;
             default:
-                std::cout << "unrecognized command\n";
+                std::cout << "Unrecognized command\n";
         }
     }
 

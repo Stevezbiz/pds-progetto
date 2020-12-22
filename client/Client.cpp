@@ -32,7 +32,7 @@ bool Client::push(const std::string &path, const std::string &hash, ElementStatu
 
 bool Client::restore() {
     bool ret = api_.restore();
-    if(ret){
+    if (ret) {
         fw_.init();
         Logger::info("Client::restore", "Restore completed", PR_NORMAL);
     }
@@ -48,31 +48,39 @@ bool Client::close() {
 }
 
 void Client::run() {
-    f_ = std::async(std::launch::async, [this](){
-        if(!this->fw_.start([this](const std::string  &path, const std::string &hash, ElementStatus status, int fw_cycle) {
-            if (!push(path, hash, status, fw_cycle)){
-                Logger::error("Client::run","Cannot push changes of '" + path + "' on server");
-                return false;
-            }
-            switch(status){
-                case ElementStatus::createdDir:
-                    Logger::info("Client::run","Created directory '" + path + "' on server", PR_NORMAL);
-                    break;
-                case ElementStatus::createdFile:
-                    Logger::info("Client::run","Created file '" + path + "' on server", PR_NORMAL);
-                    break;
-                case ElementStatus::erasedDir:
-                    Logger::info("Client::run","Erased directory '" + path + "' from server", PR_NORMAL);
-                    break;
-                case ElementStatus::erasedFile:
-                    Logger::info("Client::run","Erased file '" + path + "' from server", PR_NORMAL);
-                    break;
-                case ElementStatus::modifiedFile:
-                    Logger::info("Client::run","Modified file '" + path + "' on server", PR_NORMAL);
-                    break;
-            }
-            return true;
-        })) {
+    f_ = std::async(std::launch::async, [this]() {
+        if (!this->fw_.start(
+                [this](const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
+                    if (!push(path, hash, status, fw_cycle)) {
+                        Logger::error("Client::run", "Cannot push changes of '" + path + "' on server");
+                        std::cout << "Cannot push changes of '" + path + "' on server" << std::endl;
+                        return false;
+                    }
+                    switch (status) {
+                        case ElementStatus::createdDir:
+                            Logger::info("Client::run", "Created directory '" + path + "' on server...", PR_NORMAL);
+                            std::cout << "Creating directory '" + path + "' on server" << std::endl;
+                            break;
+                        case ElementStatus::createdFile:
+                            Logger::info("Client::run", "Created file '" + path + "' on server...", PR_NORMAL);
+                            std::cout << "Creating file '" + path + "' on server" << std::endl;
+                            break;
+                        case ElementStatus::erasedDir:
+                            Logger::info("Client::run", "Erased directory '" + path + "' from server...", PR_NORMAL);
+                            std::cout << "Erasing directory '" + path + "' from server" << std::endl;
+                            break;
+                        case ElementStatus::erasedFile:
+                            Logger::info("Client::run", "Erased file '" + path + "' from server...", PR_NORMAL);
+                            std::cout << "Erasing file '" + path + "' from server" << std::endl;
+                            break;
+                        case ElementStatus::modifiedFile:
+                            Logger::info("Client::run", "Modified file '" + path + "' on server...", PR_NORMAL);
+                            std::cout << "Modifying file '" + path + "' on server" << std::endl;
+                            break;
+                    }
+                    return true;
+                })) {
+            std::cout << "Closing..." << std::endl;
             auto ret_val = api_.end();
             fw_.stop();
             exit(-1);
@@ -85,14 +93,13 @@ bool Client::pwdAttempts() {
     std::cout << "*************** LOGIN ***************" << std::endl;
     std::string username;
     std::string password;
-    for (int tries = 0; tries < MAX_ATTEMPTS; ++tries)
-    {
+    for (int tries = 0; tries < MAX_ATTEMPTS; ++tries) {
         std::cout << "Please insert username: ";
         std::cin >> username;
         std::cout << "Please insert password: ";
         std::cin >> password;
         if (Client::login(username, password)) {
-            std::cout << "\n| Welcome " << username << " |" <<std::endl;
+            std::cout << "\n| Welcome " << username << " |" << std::endl;
             return true;
         }
         std::cout << "\nPlease try again.\n";

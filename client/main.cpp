@@ -8,7 +8,7 @@
 #define LOG_FILE ".client_logs.txt"
 
 int main(int argc, char **argv) {
-    Logger::logger_filter = PR_LOW;
+    Logger::logger_filter = PR_NULL;
     std::ofstream log_stream;
 
     Client *client;
@@ -22,6 +22,8 @@ int main(int argc, char **argv) {
 
         if (!client->pwdAttempts()) {
             Logger::error("main", "No attempts remaining... terminate the program", PR_HIGH);
+            std::cout << "No attempts remaining" << std::endl;
+            std::cout << "Closing..." << std::endl;
             log_stream.close();
             exit(-1);
         }
@@ -32,29 +34,36 @@ int main(int argc, char **argv) {
                 if (!client->probe()) {
                     // TODO: error management
                     Logger::error("main", "Probe failed", PR_HIGH);
+                    std::cout << "Probe failed" << std::endl;
+                    std::cout << "Closing..." << std::endl;
                     client->close();
                     log_stream.close();
                     exit(-1);
                 }
+                std::cout << "Syncronization completed" << std::endl;
                 break;
             case restore:
                 if (!client->restore()) {
                     // TODO: error management
                     Logger::error("main", "Restore failed", PR_HIGH);
+                    std::cout << "Restore failed" << std::endl;
+                    std::cout << "Closing..." << std::endl;
                     client->close();
                     log_stream.close();
                     exit(-1);
                 }
+                std::cout << "Restore completed" << std::endl;
                 break;
             case end:
                 return 0;
         }
         client->run();
-        while (true) {//If it triggered the third operation -> Quit
+        while (true) { //If it triggered the third operation -> Quit
             if (ConfigSettings::question_menu() == 0) {
                 if (ConfigSettings::question_yesno("Are you sure you want to exit?")) {
+                    std::cout << "Closing..." << std::endl;
                     if (!client->close()) {
-                        Logger::error("main", "client cannot be closed", PR_HIGH);
+                        Logger::error("main", "Client cannot be closed", PR_HIGH);
                         log_stream.close();
                         exit(-1);
                     }
@@ -63,10 +72,12 @@ int main(int argc, char **argv) {
             }
         }
     } catch (std::runtime_error &re) {
-        std::cerr << "Exception: " << re.what() << std::endl;
+        std::cout << "Exception: " << re.what() << std::endl;
+        std::cout << "Closing..." << std::endl;
         client->close();
     } catch (std::exception &e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
+        std::cout << "Exception: " << e.what() << std::endl;
+        std::cout << "Closing..." << std::endl;
         client->close();
     }
     log_stream.close();
