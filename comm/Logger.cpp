@@ -3,15 +3,17 @@
 //
 
 #include "Logger.h"
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 PRIORITY Logger::logger_filter = PR_NULL;
 std::mutex Logger::m_write_;
 std::ostream Logger::output_{ std::cout.rdbuf() };
 
 enum LOG_LENGTHS : int {
+    time_length = 20,
     log_length = 10,
     location_length = 35,
-    message_length = 110,
+    message_length = 90,
     priority_length = 1
 };
 
@@ -39,8 +41,8 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
         curr_location.erase(std::remove(curr_location.begin(), curr_location.end(), '\n'), curr_location.end());
         auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
         curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
-
-        Logger::output_ << std::left << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
+        std::string timestamp = boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time());
+        Logger::output_ << std::left << std::setw(time_length) << timestamp << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 

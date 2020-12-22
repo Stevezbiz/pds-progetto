@@ -157,7 +157,7 @@ message(STATUS "preparing client...")
 # add includes
 add_executable(client ${CLIENT_SOURCE_FILES} ${CLIENT_COMM_SOURCE_FILES})
 # add Boost
-find_package(Boost COMPONENTS filesystem serialization thread REQUIRED)
+find_package(Boost COMPONENTS filesystem serialization thread date_time REQUIRED)
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
     target_link_libraries(client ${Boost_LIBRARIES})
@@ -202,7 +202,7 @@ project(server)
 message(STATUS "preparing server...")
 # add includes
 add_executable(server ${SERVER_SOURCE_FILES} ${SERVER_COMM_SOURCE_FILES})
-find_package(Boost REQUIRED filesystem serialization thread)
+find_package(Boost REQUIRED filesystem serialization thread date_time)
 # add Boost
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
