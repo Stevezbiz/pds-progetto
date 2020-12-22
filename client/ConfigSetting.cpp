@@ -22,7 +22,7 @@ void ConfigSettings::read_config() {
         else if (line.find("logs") != -1)
             sin >> logs_path_;
     }
-    showConfig();
+    show_config();
 }
 
 bool ConfigSettings::exist_file(const std::string &name) {
@@ -130,7 +130,7 @@ void ConfigSettings::write_config() {
 
     // Close the file
     conf.close();
-    showConfig();
+    show_config();
 }
 
 bool ConfigSettings::question_yesno(const std::string &message) {
@@ -138,7 +138,7 @@ bool ConfigSettings::question_yesno(const std::string &message) {
     bool result;
 
     std::cout << message << "? [Y/n] ";
-    while (std::cin >> answer && !checkAnswerOK(answer, result)) {
+    while (std::cin >> answer && !check_answer_ok(answer, result)) {
         std::cout << "Invalid answer: " << answer << " ... Please try again\n"
                   << message << "? [Y/n] ";
     }
@@ -151,7 +151,7 @@ bool ConfigSettings::question_yesno(const std::string &message) {
     return result;
 }
 
-bool ConfigSettings::checkAnswerOK(std::string &answer, bool &result) {
+bool ConfigSettings::check_answer_ok(std::string &answer, bool &result) {
     std::transform(answer.begin(), answer.end(), answer.begin(), [](unsigned char x) { return ::tolower(x); });
 
     bool answer_valid =
@@ -190,15 +190,15 @@ void ConfigSettings::init_configuration() {
     }
 }
 
-std::string ConfigSettings::getAddress() {
+std::string ConfigSettings::get_address() {
     return this->address_;
 }
 
-std::string ConfigSettings::getPort() const {
+std::string ConfigSettings::get_port() const {
     return std::to_string(port_);
 }
 
-std::string ConfigSettings::getDirPath() {
+std::string ConfigSettings::get_dir_path() {
     return this->dir_path_.string();
 }
 
@@ -206,7 +206,7 @@ Command ConfigSettings::menu() {
     //unsigned short response = 0;
     unsigned short response;
     while (true) {
-        showChoice();
+        show_choice();
         response = question_menu();
         switch (response) {
             case 0:
@@ -230,7 +230,7 @@ Command ConfigSettings::menu() {
 
 }
 
-void ConfigSettings::showConfig() {
+void ConfigSettings::show_config() {
     std::cout << R"(
     +---------------------------------------+
     |  Address = )" << address_ << R"(
@@ -240,7 +240,7 @@ void ConfigSettings::showConfig() {
         )" << '\n';
 }
 
-void ConfigSettings::showChoice() {
+void ConfigSettings::show_choice() {
     std::cout
             << "-------------------------------------\nWhat action would you like to take?\n-------------------------------------\n"
             << "  1) Normal mode (keeps the remote backup server updated of any changes)\n"
@@ -253,7 +253,7 @@ int ConfigSettings::question_menu() {
     std::string answer;
     bool result;
 
-    while (std::cin >> answer && (!checkAnswerOK(answer, result) && (answer != "1" && answer != "2"))) {
+    while (std::cin >> answer && (!check_answer_ok(answer, result) && (answer != "1" && answer != "2"))) {
         std::cout << "Invalid answer: " << answer << " ... Please try again\n:";
     }
     if (!std::cin) {
@@ -263,6 +263,10 @@ int ConfigSettings::question_menu() {
     }
     if (isdigit(answer[0])) return std::stoi(answer);
     return 0;
+}
+
+std::string ConfigSettings::get_logs_path() {
+    return logs_path_;
 }
 
 

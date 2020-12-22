@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
         log_stream.open(LOG_FILE, std::ios_base::app); // append
         log_stream.open(c.get_logs_path(), std::ios::out | std::ios::trunc); // erase previous content
         Logger::redirect(log_stream);
-        client = new Client{c.getDirPath(), c.getAddress(), c.getPort()};
+        client = new Client{c.get_dir_path(), c.get_address(), c.get_port()};
 
         if (!client->pwdAttempts()) {
             Logger::error("main", "No attempts remaining... terminate the program", PR_HIGH);

@@ -54,12 +54,12 @@ public:
     /**
      * Convert every answer into a boolean
      */
-    static bool checkAnswerOK(std::string &answer, bool &result);
+    static bool check_answer_ok(std::string &answer, bool &result);
 
     /**
      * Show the configuration of the server
      */
-    void showConfig();
+    void show_config();
 
     /**
      * Manage the menu and all the possible answers
@@ -74,25 +74,31 @@ public:
     /**
      * Show the the choices from menu
      */
-    static void showChoice();
+    static void show_choice();
 
     /**
      *
      * @return
      */
-    std::string getAddress();
+    std::string get_address();
 
     /**
      *
      * @return
      */
-    [[nodiscard]] std::string getPort() const;
+    [[nodiscard]] std::string get_port() const;
 
     /**
      *
      * @return
      */
-    std::string getDirPath();
+    std::string get_dir_path();
+
+    /**
+     *
+     * @return
+     */
+    std::string get_logs_path();
 };
 
 
