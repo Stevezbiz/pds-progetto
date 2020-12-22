@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Server.h"
 
-#define LOG_FILE "./logs.txt"
+#define LOG_FILE ".server_logs.txt"
 
 int main(int argc, char **argv) {
     Logger::logger_filter = PR_LOW;

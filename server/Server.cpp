@@ -144,7 +144,7 @@ bool Server::end(Session *session) {
 }
 
 void Server::handle_error(Session *session, const Comm_error *comm_error) {
-    Logger::error("Server::handle_error", comm_error->to_string(), PR_HIGH);
+    Logger::error(comm_error);
 }
 
 void Server::server_init() {

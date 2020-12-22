@@ -39,5 +39,5 @@ std::shared_ptr<Comm_error> Comm_error::build(const std::string &serialized) {
 }
 
 std::string Comm_error::to_string() const {
-    return "[Error code " + std::to_string(this->comm_errno) + "] " + this->message +  " (" + this->location + ")";
+    return "[Error code " + std::to_string(this->comm_errno) + "] " + this->message;
 }

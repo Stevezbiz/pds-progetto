@@ -5,8 +5,14 @@
 #include "ConfigSetting.h"
 #include "../comm/Logger.h"
 
+#define LOG_FILE ".client_logs.txt"
+
 int main(int argc, char **argv) {
     Logger::logger_filter = PR_LOW;
+    std::ofstream log_stream;
+//    log_stream.open(LOG_FILE, std::ios_base::app); // append
+    log_stream.open(LOG_FILE, std::ios::out | std::ios::trunc); // erase previous content
+    Logger::redirect(log_stream);
 
     Client *client;
     try {
