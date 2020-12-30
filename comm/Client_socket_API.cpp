@@ -20,13 +20,15 @@ std::shared_ptr<Client_socket_API> Client_socket_API::create_new_API_() {
     auto new_API = std::make_unique<Client_socket_API>(this->ip, this->port, false);
     new_API->keep_alive_ = false;
     new_API->cookie_ = this->cookie_;
+    new_API->retry_delay_ = this->retry_delay_;
+    new_API->n_retry_ = this->n_retry_;
     return new_API;
 }
 
 Client_socket_API::Client_socket_API(std::string ip, std::string port, bool keep_alive) :
         Socket_API(std::move(ip), std::move(port), RETRY_ONCE, 500, keep_alive) {}
 
-bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message) {
+bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message, int retry_cont_) {
     Logger::info("Client_socket_API::send_and_receive", "Sending a message...", PR_VERY_LOW);
 
     if (!this->open_conn())
@@ -50,12 +52,19 @@ bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message
             if (!ret_val)
                 return false;
             ret_val = this->receive(expected_message);
-        } else
+        }
+        else if (this->get_message() && this->get_message()->code == MSG_RETRY_LATER && retry_cont_ <= this->n_retry_) { // check if the server is busy
+            std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay_));
+            Logger::warning("Client_socket_API::send_and_receive", "Server is busy and asked to retry later");
+            ret_val = this->send_and_receive(message, expected_message, retry_cont_ + 1);
+        }
+        else
             return false;
     }
     if (ret_val) {
         Logger::info("Client_socket_API::send_and_receive", "Get cookie...", PR_VERY_LOW);
-        this->cookie_ = this->get_message()->cookie;
+        if(this->get_message()->cookie != COOKIE_KEEP_THE_SAME)
+            this->cookie_ = this->get_message()->cookie;
     }
 
     if (!this->close_conn())

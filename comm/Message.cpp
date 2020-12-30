@@ -135,6 +135,10 @@ std::shared_ptr<Message> Message::end() {
     return std::make_shared<Message>(MSG_END);
 }
 
+std::shared_ptr<Message> Message::retry_later() {
+    return std::make_shared<Message>(MSG_RETRY_LATER);
+}
+
 std::shared_ptr<Message> Message::build_header() {
     Logger::info("Message::build_header", "Building message header...", PR_LOW);
     Logger::info("Message::build_header", "Header buffer raw content: \"" + std::string{this->header_buffer_, code_length + length_length } + "\"", PR_LOW);

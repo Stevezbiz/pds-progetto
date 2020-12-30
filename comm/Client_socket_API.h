@@ -51,9 +51,10 @@ public:
      * (sync) send a message and retrieve the response
      * @param message
      * @param expected_message
+     * @param retry_cont_ - please do not use it!
      * @return status
      */
-    bool send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message);
+    bool send_and_receive(const std::shared_ptr<Message> &message, MESSAGE_TYPE expected_message, int retry_cont_ = 0);
 
     /**
      * async send a message and retrieve the response

@@ -44,8 +44,11 @@ enum MESSAGE_TYPE : std::int32_t {
     MSG_PUSH = 7,
     MSG_RESTORE = 8,
     MSG_RESTORE_CONTENT = 9,
-    MSG_END = 100
+    MSG_END = 100,
+    MSG_RETRY_LATER = 101
 };
+
+constexpr std::string_view COOKIE_KEEP_THE_SAME = "KEEP_THE_SAME";
 
 /**
  * create and send messages
@@ -183,6 +186,12 @@ public:
      * @return new message
      */
     static std::shared_ptr<Message> end();
+
+    /**
+     * create a message to inform the other host it has to retry later
+     * @return new message
+     */
+    static std::shared_ptr<Message> retry_later();
 
     /**
      * fill message header fields
