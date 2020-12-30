@@ -5,8 +5,6 @@
 #include "ConfigSetting.h"
 #include "../comm/Logger.h"
 
-#define LOG_FILE ".client_logs.txt"
-
 int main(int argc, char **argv) {
     Logger::logger_filter = PR_NULL;
     std::ofstream log_stream;
@@ -15,7 +13,7 @@ int main(int argc, char **argv) {
     try {
         ConfigSettings c;
         c.init_configuration();
-        log_stream.open(LOG_FILE, std::ios_base::app); // append
+//        log_stream.open(c.get_logs_path(), std::ios_base::app); // append
         log_stream.open(c.get_logs_path(), std::ios::out | std::ios::trunc); // erase previous content
         Logger::redirect(log_stream);
         client = new Client{c.get_dir_path(), c.get_address(), c.get_port()};

@@ -167,9 +167,8 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
         status = false;
     }
 
-    if(!this->receive_content_()) // read the message content in any case
+    if(!this->receive_content_() || !status) // read the message content in any case
         return false; // it cannot do any other action here
-
     try {
         auto new_message = message->build_content(); // build the whole message
         this->message = new_message;
@@ -178,6 +177,7 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
         return false; // it cannot do any other action here
     }
     this->comm_error = this->message->comm_error;
+
     Logger::info("Socket_API::receive", "Receiving a message... - done", PR_LOW);
 
     return status;

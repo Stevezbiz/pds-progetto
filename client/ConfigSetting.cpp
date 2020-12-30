@@ -75,7 +75,7 @@ void ConfigSettings::write_config() {
     }
     // get the directory to bakup
     while (true) {
-        std::cout << "Folder to bakup (default '" + dir_path_.string() + "'): ";
+        std::cout << "Folder to backup (default '" + dir_path_.string() + "'): ";
         std::getline(std::cin, dir_path);
         if (!dir_path.empty()) {
             if (boost::filesystem::exists(dir_path)) {
@@ -107,9 +107,9 @@ void ConfigSettings::write_config() {
         std::cout << "Insert the path to save logs (default '" + logs_path_ + "'): ";
         std::getline(std::cin, logs_path);
         if (!logs_path.empty()) {
-            if (boost::filesystem::is_directory(dir_path_)) {
+            if (boost::filesystem::is_directory(logs_path_)) {
                 // a directory with file's name already exists
-                std::cout << "Cannot name the file: folder '" + dir_path + "' already exists" << std::endl;
+                std::cout << "Cannot name the file: folder '" + logs_path + "' already exists" << std::endl;
             } else {
                 logs_path_ = logs_path;
                 break;

@@ -54,7 +54,7 @@ public:
      * @param message
      * @param original_ec
      */
-    explicit Comm_error(COMM_ERRNO comm_errno = CE_GENERIC, std::string location = "System", std::string message = "Generic error", boost::system::error_code original_ec = boost::asio::error::fault);
+    explicit Comm_error(COMM_ERRNO comm_errno = CE_GENERIC, std::string location = "System", std::string message = "Generic error", boost::system::error_code original_ec = boost::asio::error::try_again);
 
     /**
      * send an error
