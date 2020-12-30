@@ -27,6 +27,12 @@ public:
     std::shared_ptr<Session> retrieve_session(const std::shared_ptr<Message> &message);
 
     /**
+     * save inner session status before the next call
+     * @param message
+     */
+    void pause_session(const std::shared_ptr<Message> &message);
+
+    /**
      * remove a session from the list
      * @param session
      * @return status

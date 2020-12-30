@@ -112,6 +112,13 @@ class Server_API : public API {
      */
     void do_handle_error_(const std::shared_ptr<Session>& session, const std::shared_ptr<Comm_error>& comm_error);
 
+    /**
+     * terminate the socket properly
+     * @param api
+     * @return status
+     */
+    bool terminate_(std::shared_ptr<Socket_API> api);
+
 public:
     /**
      * class constructor
@@ -203,6 +210,13 @@ public:
      * @return status
      */
     bool run(std::unique_ptr<Socket_API> api, int socket_timeout = DEFAULT_SOCKET_TIMEOUT);
+
+    /**
+     * discard the received request
+     * @param api
+     * @return status
+     */
+    bool discard(std::unique_ptr<Socket_API> api);
 };
 
 #endif //SERVER_SERVER_API_H

@@ -42,6 +42,14 @@ void Server_API::do_handle_error_(const std::shared_ptr<Session>& session, const
     this->handle_error_(session.get(), comm_error.get());
 }
 
+bool Server_API::terminate_(std::shared_ptr<Socket_API> api) {
+    Logger::info("Server_API::discard", "Terminating...", PR_LOW);
+    auto status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
+    api.reset();
+    Logger::info("Server_API::discard", "Running... - done", PR_LOW);
+    return status;
+}
+
 Server_API::Server_API(std::shared_ptr<Session_manager> session_manager) : session_manager_(std::move(session_manager)) {}
 
 void Server_API::set_login(const std::function<bool(Session *, const std::string &, const std::string &)> &login_function) {
@@ -75,8 +83,8 @@ void Server_API::set_handle_error(const std::function<void(Session *, const Comm
 bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
     bool end_session = false;
     bool keep_alive;
+    bool status = true;
     std::future<bool> f;
-    bool status;
     std::shared_ptr<Socket_API> api_ = std::move(api); // unique_ptr to shared_ptr, as it is used in more threads
 
     Logger::info("Server_API::run", "Running...", PR_LOW);
@@ -140,10 +148,23 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
             this->session_manager_->remove_session(session);
     } while(keep_alive);
 
-    Logger::info("Server_API::run", "Terminating...", PR_LOW);
-    status = api_->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
-    api_.reset();
-    Logger::info("Server_API::run", "Running... - done", PR_LOW);
+//    Logger::info("Server_API::discard", "Terminating...", PR_LOW);
+//    status = api_->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
+//    api_.reset();
+//    Logger::info("Server_API::discard", "Running... - done", PR_LOW);
+    session_manager_->pause_session(api_->get_message());
 
-    return status;
+    return this->terminate_(api_) && status;
+}
+
+bool Server_API::discard(std::unique_ptr<Socket_API> api) {
+    std::future<bool> f;
+    std::shared_ptr<Socket_API> api_ = std::move(api); // unique_ptr to shared_ptr, as it is used in more threads
+
+    // no receive
+    auto res = Message::retry_later();
+    res->cookie = COOKIE_KEEP_THE_SAME;
+    api_->send(res);
+
+    return this->terminate_(api_);
 }

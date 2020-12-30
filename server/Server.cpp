@@ -34,6 +34,29 @@ void Server::accept() {
     }
 }
 
+// TODO: evaluate this alternative, discard the request when all server threads are busy
+//void Server::accept() {
+//    while (!stop_) {
+//        acceptor_.accept(socket_);
+//        if(this->n_active_threads_ >= MAX_THREADS) { // if all threads are busy, discard the request
+//            std::thread thread([this](boost::asio::ip::tcp::socket socket) {
+//                Logger::warning("Server::accept", "Discard request");
+//                if (!this->api_->discard(std::make_unique<Socket_API>(std::move(socket))))
+//                    Logger::error("Server::accept", "No correctly closing current socket");
+//            }, std::move(socket_));
+//            continue;
+//        }
+//        this->n_active_threads_++;
+//        std::thread thread([this](boost::asio::ip::tcp::socket socket) {
+//            if (!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
+//                Logger::error("Server::accept", "No correctly closing current socket");
+//            this->n_active_threads_--;
+//            this->cv_.notify_one();
+//        }, std::move(socket_));
+//        thread.detach();
+//    }
+//}
+
 bool Server::login(Session *session, const std::string &username, const std::string &password,
                    const Database_API &database, const std::string &root_path) {
     if (database.login_query(username, password)) {
