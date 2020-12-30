@@ -43,10 +43,10 @@ void Server_API::do_handle_error_(const std::shared_ptr<Session>& session, const
 }
 
 bool Server_API::terminate_(std::shared_ptr<Socket_API> api) {
-    Logger::info("Server_API::discard", "Terminating...", PR_LOW);
+    Logger::info("Server_API::terminate_", "Terminating...", PR_LOW);
     auto status = api->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
     api.reset();
-    Logger::info("Server_API::discard", "Running... - done", PR_LOW);
+    Logger::info("Server_API::terminate_", "Running... - done", PR_LOW);
     return status;
 }
 
