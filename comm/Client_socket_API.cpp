@@ -12,8 +12,7 @@ bool Client_socket_API::is_connection_error_() {
             boost::asio::error::shut_down,
             boost::asio::error::fault
     };
-    return std::any_of(errors.begin(), errors.end(),
-                       [this](auto error) { return this->get_last_error()->original_ec == error; });
+    return std::any_of(errors.begin(), errors.end(), [this](auto error) { return this->get_last_error()->original_ec == error; });
 }
 
 std::shared_ptr<Client_socket_API> Client_socket_API::create_new_API_() {
@@ -53,10 +52,12 @@ bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message
                 return false;
             ret_val = this->receive(expected_message);
         }
-        else if (this->get_message() && this->get_message()->code == MSG_RETRY_LATER && retry_cont_ <= this->n_retry_) { // check if the server is busy
-            std::this_thread::sleep_for(std::chrono::milliseconds(retry_delay_));
+        else if (this->get_message() && this->get_message()->code == MSG_RETRY_LATER) { // check if the server is busy
+            // && retry_cont_ <= this->n_retry_
+            std::this_thread::sleep_for(std::chrono::milliseconds(this->retry_delay_));
             Logger::warning("Client_socket_API::send_and_receive", "Server is busy and asked to retry later");
-            ret_val = this->send_and_receive(message, expected_message, retry_cont_ + 1);
+//            ret_val = this->send_and_receive(message, expected_message, retry_cont_++);
+            ret_val = this->send_and_receive(message, expected_message);
         }
         else
             return false;
@@ -78,6 +79,11 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
 
     std::unique_lock<std::mutex> lock(this->m_threads_);
     this->cv_.wait(lock, [this]() { return this->n_active_threads_ < MAX_THREADS; });
+
+    if(this->keep_alive_) { // unset keep alive on server
+        this->keep_alive_ = false;
+        this->send_and_receive(Message::okay(), MSG_OKAY);
+    }
 
     auto thread_id = this->thread_id_++;
     this->n_active_threads_++;
@@ -113,6 +119,7 @@ bool Client_socket_API::wait_all_async() {
         it = this->threads_.erase(it);
     }
     this->thread_id_ = 0;
+    this->keep_alive_ = true;
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads... - done", PR_VERY_LOW);
     return status;
