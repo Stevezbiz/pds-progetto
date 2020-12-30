@@ -161,6 +161,8 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
 }
 
 bool Server_API::discard(std::unique_ptr<Socket_API> api) {
+    Logger::info("Server_API::discard", "Running...", PR_LOW);
+
     std::future<bool> f;
     std::shared_ptr<Socket_API> api_ = std::move(api); // unique_ptr to shared_ptr, as it is used in more threads
 
@@ -168,6 +170,7 @@ bool Server_API::discard(std::unique_ptr<Socket_API> api) {
     auto res = Message::retry_later();
     res->cookie = COOKIE_KEEP_THE_SAME;
     api_->send(res);
+    Logger::info("Server_API::discard", "Running... - done", PR_LOW);
 
     return this->terminate_(api_);
 }
