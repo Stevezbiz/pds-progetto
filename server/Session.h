@@ -11,12 +11,15 @@
 #include "../comm/Socket_API.h"
 #include "Database_API.h"
 
+constexpr int MAX_THREADS_PER_SESSION = 2;
+
 class Session {
 
 public:
     int session_id{-1};
     std::string user;
     bool login_status{false};
+    std::atomic<int> thread_count{ 0 };
 
     /**
      * Initializesthe object's structures
