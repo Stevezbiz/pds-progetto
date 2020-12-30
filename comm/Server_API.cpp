@@ -118,6 +118,9 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
 
         // manage the request and produce a response message
         switch (req->code) {
+            case MSG_OKAY:
+                res = Message::okay();
+                break;
             case MSG_LOGIN:
                 res = this->do_login_(session, req);
                 break;
