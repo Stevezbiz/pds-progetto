@@ -20,6 +20,7 @@ public:
     std::string user;
     bool login_status{false};
     std::atomic<int> thread_count{ 0 };
+    boost::posix_time::ptime latest_usage;
 
     /**
      * Initializesthe object's structures
