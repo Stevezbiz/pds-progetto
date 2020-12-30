@@ -14,6 +14,8 @@
 #include <utility>
 #include <boost/asio/error.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/time_serialize.hpp>
 
 /**
  * list of error numbers (error codes)
@@ -43,6 +45,7 @@ public:
     std::string location;
     std::string message;
     boost::system::error_code original_ec;
+    boost::posix_time::ptime timestamp;
 
     /**
      * class constructor

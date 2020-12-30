@@ -9,15 +9,15 @@ void Comm_error::serialize(Archive &ar, const unsigned int version) {
     ar & this->comm_errno;
     ar & this->message;
     ar & this->location;
+    ar & this->timestamp;
 }
 
 Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message, boost::system::error_code original_ec) :
         comm_errno(comm_errno),
         location(std::move(location)),
         message(std::move(message)),
-        original_ec(original_ec) {
-//    std::cerr << "ERROR: " + this->location + " " + this->message << std::endl;
-}
+        original_ec(original_ec),
+        timestamp(boost::posix_time::second_clock::local_time()) {} // now
 
 std::string Comm_error::send() const {
     std::ostringstream ostream{};
@@ -39,5 +39,8 @@ std::shared_ptr<Comm_error> Comm_error::build(const std::string &serialized) {
 }
 
 std::string Comm_error::to_string() const {
-    return "[Error code " + std::to_string(this->comm_errno) + "] " + this->message;
+    std::stringstream ss;
+    ss << to_iso_extended_string(this->timestamp);
+    ss << "[Errno " + std::to_string(this->comm_errno) + "] " + this->message;
+    return ss.str();
 }

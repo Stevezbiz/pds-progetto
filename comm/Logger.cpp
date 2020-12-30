@@ -17,7 +17,7 @@ enum LOG_LENGTHS : int {
     priority_length = 1
 };
 
-void Logger::log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority) {
+void Logger::log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority, boost::posix_time::ptime timestamp) {
     std::lock_guard lg(Logger::m_write_);
 
     std::string log_string;
@@ -41,25 +41,25 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
         curr_location.erase(std::remove(curr_location.begin(), curr_location.end(), '\n'), curr_location.end());
         auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
         curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
-        std::string timestamp = boost::posix_time::to_iso_extended_string(boost::posix_time::second_clock::local_time());
-        Logger::output_ << std::left << std::setw(time_length) << timestamp << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
+        std::string curr_timestamp = boost::posix_time::to_iso_extended_string(timestamp);
+        Logger::output_ << std::left << std::setw(time_length) << timestamp <<  " " << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 
-void Logger::info(const std::string &location, const std::string &message, PRIORITY priority) {
-    Logger::log(LOG_INFO, location, message, priority);
+void Logger::info(const std::string &location, const std::string &message, PRIORITY priority, boost::posix_time::ptime timestamp) {
+    Logger::log(LOG_INFO, location, message, priority, timestamp);
 }
 
-void Logger::warning(const std::string &location, const std::string &message, PRIORITY priority) {
-    Logger::log(LOG_WARNING, location, message, priority);
+void Logger::warning(const std::string &location, const std::string &message, PRIORITY priority, boost::posix_time::ptime timestamp) {
+    Logger::log(LOG_WARNING, location, message, priority, timestamp);
 }
 
-void Logger::error(const std::string &location, const std::string &message, PRIORITY priority) {
-    Logger::log(LOG_ERROR, location, message, priority);
+void Logger::error(const std::string &location, const std::string &message, PRIORITY priority, boost::posix_time::ptime timestamp) {
+    Logger::log(LOG_ERROR, location, message, priority, timestamp);
 }
 
 void Logger::error(const Comm_error *comm_error, PRIORITY priority) {
-    Logger::error(comm_error->location, comm_error->to_string(), priority);
+    Logger::error(comm_error->location, comm_error->message, priority, comm_error->timestamp);
 }
 
 void Logger::redirect(std::ostream &new_stream) {

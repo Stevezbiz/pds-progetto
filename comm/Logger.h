@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "Comm_error.h"
 
 enum LOG_CODE : int {
@@ -39,31 +40,35 @@ public:
      * @param location
      * @param message
      * @param priority
+     * @param timestamp
      */
-    static void log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
+    static void log(LOG_CODE log_code, const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH, boost::posix_time::ptime timestamp = boost::posix_time::second_clock::local_time());
 
     /**
      * create a new info log
      * @param location
      * @param message
      * @param priority
+     * @param timestamp
      */
-    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_VERY_LOW);
+    static void info(const std::string &location, const std::string &message, PRIORITY priority = PR_VERY_LOW, boost::posix_time::ptime timestamp = boost::posix_time::second_clock::local_time());
     /**
      * create a new warning log
      * @param location
      * @param message
      * @param priority
+     * @param timestamp
      */
-    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_NORMAL);
+    static void warning(const std::string &location, const std::string &message, PRIORITY priority = PR_NORMAL, boost::posix_time::ptime timestamp = boost::posix_time::second_clock::local_time());
 
     /**
      * create a new error log
      * @param location
      * @param message
      * @param priority
+     * @param timestamp
      */
-    static void error(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH);
+    static void error(const std::string &location, const std::string &message, PRIORITY priority = PR_HIGH, boost::posix_time::ptime timestamp = boost::posix_time::second_clock::local_time());
 
     /**
      * create a new error log
