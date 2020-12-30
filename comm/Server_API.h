@@ -117,7 +117,7 @@ class Server_API : public API {
      * @param api
      * @return status
      */
-    bool terminate_(std::shared_ptr<Socket_API> api);
+    static bool terminate_(std::shared_ptr<Socket_API> api);
 
 public:
     /**
