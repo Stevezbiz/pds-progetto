@@ -161,8 +161,9 @@ bool Socket_API::receive(MESSAGE_TYPE expectedMessage) {
     }
 
     if(expectedMessage != MSG_UNDEFINED && message->code != expectedMessage && message->code != MSG_ERROR) {
-        this->message = Message::error(new Comm_error{ CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) });
-        this->comm_error = this->message->comm_error;
+//        this->message = Message::error( new Comm_error{ CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code) });
+//        this->comm_error = this->message->comm_error;
+        this->comm_error = std::make_shared<Comm_error>(CE_UNEXPECTED_TYPE, "Socket_API::receive_header_", "Expected message code " + std::to_string(expectedMessage) + " but actual code is " + std::to_string(message->code));
         status = false;
     }
 
