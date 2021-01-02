@@ -64,7 +64,7 @@ bool Client_API::login(const std::string &username, const std::string &password)
 
 bool Client_API::probe(const std::map<std::string, std::string> &map) {
     Logger::info("Client_API::probe", "Probe check started...", PR_LOW);
-
+    bool sent = false;
     std::vector<std::string> paths;
     paths.reserve(map.size());
     for (auto const &item : map)
@@ -97,6 +97,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                 if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
                     return false;
             }
+            sent = true;
         }
     }
 
@@ -114,11 +115,13 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                 Logger::info("Client_API::probe", "Created file found " + path, PR_LOW);
                 if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile, -1))
                     return false;
+                sent = true;
             } else if(res->hashes.at(path)!=item.second){
                 // different hash -> modified
                 Logger::info("Client_API::probe", "Modified file found " + path, PR_LOW);
                 if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile, -1))
                     return false;
+                sent = true;
             }
         } else if(boost::filesystem::is_directory(dest_path)){
             if(it==res->hashes.end()){
@@ -126,13 +129,17 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                 Logger::info("Client_API::probe", "Created dir found " + path, PR_LOW);
                 if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir, -1))
                     return false;
+                sent = true;
             }
         }
     }
-    this->api_->wait_all_async();
+    bool status;
+    if(sent)
+        status = this->api_->wait_all_async();
+    else
+        status = this->api_->send(Message::okay());
     Logger::info("Client_API::probe", "Probe check started... - done", PR_LOW);
-
-    return true;
+    return status;
 }
 
 bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus, int fw_cycle) {
