@@ -6,7 +6,7 @@
 #include "../comm/Logger.h"
 
 int main(int argc, char **argv) {
-    Logger::logger_filter = PR_NULL;
+    Logger::logger_filter = PR_LOW;
     std::ofstream log_stream;
 
     Client *client;

@@ -55,28 +55,6 @@ void Client::run() {
                         std::cout << "Cannot push changes of '" + path + "' on server" << std::endl;
                         return false;
                     }
-                    switch (status) {
-                        case ElementStatus::createdDir:
-                            Logger::info("Client::run", "Created directory '" + path + "' on server...", PR_NORMAL);
-                            std::cout << "Creating directory '" + path + "' on server" << std::endl;
-                            break;
-                        case ElementStatus::createdFile:
-                            Logger::info("Client::run", "Created file '" + path + "' on server...", PR_NORMAL);
-                            std::cout << "Creating file '" + path + "' on server" << std::endl;
-                            break;
-                        case ElementStatus::erasedDir:
-                            Logger::info("Client::run", "Erased directory '" + path + "' from server...", PR_NORMAL);
-                            std::cout << "Erasing directory '" + path + "' from server" << std::endl;
-                            break;
-                        case ElementStatus::erasedFile:
-                            Logger::info("Client::run", "Erased file '" + path + "' from server...", PR_NORMAL);
-                            std::cout << "Erasing file '" + path + "' from server" << std::endl;
-                            break;
-                        case ElementStatus::modifiedFile:
-                            Logger::info("Client::run", "Modified file '" + path + "' on server...", PR_NORMAL);
-                            std::cout << "Modifying file '" + path + "' on server" << std::endl;
-                            break;
-                    }
                     return true;
                 })) {
             std::cout << "Closing..." << std::endl;

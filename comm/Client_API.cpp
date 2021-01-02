@@ -20,8 +20,12 @@ bool Client_API::get_and_save_(const std::string &path) {
            if(res->elementStatus==ElementStatus::createdFile){
                if (!Client_API::save_file_(res))
                    return false;
+               Logger::info("Client_API::get_and_save_", "Restored file '" + path + "'", PR_NORMAL);
+               std::cout << "Restored file '" + path + "'" << std::endl;
            } else {
                boost::filesystem::create_directory(dest_path);
+               Logger::info("Client_API::get_and_save_", "Restored directory '" + path + "'", PR_NORMAL);
+               std::cout << "Restored directory '" + path + "'" << std::endl;
            }
            Logger::info("Client_API::get_and_save_", "Analyzing new file... - done", PR_VERY_LOW);
 
@@ -143,16 +147,37 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
     }
 
     this->api_->async_send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY,
-       [](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
-           Logger::info("Client_API::push", "Analyzing new file...", PR_VERY_LOW);
-           if (!status || !res->is_okay()){
-               Logger::error(comm_error.get());
-               return false;
-           }
-           Logger::info("Client_API::push", "Analyzing new file... - done", PR_VERY_LOW);
-
-           return res->is_okay();
-       });
+        [path, elementStatus](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
+            Logger::info("Client_API::push", "Analyzing new file...", PR_VERY_LOW);
+            if (!status || !res->is_okay()){
+                Logger::error(comm_error.get());
+                return false;
+            }
+            Logger::info("Client_API::push", "Analyzing new file... - done", PR_VERY_LOW);
+            switch(elementStatus){
+                case ElementStatus::createdDir:
+                    Logger::info("Client::run", "Created directory '" + path + "' on server", PR_NORMAL);
+                    std::cout << "Created directory '" + path + "' on server" << std::endl;
+                    break;
+                case ElementStatus::createdFile:
+                    Logger::info("Client::run", "Created file '" + path + "' on server", PR_NORMAL);
+                    std::cout << "Created file '" + path + "' on server" << std::endl;
+                    break;
+                case ElementStatus::erasedDir:
+                    Logger::info("Client::run", "Erased directory '" + path + "' from server", PR_NORMAL);
+                    std::cout << "Erased directory '" + path + "' from server" << std::endl;
+                    break;
+                case ElementStatus::erasedFile:
+                    Logger::info("Client::run", "Erased file '" + path + "' from server", PR_NORMAL);
+                    std::cout << "Erased file '" + path + "' from server" << std::endl;
+                    break;
+                case ElementStatus::modifiedFile:
+                    Logger::info("Client::run", "Modified file '" + path + "' on server", PR_NORMAL);
+                    std::cout << "Modified file '" + path + "' on server" << std::endl;
+                    break;
+            }
+            return res->is_okay();
+        });
 
 //    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
 //        return false;
@@ -182,7 +207,7 @@ bool Client_API::restore() {
             return false;
     }
 
-    return this->api_->wait_all_async();;
+    return this->api_->wait_all_async();
 }
 
 bool Client_API::end() {

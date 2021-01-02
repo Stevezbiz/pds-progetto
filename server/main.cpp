@@ -4,7 +4,7 @@
 #define LOG_FILE ".server_logs.txt"
 
 int main(int argc, char **argv) {
-    Logger::logger_filter = PR_NULL;
+    Logger::logger_filter = PR_LOW;
     std::ofstream log_stream;
 //    log_stream.open(LOG_FILE, std::ios_base::app); // append
     log_stream.open(LOG_FILE, std::ios::out | std::ios::trunc); // erase previous content
