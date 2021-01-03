@@ -40,10 +40,13 @@ bool Client::restore() {
 }
 
 bool Client::close() {
+    Logger::info("Client::close", "Closing the socket", PR_VERY_LOW);
     auto ret_val = api_.end();
-    Logger::info("Client::close", "Closing", PR_NORMAL);
+    Logger::info("Client::close", "Closing...", PR_NORMAL);
     fw_.stop();
-    f_.get();
+    if(f_.valid())
+        f_.get();
+    Logger::info("Client::close", "Closing... - done", PR_VERY_LOW);
     return ret_val;
 }
 
