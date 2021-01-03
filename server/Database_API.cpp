@@ -106,21 +106,25 @@ bool Database_API::insert_path(const std::string &path, const std::string &hash,
         Logger::error("Database_API::insert_path", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
         return false;
     }
+    Logger::info("Database_API::insert_path", "Binding path " + path, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 1, path.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
         return false;
     }
+    Logger::info("Database_API::insert_path", "Binding hash " + hash, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 2, hash.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
         return false;
     }
+    Logger::info("Database_API::insert_path", "Binding username " + username, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 3, username.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
         return false;
     }
+    Logger::info("Database_API::insert_path", "Binding type " + std::to_string(type), PR_VERY_LOW);
     rc = sqlite3_bind_int(query, 4, type);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_int: error " + std::to_string(rc), PR_HIGH);
