@@ -13,6 +13,7 @@
 #include "Socket_API.h"
 
 constexpr int MAX_THREADS = 4;
+constexpr int WAIT_TIMEOUT = 1000 * 60 * 5;
 
 class Client_socket_API : public Socket_API {
     int thread_id_{ 0 };

@@ -122,7 +122,9 @@ bool Client_socket_API::wait_all_async() {
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads...", PR_VERY_LOW);
     auto it = this->threads_.begin();
     while (it != this->threads_.end()) {
-        if (!it->second.get()) {
+        auto f_status = it->second.wait_for(std::chrono::milliseconds(WAIT_TIMEOUT));
+
+        if(f_status == std::future_status::timeout || !it->second.get()) {
             status = false;
         }
         it = this->threads_.erase(it);
