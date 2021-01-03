@@ -17,7 +17,7 @@ bool Client_socket_API::is_connection_error_() {
 
 std::shared_ptr<Client_socket_API> Client_socket_API::create_new_API_() {
     auto new_API = std::make_unique<Client_socket_API>(this->ip, this->port, false);
-    new_API->keep_alive_ = false;
+//    new_API->keep_alive = false;
     new_API->cookie_ = this->cookie_;
     new_API->retry_delay_ = this->retry_delay_;
     new_API->n_retry_ = this->n_retry_;
@@ -34,6 +34,11 @@ bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message
         return false;
     Logger::info("Client_socket_API::send_and_receive", "Set cookie...", PR_VERY_LOW);
     message->cookie = this->cookie_;
+
+    if(message->code == MSG_END) {
+        this->prev_keep_alive_ = this->keep_alive;
+        this->keep_alive = false;
+    }
     auto ret_val = this->send(message);
 
     if (!ret_val)
@@ -68,6 +73,9 @@ bool Client_socket_API::send_and_receive(const std::shared_ptr<Message> &message
             this->cookie_ = this->get_message()->cookie;
     }
 
+    if(message->code == MSG_END)
+        this->keep_alive = this->prev_keep_alive_;
+
     if (!this->close_conn())
         return false;
     Logger::info("Client_socket_API::send_and_receive", "Receiving a message... - done", PR_VERY_LOW);
@@ -80,8 +88,9 @@ bool Client_socket_API::async_send_and_receive(const std::shared_ptr<Message> &m
     std::unique_lock<std::mutex> lock(this->m_threads_);
     this->cv_.wait(lock, [this]() { return this->n_active_threads_ < MAX_THREADS; });
 
-    if(this->keep_alive_) { // unset keep alive on server
-        this->keep_alive_ = false;
+    this->prev_keep_alive_ = this->keep_alive;
+    if(this->keep_alive) { // unset keep alive on server
+        this->keep_alive = false;
         this->send_and_receive(Message::okay(), MSG_OKAY);
     }
 
@@ -119,7 +128,7 @@ bool Client_socket_API::wait_all_async() {
         it = this->threads_.erase(it);
     }
     this->thread_id_ = 0;
-    this->keep_alive_ = true;
+    this->keep_alive = this->prev_keep_alive_;
 
     Logger::info("Client_socket_API::wait_all_async", "Waiting all threads... - done", PR_VERY_LOW);
     return status;

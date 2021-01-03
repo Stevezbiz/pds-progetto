@@ -43,7 +43,7 @@ public:
      * class constructor
      * @param ip
      * @param port
-     * @param keep_alive
+     * @param keep_alive - it could be deprecated in future
      */
     Client_socket_API(std::string ip, std::string port, bool keep_alive = true);
 
