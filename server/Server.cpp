@@ -111,6 +111,9 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
     disk_path.append(path);
     fs::path virt_path{session->user};
     virt_path.append(path);
+    Logger::info("Server::push", "Generated disk path: " + disk_path.string(), PR_VERY_LOW);
+    Logger::info("Server::push", "Generated virtual path: " + virt_path.string(), PR_VERY_LOW);
+
     switch (status) {
         case ElementStatus::createdFile:
             Utils::write_on_file(disk_path, file);
