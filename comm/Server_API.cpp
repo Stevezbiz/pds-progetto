@@ -106,8 +106,8 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
         }
 
         auto req = api_->get_message();
-        keep_alive = req->keep_alive;
-        Logger::info("Server_API::run", "Keep alive: " + std::to_string(keep_alive), PR_VERY_LOW);
+        api_->keep_alive = req->keep_alive;
+        Logger::info("Server_API::run", "Keep alive: " + std::to_string(api_->keep_alive), PR_VERY_LOW);
         auto session = this->session_manager_->retrieve_session(req);
         if (req->code != MSG_LOGIN && !session->is_logged_in()) {
             api_->send(Message::error(new Comm_error{CE_NOT_ALLOWED, "Server_API::run", "Login must be perfomed before this action"}));
@@ -149,7 +149,7 @@ bool Server_API::run(std::unique_ptr<Socket_API> api, int socket_timeout) {
         res.reset();
         if(end_session)
             this->session_manager_->remove_session(session);
-    } while(keep_alive);
+    } while(api_->keep_alive);
 
 //    Logger::info("Server_API::discard", "Terminating...", PR_LOW);
 //    status = api_->close_conn(true); // generate error in Socket_API::call_, if the timeout is over
