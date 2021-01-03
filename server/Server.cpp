@@ -52,7 +52,7 @@ void Server::accept() {
         }
         this->n_active_threads_++;
         std::thread thread([this](boost::asio::ip::tcp::socket socket) {
-            if (!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
+            if (!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500, false), SOCKET_TIMEOUT))
                 Logger::error("Server::accept", "No correctly closing current socket");
             this->n_active_threads_--;
             this->cv_.notify_one();
