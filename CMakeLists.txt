@@ -126,6 +126,8 @@ set(SERVER_SOURCE_FILES
         server/Database_API.h
         server/Session_manager.cpp
         server/Session_manager.h
+        server/ServerConfigSetting.cpp
+        server/ServerConfigSetting.h
         )
 
 ### stub client ###
