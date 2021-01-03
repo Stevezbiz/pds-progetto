@@ -32,7 +32,8 @@ class Socket_API {
 protected:
     int n_retry_ = NO_RETRY;
     long retry_delay_ = 0;
-    bool keep_alive_ = false;
+    bool keep_alive = false;
+    bool prev_keep_alive_ = false; // temporary value
     std::unique_ptr<boost::asio::ip::tcp::socket> socket_{ nullptr };
 
     /**
@@ -82,7 +83,7 @@ public:
      * @param retry_delay
      * @param keep_alive
      */
-    explicit Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
+    explicit Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = false);
 
     /**
      * class constructor
@@ -91,7 +92,7 @@ public:
      * @param retry_delay
      * @param keep_alive
      */
-    explicit Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = true);
+    explicit Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management = NO_RETRY, long retry_delay = 1000, bool keep_alive = false);
 
     /**
      * open a connection towards the specified ip and port

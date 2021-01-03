@@ -80,21 +80,21 @@ Socket_API::Socket_API(std::string ip, std::string port, ERROR_MANAGEMENT error_
         port(std::move(port)),
         n_retry_(error_management),
         retry_delay_(retry_delay),
-        keep_alive_(keep_alive) {
+        keep_alive(keep_alive) {
     this->init_config_();
 }
 
 Socket_API::Socket_API(boost::asio::ip::tcp::socket socket, ERROR_MANAGEMENT error_management, long retry_delay, bool keep_alive) :
         n_retry_(error_management),
         retry_delay_(retry_delay),
-        keep_alive_(keep_alive) {
+        keep_alive(keep_alive) {
     this->socket_ = std::make_unique<boost::asio::ip::tcp::socket>(std::move(socket));
 }
 
 bool Socket_API::open_conn(bool force) {
     Logger::info("Socket_API::open_conn", "Opening a connection...", PR_VERY_LOW);
 
-    if(this->socket_ != nullptr && this->socket_->is_open() && this->keep_alive_ && !force) {
+    if(this->socket_ != nullptr && this->socket_->is_open() && this->keep_alive && !force) {
         Logger::info("Socket_API::open_conn", "Connection already opened", PR_VERY_LOW);
         return true;
     }
@@ -133,7 +133,8 @@ bool Socket_API::open_conn(bool force) {
 bool Socket_API::send(std::shared_ptr<Message> message) {
     Logger::info("Socket_API::send", "Sending a message...", PR_LOW);
 
-    message->keep_alive = this->keep_alive_;
+    message->keep_alive = this->keep_alive;
+    Logger::info("Socket_API::send", "Sending a message with keep alive " + std::to_string(this->keep_alive), PR_LOW);
     if(!this->call_([&message](boost::asio::ip::tcp::socket &socket, boost::system::error_code &ec) {
             boost::asio::write(socket, message->send(), ec);
         })) {
@@ -202,7 +203,7 @@ bool Socket_API::close_conn(bool force) {
 
     if(this->socket_ == nullptr)
         return true;
-    if(this->socket_->is_open() && this->keep_alive_ && !force)
+    if(this->socket_->is_open() && this->keep_alive && !force)
         return true;
     Logger::info("Socket_API::close_conn", "Force closing", PR_VERY_LOW);
 
@@ -244,6 +245,7 @@ Socket_API::~Socket_API() {
         this->socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         this->socket_->release(ec);
         this->socket_->close(ec);
+        this->ctx_.stop();
     }
     this->socket_.reset(nullptr);
 }
