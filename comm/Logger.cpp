@@ -42,7 +42,8 @@ void Logger::log(LOG_CODE log_code, const std::string &location, const std::stri
         auto curr_message = message.length() <= message_length ? message : message.substr(0, message_length-3) + "...";
         curr_message.erase(std::remove(curr_message.begin(), curr_message.end(), '\n'), curr_message.end());
         std::string curr_timestamp = boost::posix_time::to_iso_extended_string(timestamp);
-        Logger::output_ << std::left << std::setw(time_length) << timestamp <<  " " << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
+        curr_timestamp = curr_timestamp.length() <= time_length ? curr_timestamp : curr_timestamp.substr(0, time_length-3) + "...";
+        Logger::output_ << std::left << std::setw(time_length) << curr_timestamp <<  " " << std::setw(log_length) << "[" + log_string + "]" << std::left << std::setw(location_length+1) << "(" + curr_location + ")" << std::left  << std::setw(message_length+1) << curr_message << std::setw(priority_length) << "(PR " + std::to_string(priority) + ")" << std::endl;
     }
 }
 
