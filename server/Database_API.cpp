@@ -31,28 +31,33 @@ bool Database_API::login_query(const std::string &username, const std::string &p
     rc = sqlite3_prepare_v2(db_, "SELECT COUNT(*) FROM USERS WHERE username = ? AND password = ?", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::login_query", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_bind_text(query, 1, username.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::login_query", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     std::string hash = Utils::hash(password);
     rc = sqlite3_bind_text(query, 2, hash.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::login_query", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     // execute the query
     rc = sqlite3_step(query);
     if (rc != SQLITE_DONE && rc != SQLITE_ROW) {
         Logger::error("Database_API::login_query", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     // verify the result of the query
     int count = sqlite3_column_int(query, 0);
     if (count != 1) {
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_finalize(query);
@@ -71,11 +76,13 @@ std::vector<std::string> *Database_API::get_path_schema(const std::string &usern
     rc = sqlite3_prepare_v2(db_, "SELECT path FROM SESSIONS WHERE user = ?", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::get_path_schema", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return new std::vector<std::string>(res);
     }
     rc = sqlite3_bind_text(query, 1, username.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::get_path_schema", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return new std::vector<std::string>(res);
     }
     while (rc != SQLITE_DONE) {
@@ -86,6 +93,7 @@ std::vector<std::string> *Database_API::get_path_schema(const std::string &usern
             res.emplace_back(s);
         } else if (rc != SQLITE_DONE) {
             Logger::error("Database_API::get_path_schema", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+            sqlite3_finalize(query);
             return new std::vector<std::string>(res);
         }
     }
@@ -104,35 +112,41 @@ bool Database_API::insert_path(const std::string &path, const std::string &hash,
     rc = sqlite3_prepare_v2(db_, "INSERT INTO SESSIONS(path,hash,user,dir) values(?,?,?,?)", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     Logger::info("Database_API::insert_path", "Binding path " + path, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 1, path.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     Logger::info("Database_API::insert_path", "Binding hash " + hash, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 2, hash.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     Logger::info("Database_API::insert_path", "Binding username " + username, PR_VERY_LOW);
     rc = sqlite3_bind_text(query, 3, username.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     Logger::info("Database_API::insert_path", "Binding type " + std::to_string(type), PR_VERY_LOW);
     rc = sqlite3_bind_int(query, 4, type);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::insert_path", "sqlite3_bind_int: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_step(query);
     if (rc != SQLITE_DONE) {
         Logger::error("Database_API::insert_path", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_finalize(query);
@@ -149,19 +163,22 @@ bool Database_API::delete_path(const std::string &path) const {
     rc = sqlite3_prepare_v2(db_, "DELETE FROM SESSIONS WHERE path = ?", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::delete_path", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_bind_text(query, 1, path.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::delete_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_step(query);
     if (rc != SQLITE_DONE) {
         Logger::error("Database_API::delete_path", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
-    rc = sqlite3_reset(query);
+    rc = sqlite3_finalize(query);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::delete_path", "sqlite3_finalize: error " + std::to_string(rc), PR_HIGH);
         return false;
@@ -175,21 +192,25 @@ bool Database_API::update_path(const std::string &path, const std::string &hash)
     rc = sqlite3_prepare_v2(db_, "UPDATE SESSIONS SET hash = ? WHERE path = ?", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::update_path", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_bind_text(query, 1, hash.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::update_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_bind_text(query, 2, path.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::update_path", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_step(query);
     if (rc != SQLITE_DONE) {
         Logger::error("Database_API::update_path", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return false;
     }
     rc = sqlite3_finalize(query);
@@ -208,11 +229,13 @@ std::unordered_map<std::string, std::string> *Database_API::get_schema(const std
     rc = sqlite3_prepare_v2(db_, "SELECT path, hash, dir FROM SESSIONS WHERE user = ?", -1, &query, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::get_schema", "sqlite3_prepare_v2: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return new std::unordered_map<std::string, std::string>(res);
     }
     rc = sqlite3_bind_text(query, 1, username.data(), -1, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::get_schema", "sqlite3_bind_text: error " + std::to_string(rc), PR_HIGH);
+        sqlite3_finalize(query);
         return new std::unordered_map<std::string, std::string>(res);
     }
     while (rc != SQLITE_DONE) {
@@ -227,6 +250,7 @@ std::unordered_map<std::string, std::string> *Database_API::get_schema(const std
             }
         } else if (rc != SQLITE_DONE) {
             Logger::error("Database_API::get_schema", "sqlite3_step: error " + std::to_string(rc), PR_HIGH);
+            sqlite3_finalize(query);
             return new std::unordered_map<std::string, std::string>(res);
         }
     }
