@@ -136,8 +136,10 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     bool status;
     if(sent)
         status = this->api_->wait_all_async();
-    else
-        status = this->api_->send(Message::okay());
+    else {
+        this->api_->send_and_receive(Message::okay(), MSG_OKAY);
+        status = this->api_->get_message()->is_okay();
+    }
     Logger::info("Client_API::probe", "Probe check started... - done", PR_LOW);
     return status;
 }
