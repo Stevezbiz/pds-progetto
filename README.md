@@ -67,11 +67,10 @@ $ ./build_c.sh
 - Server
 
   ```
-  ./server <Port>
+  ./server
   ```
 
-  - Backup directory folders for each user
-    __/server/???__
+  - The backup directory folders for each user depend on the configuration parameters (these can be set at first boot default directory is ./server_files)
     
 
 - Client 
@@ -79,20 +78,24 @@ $ ./build_c.sh
   ```
   ./client
   ```
-
+  - As for the server, the path for executing remote backup depends on the configuration parameters
 ## Description
 
 ### Client
-  - It is not necessary to pass arguments, it is possible to insert the configuration parameters(_server ip_, _port_, _path_ ) at the first start.
+  - It is not necessary to pass arguments, it is possible to insert the configuration parameters (_server ip_, _port_, _path_ ) at the first start.
   - A socket has been created and there is an attempt to connect with the server at the given port.
   - After the login phase, if it is successful, a user can decide if **_recover all_** files and folders from the Remote Backup Server or decide to keeps the remote backup server updated of any changes (**_normal mode_**), the normal mode is anticipated from a **_probe phase_** where the client can verify if the server already has every folder and file of users updated.
   - After initial settings is actived a system watcher that notices all the changes (Erased / Created or Modified) in the path provided by the user. Each element (file or folder) is represented by SHA256 hash + path name.
+  - The parallelization of Client is based on 4 threads, the application operates on the socket managing the communication in a concurrent way, potentially it can send 4 files using 4 different threads. (the limit on the client is set for performance reasons, also the tests emphasized that no further was needed).
+
 
 ### Server
-  - the argument is just the port on which the server will start listening
-  - the endpoint is connected to the port.
+  - The endpoint is connected to the port.
   - The system can accept multiple clients, for each is created a thread where is created a class session (that expires in case of inactivity).
-  - server manages the login, a user provides their own username and password and the server checks the database and queries it if users are saved in the system.
+  - Server manages the login, a user provides their own username and password and the server checks the database and queries it if users are saved in the system.
+  - The server handles receiving requests using 32 threads, if all threads are busy, discards the request and the socket is closed, the client detects the server busy and retries the connection, until the connection timeout expires, at this point the client closes the socket and terminate execution (client side).
+
+    -  The accepted request generates the opening of the socket with its timer. (the life of a socket is fixed at 5 minutes: it is a reasonable amount of time, a good compromise between the protection of the Dos attack and the time to send large packets).
 ### Comm
 - Server and client APIs shared all methods of the Message class that is the basis of the communication, it provides all communication functionality as send, probe, get, push, restore, build_content, build_header, get_header_buffer ...
 
@@ -146,8 +149,14 @@ Sessions are managed by the Session manager who takes care of the verify of the 
 - From the client-side check if there are a connection error status -> in this case probably the session was session dropped from the server, it retries and opens the connection trying a recontact the server from a new session created from the other side (server).
 
 
- ## Contributors
+---
+### Testing
+
+Here are reported some general tests used to evaluate the robustness of the application protocol.
+Please refer to [tests](https://docs.google.com/document/d/1il2Jn_PaOJgVW9Q2TIM7fdbESWLrJWPBcLl2pLu8cuM/edit?usp=sharing).
+
+## Contributors
  The application has been developed by:
-- Paolo Gastaldi
-- Stefano Gennero
-- Carlo Borsarelli
+- Borsarelli Carlo 
+- Gastaldi Paolo 
+- Gennero Stefano 

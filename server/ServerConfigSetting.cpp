@@ -6,7 +6,10 @@ ServerConfigSetting::ServerConfigSetting(boost::filesystem::path dir_path, int p
 void ServerConfigSetting::init_configuration() {
     bool exist_config = ServerConfigSetting::exist_file(".server_config.txt");
     std::cout << "Server started..." << std::endl;
-
+    //create the default file on server if it is not present
+    if (!boost::filesystem::exists(dir_path_)) {
+        boost::filesystem::create_directory(dir_path_); // create src folder
+    }
     while (true) {
         if (exist_config) {
 
