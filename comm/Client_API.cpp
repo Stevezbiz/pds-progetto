@@ -17,16 +17,31 @@ bool Client_API::get_and_save_(const std::string &path) {
            boost::filesystem::path dest_path{root_path_};
            dest_path.append(path);
            res->path = dest_path.string();
-           if(res->elementStatus==ElementStatus::createdFile){
-               if (!Client_API::save_file_(res))
-                   return false;
-               Logger::info("Client_API::get_and_save_", "Restored file '" + path + "'", PR_NORMAL);
-               std::cout << "Restored file '" + path + "'" << std::endl;
-           } else {
-               boost::filesystem::create_directory(dest_path);
-               Logger::info("Client_API::get_and_save_", "Restored directory '" + path + "'", PR_NORMAL);
-               std::cout << "Restored directory '" + path + "'" << std::endl;
+           std::unique_lock<std::mutex> lock(m_);
+           cv_.wait(lock, [this]() { return !active_thread_; });
+           active_thread_=true;
+           lock.unlock();
+           try{
+               create_dirs(root_path_, path);
+               if(res->elementStatus==ElementStatus::createdFile){
+                   if (!Client_API::save_file_(res)){
+                       Logger::error("Client_API::get_and_save_","Cannot save the file " + path);
+                       return false;
+                   }
+                   Logger::info("Client_API::get_and_save_", "Restored file '" + path + "'", PR_NORMAL);
+                   std::cout << "Restored file '" + path + "'" << std::endl;
+               } else if(!boost::filesystem::exists(dest_path)) {
+                   if(!boost::filesystem::create_directory(dest_path))
+                       Logger::error("Client_API::get_and_save_","Cannot save the directory " + path);
+                   Logger::info("Client_API::get_and_save_", "Restored directory '" + path + "'", PR_NORMAL);
+                   std::cout << "Restored directory '" + path + "'" << std::endl;
+               }
+           } catch( std::exception &e) {
+               std::cout << "Unexpected error while restoring '" << path << "'" << std::endl;
+               Logger::error("Client_API::get_and_save_",e.what());
            }
+           active_thread_=false;
+           cv_.notify_one();
            Logger::info("Client_API::get_and_save_", "Analyzing new file... - done", PR_VERY_LOW);
 
            return true;
@@ -227,4 +242,15 @@ bool Client_API::end() {
     auto res = this->api_->get_message();
     Logger::info("Client_API::end", "End started... - done", PR_LOW);
     return res->is_okay();
+}
+
+void Client_API::create_dirs(fs::path base, const std::string &path) {
+    fs::path dirs(path);
+    dirs.remove_leaf();
+    fs::path dir(std::move(base));
+    for (const auto &p : dirs) {
+        dir.append(p.string());
+        if (!fs::exists(dir))
+            fs::create_directory(dir);
+    }
 }

@@ -23,6 +23,9 @@ class Client_API : public API {
     Client_socket_API *api_;
     std::string root_path_;
     int fw_cycle_ = -1; // first cycle for probe or restore
+    std::atomic_bool active_thread_{false};
+    std::mutex m_;
+    std::condition_variable cv_;
 
     /**
      * get a file from the server and save it
@@ -30,6 +33,13 @@ class Client_API : public API {
      * @return status
      */
     bool get_and_save_(const std::string &path);
+
+    /**
+     *
+     * @param base
+     * @param path
+     */
+    static void create_dirs(fs::path base, const std::string &path);
 
 public:
 

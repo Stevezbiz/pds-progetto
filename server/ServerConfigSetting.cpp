@@ -1,6 +1,8 @@
 #include "ServerConfigSetting.h"
+
+#include <utility>
 ServerConfigSetting::ServerConfigSetting(boost::filesystem::path dir_path, int port, std::string logs_path,
-                                         std::string db_path): dir_path_(dir_path), port_(port), logs_path_(logs_path),db_path_(db_path) { }
+                                         std::string db_path): dir_path_(std::move(dir_path)), port_(port), logs_path_(std::move(logs_path)),db_path_(std::move(db_path)) { }
 
 
 void ServerConfigSetting::init_configuration() {
@@ -76,7 +78,6 @@ void ServerConfigSetting::read_config() {
 }
 
 void ServerConfigSetting::write_config() {
-    boost::system::error_code ec;
     std::string port;
     std::string dir_path;
     std::string logs_path;
