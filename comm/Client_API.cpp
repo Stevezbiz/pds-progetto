@@ -39,6 +39,9 @@ bool Client_API::get_and_save_(const std::string &path) {
            } catch( std::exception &e) {
                std::cout << "Unexpected error while restoring '" << path << "'" << std::endl;
                Logger::error("Client_API::get_and_save_",e.what());
+               active_thread_=false;
+               cv_.notify_one();
+               return false;
            }
            active_thread_=false;
            cv_.notify_one();

@@ -41,7 +41,7 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
-        if(this->n_active_threads_ >= MAX_THREADS) { // if all threads are busy, discard the request
+        if (this->n_active_threads_ >= MAX_THREADS) { // if all threads are busy, discard the request
             std::thread thread([this](boost::asio::ip::tcp::socket socket) {
                 Logger::warning("Server::accept", "Discard request");
                 if (!this->api_->discard(std::make_unique<Socket_API>(std::move(socket))))
@@ -106,59 +106,84 @@ bool Server::push(Session *session, const std::string &path, const std::vector<u
                   const Database_API &database) {
     fs::path disk_path{root_path};
     disk_path.append(session->user);
-    if (status == ElementStatus::createdFile || status == ElementStatus::createdDir)
-        create_dirs(disk_path, path);
-    disk_path.append(path);
-    fs::path virt_path{session->user};
-    virt_path.append(path);
-    Logger::info("Server::push", "Generated disk path: " + disk_path.string(), PR_VERY_LOW);
-    Logger::info("Server::push", "Generated virtual path: " + virt_path.string(), PR_VERY_LOW);
+    std::unique_lock lock(session->m_);
+    session->cv_.wait(lock, [&session]() { return !session->active_thread_; });
+    session->active_thread_=true;
+    lock.unlock();
+    try {
+        if (status == ElementStatus::createdFile || status == ElementStatus::createdDir)
+            create_dirs(disk_path, path);
+        disk_path.append(path);
+        fs::path virt_path{session->user};
+        virt_path.append(path);
+        Logger::info("Server::push", "Generated disk path: " + disk_path.string(), PR_VERY_LOW);
+        Logger::info("Server::push", "Generated virtual path: " + virt_path.string(), PR_VERY_LOW);
 
-    switch (status) {
-        case ElementStatus::createdFile:
-            Utils::write_on_file(disk_path, file);
-            if (!session->create_file(database, virt_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot create file: " + disk_path.string(), PR_HIGH);
+        switch (status) {
+            case ElementStatus::createdFile:
+                Utils::write_on_file(disk_path, file);
+                if (!session->create_file(database, virt_path.string(), hash)) {
+                    session->active_thread_ = false;
+                    session->cv_.notify_one();
+                    Logger::error("Server::push", "Cannot create file: " + disk_path.string(), PR_HIGH);
+                    return false;
+                }
+                break;
+            case ElementStatus::modifiedFile:
+                if (!Session::modify_file(database, virt_path.string(), hash)) {
+                    session->active_thread_ = false;
+                    session->cv_.notify_one();
+                    Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
+                    return false;
+                }
+                Utils::write_on_file(disk_path, file);
+                break;
+            case ElementStatus::erasedFile:
+                if (fs::exists(disk_path)) {
+                    fs::remove(disk_path);
+                }
+                if (!Session::remove_file(database, virt_path.string())) {
+                    session->active_thread_ = false;
+                    session->cv_.notify_one();
+                    Logger::error("Server::push", "Cannot erase file: " + disk_path.string(), PR_HIGH);
+                    return false;
+                }
+                break;
+            case ElementStatus::createdDir:
+                if (!fs::exists(disk_path)) {
+                    fs::create_directory(disk_path);
+                }
+                if (!session->create_dir(database, virt_path.string(), hash)) {
+                    session->active_thread_ = false;
+                    session->cv_.notify_one();
+                    Logger::error("Server::push", "Cannot create directory: " + disk_path.string(), PR_HIGH);
+                    return false;
+                }
+                break;
+            case ElementStatus::erasedDir:
+                if (fs::exists(disk_path)) {
+                    fs::remove_all(disk_path);
+                }
+                if (!Session::remove_dir(database, virt_path.string())) {
+                    session->active_thread_ = false;
+                    session->cv_.notify_one();
+                    Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
+                    return false;
+                }
+                break;
+            default:
+                session->active_thread_ = false;
+                session->cv_.notify_one();
                 return false;
-            }
-            break;
-        case ElementStatus::modifiedFile:
-            if (!Session::modify_file(database, virt_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot modify file: " + disk_path.string(), PR_HIGH);
-                return false;
-            }
-            Utils::write_on_file(disk_path, file);
-            break;
-        case ElementStatus::erasedFile:
-            if (fs::exists(disk_path)) {
-                fs::remove(disk_path);
-            }
-            if (!Session::remove_file(database, virt_path.string())) {
-                Logger::error("Server::push", "Cannot erase file: " + disk_path.string(), PR_HIGH);
-                return false;
-            }
-            break;
-        case ElementStatus::createdDir:
-            if (!fs::exists(disk_path)) {
-                fs::create_directory(disk_path);
-            }
-            if (!session->create_dir(database, virt_path.string(), hash)) {
-                Logger::error("Server::push", "Cannot create directory: " + disk_path.string(), PR_HIGH);
-                return false;
-            }
-            break;
-        case ElementStatus::erasedDir:
-            if (fs::exists(disk_path)) {
-                fs::remove_all(disk_path);
-            }
-            if (!Session::remove_dir(database, virt_path.string())) {
-                Logger::error("Server::push", "Cannot erase directory: " + disk_path.string(), PR_HIGH);
-                return false;
-            }
-            break;
-        default:
-            return false;
+        }
+    } catch (std::exception &e) {
+        Logger::error("Server::push",e.what());
+        session->active_thread_ = false;
+        session->cv_.notify_one();
+        return false;
     }
+    session->active_thread_ = false;
+    session->cv_.notify_one();
     Logger::info("Server::push", "Success: " + disk_path.string(), PR_LOW);
     return true;
 }

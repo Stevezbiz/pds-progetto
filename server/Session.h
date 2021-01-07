@@ -19,8 +19,11 @@ public:
     int session_id{-1};
     std::string user;
     bool login_status{false};
-    std::atomic<int> thread_count{ 0 };
+    std::atomic<int> thread_count{0};
     boost::posix_time::ptime latest_usage;
+    std::mutex m_;
+    std::atomic_bool active_thread_{false};
+    std::condition_variable cv_;
 
     /**
      * Initializesthe object's structures
