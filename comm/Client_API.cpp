@@ -9,7 +9,7 @@
 namespace fs = boost::filesystem;
 
 bool Client_API::get_and_save_(const std::string &path) {
-    this->api_->async_send_and_receive(Message::get(path),MSG_GET_CONTENT,
+    api_->async_send_and_receive(Message::get(path),MSG_GET_CONTENT,
        [this, path](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
            Logger::info("Client_API::get_and_save_", "Analyzing new file...", PR_VERY_LOW);
            if (!res->is_okay()) {
@@ -20,7 +20,7 @@ bool Client_API::get_and_save_(const std::string &path) {
            dest_path.append(path);
            res->path = dest_path.string();
            std::unique_lock<std::mutex> lock(m_);
-           cv_.wait(lock, [this]() { return !active_thread_; });
+           cv_.wait(lock, [this] () { return !active_thread_; });
            active_thread_=true;
            lock.unlock();
            try{
@@ -52,9 +52,9 @@ bool Client_API::get_and_save_(const std::string &path) {
            return true;
        });
 
-//    if(!this->api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
+//    if(!api_->send_and_receive(Message::get(path), MSG_GET_CONTENT))
 //        return false;
-//    auto res = this->api_->get_message();
+//    auto res = api_->get_message();
 //    if (!res->is_okay())
 //        return false;
 //    fs::path dest_path{root_path_};
@@ -74,9 +74,9 @@ Client_API::Client_API(Client_socket_API *socket_api, std::string root_path) : A
 
 bool Client_API::login(const std::string &username, const std::string &password) {
     Logger::info("Client_API::login", "Trying to perform login...", PR_LOW);
-    if(!this->api_->send_and_receive(Message::login(username, password), MSG_OKAY))
+    if(!api_->send_and_receive(Message::login(username, password), MSG_OKAY))
         return false;
-    auto res = this->api_->get_message();
+    auto res = api_->get_message();
     Logger::info("Client_API::login", "Trying to perform login... - done", PR_LOW);
 
     return res->is_okay();
@@ -89,9 +89,9 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     paths.reserve(map.size());
     for (auto const &item : map)
         paths.push_back(item.first);
-    if(!this->api_->send_and_receive(Message::probe(paths), MSG_PROBE_CONTENT))
+    if(!api_->send_and_receive(Message::probe(paths), MSG_PROBE_CONTENT))
         return false;
-    auto res = this->api_->get_message();
+    auto res = api_->get_message();
 
     if(!res->is_okay())
         return false;
@@ -108,13 +108,13 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
             if(!hash.empty()) { // file
                 // file not found -> erase
                 Logger::info("Client_API::probe", "Deleted file found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile, -1))
+                if (!push(std::vector<unsigned char>(), path, "", ElementStatus::erasedFile, -1))
                     return false;
             }
             else { // dir
                 // dir not found -> erase
                 Logger::info("Client_API::probe", "Deleted dir found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
+                if (!push(std::vector<unsigned char>(), path, "", ElementStatus::erasedDir, -1))
                     return false;
             }
             sent = true;
@@ -133,13 +133,13 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
             if(it==res->hashes.end()){
                 // file not registered -> create
                 Logger::info("Client_API::probe", "Created file found " + path, PR_LOW);
-                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile, -1))
+                if (!push(Utils::read_from_file(dest_path), path, map.at(path), ElementStatus::createdFile, -1))
                     return false;
                 sent = true;
             } else if(res->hashes.at(path)!=item.second){
                 // different hash -> modified
                 Logger::info("Client_API::probe", "Modified file found " + path, PR_LOW);
-                if (!this->push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile, -1))
+                if (!push(Utils::read_from_file(dest_path), path, map.at(path),ElementStatus::modifiedFile, -1))
                     return false;
                 sent = true;
             }
@@ -147,7 +147,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
             if(it==res->hashes.end()){
                 // dir not registered -> create
                 Logger::info("Client_API::probe", "Created dir found " + path, PR_LOW);
-                if (!this->push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir, -1))
+                if (!push(std::vector<unsigned char>(), path, map.at(path), ElementStatus::createdDir, -1))
                     return false;
                 sent = true;
             }
@@ -155,10 +155,10 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     }
     bool status;
     if(sent)
-        status = this->api_->wait_all_async();
+        status = api_->wait_all_async();
     else {
-        this->api_->send_and_receive(Message::okay(), MSG_OKAY);
-        status = this->api_->get_message()->is_okay();
+        api_->send_and_receive(Message::okay(), MSG_OKAY);
+        status = api_->get_message()->is_okay();
     }
     Logger::info("Client_API::probe", "Probe check started... - done", PR_LOW);
     return status;
@@ -167,15 +167,15 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
 bool Client_API::push(const std::vector<unsigned char> &file, const std::string &path, const std::string &hash, ElementStatus elementStatus, int fw_cycle) {
     Logger::info("Client_API::push", "Push started...", PR_LOW);
 
-    if(this->fw_cycle_ != fw_cycle) {
+    if(fw_cycle_ != fw_cycle) {
         Logger::info("Client_API::push", "New filewatcher cycle, waiting all threads...", PR_VERY_LOW);
-        if (!this->api_->wait_all_async()) // all files from the previous filewatcher analysy must be pushed before proceding
+        if (!api_->wait_all_async()) // all files from the previous filewatcher analysy must be pushed before proceding
             return false;
-        this->fw_cycle_ = fw_cycle;
+        fw_cycle_ = fw_cycle;
         Logger::info("Client_API::push", "New filewatcher cycle, waiting all threads... - done", PR_VERY_LOW);
     }
 
-    this->api_->async_send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY,
+    api_->async_send_and_receive(Message::push(file, path, hash, elementStatus), MSG_OKAY,
         [path, elementStatus](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
             Logger::info("Client_API::push", "Analyzing new file...", PR_VERY_LOW);
             if (!status || !res->is_okay()){
@@ -208,9 +208,9 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
             return res->is_okay();
         });
 
-//    if(!this->api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
+//    if(!api_->send_and_receive(Message::push(file, path, hash, elementStatus),MSG_OKAY))
 //        return false;
-//    auto res = this->api_->get_message();
+//    auto res = api_->get_message();
     Logger::info("Client_API::push", "Push started... - done");
 
 //    return res->is_okay();
@@ -220,9 +220,9 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 bool Client_API::restore() {
     fs::remove_all(root_path_);
     fs::create_directory(root_path_);
-    if(!this->api_->send_and_receive(Message::restore(),MSG_RESTORE_CONTENT))
+    if(!api_->send_and_receive(Message::restore(),MSG_RESTORE_CONTENT))
         return false;
-    auto res = this->api_->get_message();
+    auto res = api_->get_message();
 
     if(!res->is_okay())
         return false;
@@ -232,19 +232,19 @@ bool Client_API::restore() {
         paths.insert(el);
     }
     for(const auto &path : paths){
-        if (!this->get_and_save_(path))
+        if (!get_and_save_(path))
             return false;
     }
 
-    return this->api_->wait_all_async();
+    return api_->wait_all_async();
 }
 
 bool Client_API::end() {
     Logger::info("Client_API::end", "End started...", PR_LOW);
-    this->api_->wait_all_async(); // thread safe
-    if(!this->api_->send_and_receive(Message::end(), MSG_OKAY))
+    api_->wait_all_async(); // thread safe
+    if(!api_->send_and_receive(Message::end(), MSG_OKAY))
         return false;
-    auto res = this->api_->get_message();
+    auto res = api_->get_message();
     Logger::info("Client_API::end", "End started... - done", PR_LOW);
     return res->is_okay();
 }

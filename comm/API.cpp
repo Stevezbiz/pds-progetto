@@ -14,13 +14,13 @@ bool API::save_file_(const std::shared_ptr<Message> &message) {
 }
 
 std::shared_ptr<Message> API::get_message() {
-    return this->api_->get_message();
+    return api_->get_message();
 }
 
 std::shared_ptr<Comm_error> API::get_last_error() {
-    return this->api_->get_last_error();
+    return api_->get_last_error();
 }
 
 API::~API() {
-    delete this->api_;
+    delete api_;
 }

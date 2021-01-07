@@ -8,11 +8,11 @@
 Session::Session(int session_id) : session_id(session_id) {}
 
 std::string Session::get_cookie() const {
-    return Utils::sign_cookie(std::to_string(this->session_id)); // TODO: make this more secure
+    return Utils::sign_cookie(std::to_string(session_id));
 }
 
 bool Session::is_logged_in() const {
-    return this->login_status;
+    return login_status;
 }
 
 bool Session::create_file(const Database_API &database, const std::string &path, const std::string &hash) const {

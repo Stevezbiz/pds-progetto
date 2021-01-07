@@ -193,7 +193,7 @@ void ConfigSettings::init_configuration() {
 }
 
 std::string ConfigSettings::get_address() {
-    return this->address_;
+    return address_;
 }
 
 std::string ConfigSettings::get_port() const {
@@ -201,7 +201,7 @@ std::string ConfigSettings::get_port() const {
 }
 
 std::string ConfigSettings::get_dir_path() {
-    return this->dir_path_.string();
+    return dir_path_.string();
 }
 
 Command ConfigSettings::menu() {

@@ -6,10 +6,10 @@
 
 template<class Archive>
 void Comm_error::serialize(Archive &ar, const unsigned int version) {
-    ar & this->comm_errno;
-    ar & this->message;
-    ar & this->location;
-    ar & this->timestamp;
+    ar & comm_errno;
+    ar & message;
+    ar & location;
+    ar & timestamp;
 }
 
 Comm_error::Comm_error(COMM_ERRNO comm_errno, std::string location, std::string message, boost::system::error_code original_ec) :
@@ -40,7 +40,7 @@ std::shared_ptr<Comm_error> Comm_error::build(const std::string &serialized) {
 
 std::string Comm_error::to_string() const {
     std::stringstream ss;
-    ss << to_iso_extended_string(this->timestamp);
-    ss << "[Errno " + std::to_string(this->comm_errno) + "] " + this->message;
+    ss << to_iso_extended_string(timestamp);
+    ss << "[Errno " + std::to_string(comm_errno) + "] " + message;
     return ss.str();
 }

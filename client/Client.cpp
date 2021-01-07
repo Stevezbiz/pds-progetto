@@ -52,7 +52,7 @@ bool Client::close() {
 
 void Client::run() {
     f_ = std::async(std::launch::async, [this]() {
-        if (!this->fw_.start([this](const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
+        if (!fw_.start([this](const std::string &path, const std::string &hash, ElementStatus status, int fw_cycle) {
                     if (!push(path, hash, status, fw_cycle)) {
                         Logger::error("Client::run", "Cannot push changes of '" + path + "' on server");
                         std::cout << "Cannot push changes of '" + path + "' on server" << std::endl;

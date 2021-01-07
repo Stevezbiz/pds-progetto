@@ -214,7 +214,7 @@ public:
      * @param api
      * @return status
      */
-    bool discard(std::unique_ptr<Socket_API> api);
+    static bool discard(std::unique_ptr<Socket_API> api);
 };
 
 #endif //SERVER_SERVER_API_H

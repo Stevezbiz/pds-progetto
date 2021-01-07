@@ -104,11 +104,11 @@ public:
     /**
      * send a Message
      * (sync mode by default)
-     * wait until the message as been sent
-     * @param message
+     * wait until the msg as been sent
+     * @param msg
      * @return status
      */
-    bool send(std::shared_ptr<Message> message = std::make_shared<Message>(MSG_ERROR));
+    bool send(std::shared_ptr<Message> msg = std::make_shared<Message>(MSG_ERROR));
 
     /**
      * receive a message

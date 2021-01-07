@@ -1,6 +1,4 @@
 #include <iostream>
-#include <thread>
-#include <utility>
 #include "Client.h"
 #include "ConfigSetting.h"
 #include "../comm/Logger.h"
@@ -30,7 +28,6 @@ int main(int argc, char **argv) {
         switch (cmd) {
             case normal:
                 if (!client->probe()) {
-                    // TODO: error management
                     Logger::error("main", "Probe failed", PR_HIGH);
                     std::cout << "Probe failed" << std::endl;
                     std::cout << "Closing..." << std::endl;
@@ -42,7 +39,6 @@ int main(int argc, char **argv) {
                 break;
             case restore:
                 if (!client->restore()) {
-                    // TODO: error management
                     Logger::error("main", "Restore failed", PR_HIGH);
                     std::cout << "Restore failed" << std::endl;
                     std::cout << "Closing..." << std::endl;

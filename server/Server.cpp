@@ -11,8 +11,8 @@ namespace fs = boost::filesystem;
 Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoint &endpoint, std::string db_path,
                std::string root_path) : acceptor_(ctx, endpoint), socket_(ctx), db_(std::move(db_path)),
                                         root_path_(std::move(root_path)), stop_(false) {
-    this->session_manager_ = std::make_shared<Session_manager>();
-    this->api_ = std::make_unique<Server_API>(this->session_manager_);
+    session_manager_ = std::make_shared<Session_manager>();
+    api_ = std::make_unique<Server_API>(session_manager_);
     server_init();
     accept();
 }
@@ -20,16 +20,16 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 //void Server::accept() {
 //    while (!stop_) {
 //        acceptor_.accept(socket_);
-//        std::unique_lock<std::mutex> lock(this->m_threads_);
-//        this->cv_.wait(lock, [this]() { return this->n_active_threads_ < MAX_THREADS; });
-//        this->n_active_threads_++;
+//        std::unique_lock<std::mutex> lock(m_threads_);
+//        cv_.wait(lock, [this]() { return n_active_threads_ < MAX_THREADS; });
+//        n_active_threads_++;
 //        int id = n_active_threads_;
 //        std::thread thread([this](boost::asio::ip::tcp::socket socket, int id) {
 //            Logger::info("Server::accept", "Thread " + std::to_string(id));
-//            if (!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
+//            if (!api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500), SOCKET_TIMEOUT))
 //                Logger::error("Server::accept", "No correctly closing current socket");
-//            this->n_active_threads_--;
-//            this->cv_.notify_one();
+//            n_active_threads_--;
+//            cv_.notify_one();
 //            Logger::info("Server::accept", "Thread " + std::to_string(id) + "... - done");
 //        }, std::move(socket_), id);
 //        thread.detach();
@@ -37,25 +37,24 @@ Server::Server(boost::asio::io_context &ctx, const boost::asio::ip::tcp::endpoin
 //    }
 //}
 
-// TODO: evaluate this alternative, discard the request when all server threads are busy
 void Server::accept() {
     while (!stop_) {
         acceptor_.accept(socket_);
-        if (this->n_active_threads_ >= MAX_THREADS) { // if all threads are busy, discard the request
+        if (n_active_threads_ >= MAX_THREADS) { // if all threads are busy, discard the request
             std::thread thread([this](boost::asio::ip::tcp::socket socket) {
                 Logger::warning("Server::accept", "Discard request");
-                if (!this->api_->discard(std::make_unique<Socket_API>(std::move(socket))))
+                if (!api_->discard(std::make_unique<Socket_API>(std::move(socket))))
                     Logger::error("Server::accept", "No correctly closing current socket");
             }, std::move(socket_));
             thread.detach();
             continue;
         }
-        this->n_active_threads_++;
+        n_active_threads_++;
         std::thread thread([this](boost::asio::ip::tcp::socket socket) {
-            if (!this->api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500, false), SOCKET_TIMEOUT))
+            if (!api_->run(std::make_unique<Socket_API>(std::move(socket), NO_RETRY, 500, false), SOCKET_TIMEOUT))
                 Logger::error("Server::accept", "No correctly closing current socket");
-            this->n_active_threads_--;
-            this->cv_.notify_one();
+            n_active_threads_--;
+            cv_.notify_one();
         }, std::move(socket_));
         thread.detach();
     }

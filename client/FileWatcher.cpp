@@ -15,9 +15,9 @@ FileWatcher::FileWatcher(std::string path_to_watch, std::chrono::duration<int, s
 bool FileWatcher::start(const std::function<bool(std::string, std::string, ElementStatus, int)> &action) {
     Logger::info("FileWatcher::start", "Started monitoring", PR_NORMAL);
     while (running_) {
-        if(!find_erased(action))
+        if (!find_erased(action))
             return false;
-        if(!find_created_or_modified(action))
+        if (!find_created_or_modified(action))
             return false;
         fw_cycle_++;
         std::this_thread::sleep_for(delay_);
@@ -36,7 +36,7 @@ bool FileWatcher::find_erased(const std::function<bool(std::string, std::string,
     while (it != files_.end()) {
         if (!fs::exists(it->first)) {
             Logger::info("FileWatcher::find_erased", "Found erased file " + it->first, PR_VERY_LOW);
-            if(!action(parse_path(it->first), it->second.getHash(), ElementStatus::erasedFile, fw_cycle_))
+            if (!action(parse_path(it->first), it->second.getHash(), ElementStatus::erasedFile, fw_cycle_))
                 return false;
             it = files_.erase(it);
         } else {
@@ -47,7 +47,7 @@ bool FileWatcher::find_erased(const std::function<bool(std::string, std::string,
     while (it2 != dirs_.rend()) {
         if (!fs::exists(*it2)) {
             Logger::info("FileWatcher::find_erased", "Found erased directory " + *it2, PR_VERY_LOW);
-            if(!action(parse_path(*it2), "", ElementStatus::erasedDir, fw_cycle_))
+            if (!action(parse_path(*it2), "", ElementStatus::erasedDir, fw_cycle_))
                 return false;
             auto it3 = dirs_.erase(--it2.base());
             it2 = std::reverse_iterator(it3);
@@ -68,15 +68,15 @@ bool FileWatcher::find_created_or_modified(
                 files_.insert(std::make_pair(el.path().string(), new_file));
                 Logger::info("FileWatcher::find_created_or_modified", "Found created file " + el.path().string(),
                              PR_VERY_LOW);
-                if(!action(parse_path(el.path().string()), new_file.getHash(), ElementStatus::createdFile, fw_cycle_))
+                if (!action(parse_path(el.path().string()), new_file.getHash(), ElementStatus::createdFile, fw_cycle_))
                     return false;
             } else {
                 if (files_.find(el.path().string())->second.isOld(lwt)) {
                     if (files_.find(el.path().string())->second.needUpdate()) {
                         Logger::info("FileWatcher::find_created_or_modified",
                                      "Found modified file " + el.path().string(), PR_VERY_LOW);
-                        if(!action(parse_path(el.path().string()), files_.find(el.path().string())->second.getHash(),
-                               ElementStatus::modifiedFile, fw_cycle_))
+                        if (!action(parse_path(el.path().string()), files_.find(el.path().string())->second.getHash(),
+                                    ElementStatus::modifiedFile, fw_cycle_))
                             return false;
                     }
                 }
@@ -86,7 +86,7 @@ bool FileWatcher::find_created_or_modified(
                 dirs_.insert(el.path().string());
                 Logger::info("FileWatcher::find_created_or_modified", "Found created directory " + el.path().string(),
                              PR_VERY_LOW);
-                if(!action(parse_path(el.path().string()), "", ElementStatus::createdDir, fw_cycle_))
+                if (!action(parse_path(el.path().string()), "", ElementStatus::createdDir, fw_cycle_))
                     return false;
             }
         }

@@ -205,7 +205,7 @@ std::string ServerConfigSetting::get_port() const {
 }
 
 std::string ServerConfigSetting::get_dir_path() {
-    return this->dir_path_.string();
+    return dir_path_.string();
 }
 
 std::string ServerConfigSetting::get_logs_path() {

@@ -12,7 +12,7 @@ Database_API::Database_API(std::string path) {
     int rc = sqlite3_open_v2(path.data(), &db_, SQLITE_OPEN_READWRITE, nullptr);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::Database_API", "sqlite3_open_v2: error " + std::to_string(rc), PR_VERY_HIGH);
-        // TODO: error management
+        throw std::runtime_error{"sqlite3_open_v2: error " + std::to_string(rc) + ". Cannot open the database"};
     }
 }
 
@@ -20,7 +20,6 @@ Database_API::~Database_API() {
     int rc = sqlite3_close_v2(db_);
     if (rc != SQLITE_OK) {
         Logger::error("Database_API::~Database_API", "sqlite3_close_v2: error " + std::to_string(rc), PR_VERY_HIGH);
-        // TODO: error management
     }
 }
 
