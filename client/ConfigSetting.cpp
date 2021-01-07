@@ -4,7 +4,9 @@
 
 #include "ConfigSetting.h"
 
-ConfigSettings::ConfigSettings(std::string address, boost::filesystem::path dir_path, int port, std::string logs_path)
+namespace fs = boost::filesystem;
+
+ConfigSettings::ConfigSettings(std::string address, fs::path dir_path, int port, std::string logs_path)
         : address_(std::move(address)), dir_path_(std::move(dir_path)), port_(port), logs_path_(std::move(logs_path)) {}
 
 
@@ -78,10 +80,10 @@ void ConfigSettings::write_config() {
         std::cout << "Folder to backup (default '" + dir_path_.string() + "'): ";
         std::getline(std::cin, dir_path);
         if (!dir_path.empty()) {
-            if (boost::filesystem::exists(dir_path)) {
-                if (boost::filesystem::is_directory(dir_path)) {
+            if (fs::exists(dir_path)) {
+                if (fs::is_directory(dir_path)) {
                     // the directory already exists
-                    dir_path_ = boost::filesystem::path(dir_path);
+                    dir_path_ = fs::path(dir_path);
                     break;
                 } else {
                     // a file with directory's name already exists
@@ -91,8 +93,8 @@ void ConfigSettings::write_config() {
                 // the directory does not exists
                 std::cout << "The folder doesn't not exist" << std::endl;
                 if (question_yesno("Would you like to create the folder")) {
-                    boost::filesystem::create_directory(dir_path); // create src folder
-                    dir_path_ = boost::filesystem::path(dir_path);
+                    fs::create_directory(dir_path); // create src folder
+                    dir_path_ = fs::path(dir_path);
                     std::cout << "The " << dir_path << " folder has been created." << std::endl;
                     break;
                 }
@@ -107,7 +109,7 @@ void ConfigSettings::write_config() {
         std::cout << "Insert the path to save logs (default '" + logs_path_ + "'): ";
         std::getline(std::cin, logs_path);
         if (!logs_path.empty()) {
-            if (boost::filesystem::is_directory(logs_path_)) {
+            if (fs::is_directory(logs_path_)) {
                 // a directory with file's name already exists
                 std::cout << "Cannot name the file: folder '" + logs_path + "' already exists" << std::endl;
             } else {

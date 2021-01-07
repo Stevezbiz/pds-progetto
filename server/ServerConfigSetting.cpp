@@ -1,16 +1,21 @@
 #include "ServerConfigSetting.h"
 
 #include <utility>
-ServerConfigSetting::ServerConfigSetting(boost::filesystem::path dir_path, int port, std::string logs_path,
-                                         std::string db_path): dir_path_(std::move(dir_path)), port_(port), logs_path_(std::move(logs_path)),db_path_(std::move(db_path)) { }
+
+namespace fs = boost::filesystem;
+
+ServerConfigSetting::ServerConfigSetting(fs::path dir_path, int port, std::string logs_path, std::string db_path)
+        : dir_path_(std::move(dir_path)), port_(port),
+          logs_path_(std::move(logs_path)),
+          db_path_(std::move(db_path)) {}
 
 
 void ServerConfigSetting::init_configuration() {
     bool exist_config = ServerConfigSetting::exist_file(".server_config.txt");
     std::cout << "Server started..." << std::endl;
     //create the default file on server if it is not present
-    if (!boost::filesystem::exists(dir_path_)) {
-        boost::filesystem::create_directory(dir_path_); // create src folder
+    if (!fs::exists(dir_path_)) {
+        fs::create_directory(dir_path_); // create src folder
     }
     while (true) {
         if (exist_config) {
@@ -28,6 +33,7 @@ void ServerConfigSetting::init_configuration() {
         break;
     }
 }
+
 bool ServerConfigSetting::question_yesno(const std::string &message) {
     std::string answer;
     bool result;
@@ -103,10 +109,10 @@ void ServerConfigSetting::write_config() {
         std::cout << "Folder to backup (default '" + dir_path_.string() + "'): ";
         std::getline(std::cin, dir_path);
         if (!dir_path.empty()) {
-            if (boost::filesystem::exists(dir_path)) {
-                if (boost::filesystem::is_directory(dir_path)) {
+            if (fs::exists(dir_path)) {
+                if (fs::is_directory(dir_path)) {
                     // the directory already exists
-                    dir_path_ = boost::filesystem::path(dir_path);
+                    dir_path_ = fs::path(dir_path);
                     break;
                 } else {
                     // a file with directory's name already exists
@@ -116,8 +122,8 @@ void ServerConfigSetting::write_config() {
                 // the directory does not exists
                 std::cout << "The folder doesn't not exist" << std::endl;
                 if (question_yesno("Would you like to create the folder")) {
-                    boost::filesystem::create_directory(dir_path); // create src folder
-                    dir_path_ = boost::filesystem::path(dir_path);
+                    fs::create_directory(dir_path); // create src folder
+                    dir_path_ = fs::path(dir_path);
                     std::cout << "The " << dir_path << " folder has been created." << std::endl;
                     break;
                 }
@@ -132,7 +138,7 @@ void ServerConfigSetting::write_config() {
         std::cout << "Insert the path to save logs (default '" + logs_path_ + "'): ";
         std::getline(std::cin, logs_path);
         if (!logs_path.empty()) {
-            if (boost::filesystem::is_directory(logs_path_)) {
+            if (fs::is_directory(logs_path_)) {
                 // a directory with file's name already exists
                 std::cout << "Cannot name the file: folder '" + logs_path + "' already exists" << std::endl;
             } else {
@@ -149,7 +155,7 @@ void ServerConfigSetting::write_config() {
         std::cout << "Insert the path of DB (default '" + db_path_ + "'): ";
         std::getline(std::cin, db_path);
         if (!db_path.empty()) {
-            if (boost::filesystem::is_directory(db_path_)) {
+            if (fs::is_directory(db_path_)) {
                 // a directory with file's name already exists
                 std::cout << "Cannot name the file: folder '" + db_path + "' already exists" << std::endl;
             } else {

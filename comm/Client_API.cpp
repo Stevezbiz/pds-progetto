@@ -6,6 +6,8 @@
 #include <utility>
 #include "Client_API.h"
 
+namespace fs = boost::filesystem;
+
 bool Client_API::get_and_save_(const std::string &path) {
     this->api_->async_send_and_receive(Message::get(path),MSG_GET_CONTENT,
        [this, path](bool status, const std::shared_ptr<Message> &res, const std::shared_ptr<Comm_error> &comm_error) {
@@ -14,7 +16,7 @@ bool Client_API::get_and_save_(const std::string &path) {
                Logger::error(comm_error.get());
                return false;
            }
-           boost::filesystem::path dest_path{root_path_};
+           fs::path dest_path{root_path_};
            dest_path.append(path);
            res->path = dest_path.string();
            std::unique_lock<std::mutex> lock(m_);
@@ -30,8 +32,8 @@ bool Client_API::get_and_save_(const std::string &path) {
                    }
                    Logger::info("Client_API::get_and_save_", "Restored file '" + path + "'", PR_NORMAL);
                    std::cout << "Restored file '" + path + "'" << std::endl;
-               } else if(!boost::filesystem::exists(dest_path)) {
-                   if(!boost::filesystem::create_directory(dest_path))
+               } else if(!fs::exists(dest_path)) {
+                   if(!fs::create_directory(dest_path))
                        Logger::error("Client_API::get_and_save_","Cannot save the directory " + path);
                    Logger::info("Client_API::get_and_save_", "Restored directory '" + path + "'", PR_NORMAL);
                    std::cout << "Restored directory '" + path + "'" << std::endl;
@@ -55,14 +57,14 @@ bool Client_API::get_and_save_(const std::string &path) {
 //    auto res = this->api_->get_message();
 //    if (!res->is_okay())
 //        return false;
-//    boost::filesystem::path dest_path{root_path_};
+//    fs::path dest_path{root_path_};
 //    dest_path.append(path);
 //    res->path = dest_path.string();
 //    if(res->elementStatus==ElementStatus::createdFile){
 //        if (!Client_API::save_file_(res))
 //            return false;
 //    } else {
-//        boost::filesystem::create_directory(dest_path);
+//        fs::create_directory(dest_path);
 //    }
 
     return true;
@@ -97,7 +99,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
     for(auto const &item : res->hashes) {
         auto path = item.first;
         Logger::info("Client_API::probe", "Analyzing " + path + " from server...", PR_VERY_LOW);
-        boost::filesystem::path dest_path{root_path_};
+        fs::path dest_path{root_path_};
         dest_path /= path ;
         auto it = map.find(path);
 
@@ -124,10 +126,10 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
         auto path = item.first;
         Logger::info("Client_API::probe", "Analyzing " + path + "...", PR_VERY_LOW);
         auto it = res->hashes.find(path);
-        boost::filesystem::path dest_path{root_path_};
+        fs::path dest_path{root_path_};
 //        dest_path.append(path);
         dest_path /= path ;
-        if(boost::filesystem::is_regular_file(dest_path)){
+        if(fs::is_regular_file(dest_path)){
             if(it==res->hashes.end()){
                 // file not registered -> create
                 Logger::info("Client_API::probe", "Created file found " + path, PR_LOW);
@@ -141,7 +143,7 @@ bool Client_API::probe(const std::map<std::string, std::string> &map) {
                     return false;
                 sent = true;
             }
-        } else if(boost::filesystem::is_directory(dest_path)){
+        } else if(fs::is_directory(dest_path)){
             if(it==res->hashes.end()){
                 // dir not registered -> create
                 Logger::info("Client_API::probe", "Created dir found " + path, PR_LOW);
@@ -216,8 +218,8 @@ bool Client_API::push(const std::vector<unsigned char> &file, const std::string 
 }
 
 bool Client_API::restore() {
-    boost::filesystem::remove_all(root_path_);
-    boost::filesystem::create_directory(root_path_);
+    fs::remove_all(root_path_);
+    fs::create_directory(root_path_);
     if(!this->api_->send_and_receive(Message::restore(),MSG_RESTORE_CONTENT))
         return false;
     auto res = this->api_->get_message();
