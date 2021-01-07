@@ -16,11 +16,11 @@ constexpr int MAX_THREADS = 4;
 constexpr int WAIT_TIMEOUT = 1000 * 60 * 5;
 
 class Client_socket_API : public Socket_API {
-    int thread_id_{ 0 };
+    int thread_id_{0};
     std::map<int, std::future<bool>> threads_;
     std::mutex m_threads_;
     std::condition_variable cv_;
-    std::atomic<int> n_active_threads_{ 0 };
+    std::atomic_int n_active_threads_{0};
 
     /**
      * check if this is a connection error status

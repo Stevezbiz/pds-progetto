@@ -13,7 +13,7 @@
 #include "../comm/Utils.h"
 
 class Session_manager {
-    std::atomic<int> session_counter_{ 1 };
+    std::atomic_int session_counter_{1};
     std::map<int, std::shared_ptr<Session>> sessions_{};
 
 public:

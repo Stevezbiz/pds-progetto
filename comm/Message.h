@@ -62,9 +62,9 @@ class Message : public std::enable_shared_from_this<Message>{
         length_length = sizeof(std::size_t)
     };
 
-    char *header_buffer_ = new char[code_length + length_length]();
-    char *content_buffer_ = nullptr;
-    std::size_t content_buffer_length_ = 0;
+    char *header_buffer_{new char[code_length + length_length]()};
+    char *content_buffer_{nullptr};
+    std::size_t content_buffer_length_{0};
     std::string header_data_;
     std::string content_data_;
     std::string file_string_;
@@ -83,9 +83,9 @@ public:
     std::vector<unsigned char> file;
     ElementStatus elementStatus = ElementStatus::modifiedFile;
     std::shared_ptr<Comm_error> comm_error;
-    bool status = true; // = okay
+    bool status{true}; // = okay
     std::string cookie;
-    bool keep_alive = false;
+    bool keep_alive{false};
 
     /**
     * send this message

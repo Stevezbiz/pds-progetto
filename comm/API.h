@@ -14,8 +14,6 @@
 #include "Comm_error.h"
 #include "Utils.h"
 
-namespace fs = boost::filesystem;
-
 class API {
 
 protected:

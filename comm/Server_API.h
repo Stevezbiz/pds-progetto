@@ -19,8 +19,6 @@
 #include "../server/Session.h"
 #include "../server/Session_manager.h"
 
-namespace fs = boost::filesystem;
-
 constexpr int DEFAULT_SOCKET_TIMEOUT = 1000 * 30; // 30 seconds
 
 /**

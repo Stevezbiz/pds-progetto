@@ -22,7 +22,7 @@ namespace fs = boost::filesystem;
 class Client_API : public API {
     Client_socket_API *api_;
     std::string root_path_;
-    int fw_cycle_ = -1; // first cycle for probe or restore
+    int fw_cycle_{-1}; // first cycle for probe or restore
     std::atomic_bool active_thread_{false};
     std::mutex m_;
     std::condition_variable cv_;
@@ -39,7 +39,7 @@ class Client_API : public API {
      * @param base
      * @param path
      */
-    static void create_dirs(fs::path base, const std::string &path);
+    static void create_dirs(boost::filesystem::path base, const std::string &path);
 
 public:
 

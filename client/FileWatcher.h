@@ -22,7 +22,7 @@ class FileWatcher {
     std::map<std::string, FSElement> files_;
     std::set<std::string> dirs_;
     std::atomic_bool running_;
-    int fw_cycle_ = -1;
+    int fw_cycle_{-1};
 
     /**
      * Verifies if the files' map contains a certain key

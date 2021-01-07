@@ -30,10 +30,10 @@ class Socket_API {
     void init_config_();
 
 protected:
-    int n_retry_ = NO_RETRY;
-    long retry_delay_ = 0;
-    bool prev_keep_alive_ = false; // temporary value
-    std::unique_ptr<boost::asio::ip::tcp::socket> socket_{ nullptr };
+    int n_retry_{NO_RETRY};
+    long retry_delay_{0};
+    bool prev_keep_alive_{false}; // temporary value
+    std::unique_ptr<boost::asio::ip::tcp::socket> socket_{nullptr};
 
     /**
      * class constructor
@@ -73,7 +73,7 @@ public:
     std::string port;
     std::shared_ptr<Message>(message);
     std::shared_ptr<Comm_error>(comm_error);
-    bool keep_alive = false;
+    bool keep_alive{false};
 
     /**
      * class constructor

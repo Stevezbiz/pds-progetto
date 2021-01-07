@@ -29,10 +29,10 @@ enum PRIORITY : int {
 
 class Logger {
     static std::mutex m_write_;
+    static std::ostream output_;
 
 public:
     static PRIORITY logger_filter;
-    static std::ostream output_;
 
     /**
      * create a new log

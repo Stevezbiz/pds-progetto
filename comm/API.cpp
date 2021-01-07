@@ -9,7 +9,7 @@
 API::API(Socket_API *socket_api) : api_(socket_api) {}
 
 bool API::save_file_(const std::shared_ptr<Message> &message) {
-    Utils::write_on_file(fs::path{ message->path }, message->file);
+    Utils::write_on_file(boost::filesystem::path{ message->path }, message->file);
     return true;
 }
 

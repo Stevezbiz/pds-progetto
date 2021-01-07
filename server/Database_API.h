@@ -14,7 +14,7 @@ enum PathType {
 };
 
 class Database_API {
-    sqlite3 *db_ = nullptr;
+    sqlite3 *db_{nullptr};
 
 public:
     /**

@@ -6,10 +6,10 @@
 
 class ServerConfigSetting {
 
-        boost::filesystem::path dir_path_ = "./server_files";
-        int port_ = 8080;
-        std::string logs_path_ = ".server_logs.txt";
-        std::string db_path_ = "../database/remote_backup.db";
+        boost::filesystem::path dir_path_{"./server_files"};
+        int port_{8080};
+        std::string logs_path_{".server_logs.txt"};
+        std::string db_path_{"../database/remote_backup.db"};
 
     public:
         ServerConfigSetting() = default;
@@ -20,7 +20,7 @@ class ServerConfigSetting {
          * @param port
          * @param logs_path
          */
-        ServerConfigSetting( boost::filesystem::path dir_path, int port, std::string logs_path, std::string db_path);
+        ServerConfigSetting(boost::filesystem::path dir_path, int port, std::string logs_path, std::string db_path);
 
         /**
          * Function to used to initialize the application
